@@ -1,0 +1,86 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(echo -n $CI_DEPENDENCY_PROXY_USER:$CI_DEPENDENCY_PROXY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
+  only:
+    - develop
+    - master
+  script:
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+      --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
+
+.deploy:
+  stage: deploy
+  image:
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bitnami/kubectl:latest
+    entrypoint: [""]
+  before_script:
+    - kubectl config use-context clippic/gitlab-agent:clippic-agent-1
+    - kubectl delete --ignore-not-found=true namespace clippic-user-$CI_COMMIT_REF_SLUG
+    - kubectl create namespace clippic-user-$CI_COMMIT_REF_SLUG
+    - kubectl create secret docker-registry -n clippic-user-$CI_COMMIT_REF_SLUG clippic --docker-server=$CI_REGISTRY --docker-username=gitlab+deploy-token-6 --docker-password=$DEPLOY_TOKEN_PASSWORD
+    - kubectl create secret generic -n clippic-user-$CI_COMMIT_REF_SLUG fcm-json --from-file=serviceAccountKey.json=$FCM_SERVICE_ACCOUNT
+  script:
+    - |
+      for VAR in DATABASE_USER DATABASE_PASSWORD DATABASE_NAME DATABASE_SERVER ORDER_BACKEND VIDEO_BACKEND
+      do
+        for FILE in k8s/*
+          do
+            if [ "$CI_COMMIT_REF_SLUG" = "master" ]; then
+              sed -i "s@__${VAR}__@${!VAR}@g" ${FILE}
+            elif [ "$CI_COMMIT_REF_SLUG" = "develop" ]; then
+              DEV_VAR="DEV_${VAR}"
+              sed -i "s@__${VAR}__@${!DEV_VAR}@g" ${FILE}
+            fi
+          done
+      done
+
+      # Replace default variables
+      for VAR in CI_COMMIT_SHORT_SHA CI_COMMIT_REF_SLUG CI_ENVIRONMENT_SLUG CI_PROJECT_PATH_SLUG CI_REGISTRY_IMAGE SMTP_SERVER SMTP_PASS SMTP_PORT JAEGER_ENDPOINT SUBDOMAIN
+        do
+          for FILE in k8s/*
+            do
+              sed -i "s@__${VAR}__@${!VAR}@g" ${FILE}
+            done
+        done
+      # Replaces variables which contains a '@'
+      for VAR in SMTP_USER
+        do
+          for FILE in k8s/*
+            do
+              sed -i "s/__${VAR}__/${!VAR}/g" ${FILE}
+            done
+        done
+    - kubectl apply -n clippic-user-$CI_COMMIT_REF_SLUG -f k8s/
+
+deploy-dev:
+  extends: .deploy
+  environment:
+    name: dev
+    url: https://${SUBDOMAIN}.clippic.app
+  only:
+    - develop
+  variables:
+    SUBDOMAIN: api-dev
+
+deploy-production:
+  extends: .deploy
+  environment:
+    name: production
+    url: https://${SUBDOMAIN}.clippic.app
+  only:
+    - master
+  variables:
+    SUBDOMAIN: api
