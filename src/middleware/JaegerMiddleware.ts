@@ -14,6 +14,7 @@ function JaegerMiddleware(request: any, response: express.Response, next: any) {
         request.span.setTag(Tags.HTTP_STATUS_CODE, response.statusCode);
         // check HTTP status code
         request.span.setTag(Tags.ERROR, ((response.statusCode >= 500)));
+        request.span.setTag("Exception", ((response.statusCode >= 299)));
         // close the span
         request.span.finish();
     });

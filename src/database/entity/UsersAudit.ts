@@ -7,7 +7,8 @@ export class UsersAudit {
     @PrimaryGeneratedColumn("increment", {type: "int", unsigned: true})
     id: number;
 
-    @ManyToOne(() => Users, (users) => users.id)
+    //@ManyToOne(() => Users, (users) => users.id)
+    @Column("uuid", { nullable: false})
     user_id: string;
 
     @UpdateDateColumn()
