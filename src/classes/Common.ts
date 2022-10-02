@@ -1,4 +1,3 @@
-import express from "express";
 import {
     AccessTokenExpiredError,
     AccessTokenMissingError, AccessTokenNotAllowedForUriError,
@@ -6,21 +5,26 @@ import {
     BodyFieldIsNullError,
     BodyFieldToLongError,
     BodyFieldToShortError,
-    BodyKeyIsMissingError,
     FCMSendError,
     ParseToBooleanError,
     ParseToNumberError,
-    PasswordInvalidError, VerifyJWTError
+    PasswordInvalidError,
+    VerifyJWTError
 } from "@clippic/clippic-errors"
-import tracer from "../classes/Jaeger";
-import admin, {messaging} from "firebase-admin";
+import admin, { messaging } from "firebase-admin";
+import { SpanContext } from "opentracing";
+import { AccessToken } from "../models/AccessToken";
+import { User } from "../models/User";
+
+import Country from "./Country";
 import FirebaseCodes from "./FirebaseCodes";
 import MulticastMessage = messaging.MulticastMessage;
-import {opentracing} from "jaeger-client";
-import Country from "./Country";
-import RequestTracing from "./RequestTracing";
+import { RequestTracing } from "../models/RequestTracing";
 import crypto from "crypto";
-import {verify} from "jsonwebtoken"
+import express from "express";
+import { opentracing } from "jaeger-client";
+import tracer from "../classes/Jaeger";
+import { decode, verify } from "jsonwebtoken"
 
 
 // Initialize country list
@@ -45,34 +49,18 @@ export function getJWTSecret (): string {
     return jwtSecret;
 }
 
+export function getTraceContext (req: RequestTracing) {
+    if (req.hasOwnProperty("span")) {
+        return req.span.context();
+    }
+    return new SpanContext()
+}
+
 export function getTraceId (req: RequestTracing) {
     if (req.hasOwnProperty("span")) {
         return req.span.context().toTraceId();
     }
     return ""
-}
-
-export function checkIfJsonContainsFieldAndReturnValue(req: RequestTracing, res: express.Response, field: string): string {
-    const bodyAsJSON = req.body;
-
-    if (bodyAsJSON.hasOwnProperty(field)) {
-        return bodyAsJSON[field];
-    }
-
-    throw new BodyKeyIsMissingError(field, getTraceId(req));
-}
-
-export function checkIfJsonContainsFieldAndReturnValueIfExists(req: RequestTracing, res: express.Response, field: string): any {
-    const bodyAsJSON = req.body;
-
-    if (bodyAsJSON.hasOwnProperty(field)) {
-        if (bodyAsJSON[field] === "") {
-            return null;
-        } else {
-            return bodyAsJSON[field];
-        }
-    }
-    return null;
 }
 
 export function validatePasswordRegex(password: string): boolean {
@@ -92,7 +80,7 @@ export function validateField(
     res: express.Response,
     field: any,
     fieldName: string,
-    minLength: number = 1,
+    minLength = 1,
     maxLength: number = Number.MAX_SAFE_INTEGER
 ): void {
 
@@ -117,13 +105,13 @@ export function validateAndProcessBoolean(
     field: any,
     fieldName: string
 ): boolean {
-    if (typeof field === 'boolean') {
+    if (typeof field === "boolean") {
         return field;
-    } else if (typeof field === 'number') {
+    } else if (typeof field === "number") {
         if (field === 0 || field === 1) {
             return Boolean(field);
         }
-    } else if (typeof field === 'string') {
+    } else if (typeof field === "string") {
         if (field === "true") {
             return true;
         } else if (field === "false") {
@@ -140,7 +128,7 @@ export function validateAndProcessNumber(
     field: any,
     fieldName: string
 ): number {
-    if (typeof field === 'number') {
+    if (typeof field === "number") {
         return field;
     } else if (!isNaN(Number(field))) {
         return Number(field);
@@ -151,7 +139,7 @@ export function validateAndProcessNumber(
 
 export function generateUsername(): string {
     const length = 10;
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     let result = "";
     for ( let i = 0; i < length; i++ ) {
@@ -166,10 +154,10 @@ export async function _sendFirebaseMessage(req: RequestTracing, message: Multica
         await this.fcm.sendMulticast(message);
     } catch (e) {
         span.log({
-            'event': 'error',
-            'error.object': e,
-            'message': e.message,
-            'stack': e.stack
+            "event": "error",
+            "error.object": e,
+            "message": e.message,
+            "stack": e.stack
         });
         span.finish();
         throw new FCMSendError(getTraceId(req));
@@ -191,8 +179,8 @@ export async function sendFirebaseMessage(
 
     const message = {
         data: {
-            message: userInformation['username'] + FirebaseCodes.firebaseCodes[firebaseCode],
-            username: userInformation['username'],
+            message: userInformation["username"] + FirebaseCodes.firebaseCodes[firebaseCode],
+            username: userInformation["username"],
             user_id: user_id,
             type: firebaseCode
         },
@@ -266,11 +254,11 @@ export async function sendFirebaseMessageOrder(
 export function processCountry(req: RequestTracing, res: express.Response): number {
     let country_id;
     if (req.body.hasOwnProperty("country")) {
-        country_id = req.body['country'];
+        country_id = req.body["country"];
     } else if (req.body.hasOwnProperty("country_iso2")) {
-        country_id = this.country.getIDFromISO2(req.body['country_iso2'])
+        country_id = this.country.getIDFromISO2(req.body["country_iso2"])
     } else if (req.body.hasOwnProperty("country_iso3")) {
-        country_id = this.country.getIDFromISO3(req.body['country_iso3'])
+        country_id = this.country.getIDFromISO3(req.body["country_iso3"])
     }
 
     if (country_id === undefined || country_id === null) {
@@ -282,45 +270,40 @@ export function processCountry(req: RequestTracing, res: express.Response): numb
 
 
 export function generatePasswordHash(password: string, salt: string) {
-    return crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
+    return crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
 }
 
 
-/**
- * Checks if user provides an access token in request header and if its valid.
- * @param req
- * @param user
- * @returns {Promise<*>}
- */
-function checkJWTAuthentication(req: RequestTracing, user: User) {
-
-    const token = req.headers['x-access-token'][0];
-
-    if (!token) {
-        throw new AccessTokenMissingError(getTraceId(req))
-    }
-    let decodedToken;
-
-    try {
-        decodedToken = verify(token, jwtSecret) as AccessToken;
-    } catch (e) {
-        if (e.name === 'JsonWebTokenError') {
-            throw new AccessTokenNotAllowedForUriError(getTraceId(req));
-        } else if (e.name === 'TokenExpiredError') {
-            throw new AccessTokenExpiredError(getTraceId(req));
-        }
-        else {
-            throw new VerifyJWTError(getTraceId(req));
-        }
-    }
-
-    // Check if id from token is the same as from uri
-    if (user.id !== decodedToken.userId) {
+export function getJWTTokenFromHeaders(req: RequestTracing): string {
+    const tokenFromHeaders = req.headers["x-access-token"];
+    let token: string;
+    if (typeof tokenFromHeaders != "string") {
         throw new AccessTokenNotAllowedForUriError(getTraceId(req));
+    } else {
+        token = tokenFromHeaders.toString();
     }
+    return token;
+}
+
+export function checkJWTAuthenticationUserId(req: RequestTracing, user: User) {
+    const token: string = getJWTTokenFromHeaders(req);
+
+    const decodedToken: AccessToken = decode(token) as AccessToken;
 
     // Check if id from token is the same as from uri
-    if (user.salt !== decodedToken.session) {
+    if (user.id != decodedToken.userId) {
         throw new AccessTokenNotAllowedForUriError(getTraceId(req));
     }
 }
+
+export function checkJWTAuthenticationSession(req: RequestTracing, user: User) {
+    const token: string = getJWTTokenFromHeaders(req);
+
+    const decodedToken: AccessToken = decode(token) as AccessToken;
+
+    // Check if id from token is the same as from uri
+    if (user.salt != decodedToken.session) {
+        throw new AccessTokenNotAllowedForUriError(getTraceId(req));
+    }
+}
+

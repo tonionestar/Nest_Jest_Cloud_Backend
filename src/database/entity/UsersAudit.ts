@@ -1,21 +1,20 @@
-import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne} from "typeorm";
-import {Users} from "./Users";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class UsersAudit {
 
-    @PrimaryGeneratedColumn("increment", {type: "int", unsigned: true})
+    @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
     id: number;
 
     //@ManyToOne(() => Users, (users) => users.id)
-    @Column("uuid", { nullable: false})
+    @Column("uuid", { nullable: false })
     user_id: string;
 
     @UpdateDateColumn()
-    @Column("timestamp", { nullable: false})
+    @Column("timestamp", { nullable: false })
     modified: string
 
     @CreateDateColumn()
-    @Column("timestamp", { nullable: false})
+    @Column("timestamp", { nullable: false })
     created: string
 }

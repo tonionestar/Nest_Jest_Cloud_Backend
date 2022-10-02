@@ -1,18 +1,28 @@
 // 3rd party modules
-import cors from "cors";
-import express from "express";
-import promBundle from "express-prom-bundle";
 
-// Custom modules
+import { ClippicError, ValidationError } from "@clippic/clippic-errors";
+import { ValidateError } from "@tsoa/runtime";
+import { getTraceId } from "./classes/Common";
+import {
+    ClippicDataSource
+} from "./database/DatabaseConnection";
+import { RequestTracing } from "./models/RequestTracing";
+import { RegisterRoutes } from "./routes";
 import JaegerMiddleware from "./middleware/JaegerMiddleware";
-import HealthController from "./routes/v2/health";
-import IndexController from "./routes/v2";
-import { ClippicDataSource } from "./database/DatabaseConnection";
 import { LoginController } from "./routes/v2/users/Login";
+
+import cors from "cors";
+import express, {
+    NextFunction,
+    Response,
+} from "express";
+import promBundle from "express-prom-bundle";
+import swaggerUi from "swagger-ui-express";
+import {UsernameController} from "./routes/v2/users/Username";
 
 // Express
 const app = express();
-let port: number = 3000;
+let port = 3000;
 
 function initializeTestEnvironment() {
     if (process.env.NODE_ENV == "test") {
@@ -21,7 +31,7 @@ function initializeTestEnvironment() {
 }
 
 function enableMetrics() {
-    const metricsMiddleware = promBundle({includeMethod: true});
+    const metricsMiddleware = promBundle({ includeMethod: true });
     app.use(metricsMiddleware);
 }
 
@@ -35,15 +45,9 @@ function initializeExpress() {
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
 
-    if (process.env.hasOwnProperty("PORT")) {
+    if (Object.prototype.hasOwnProperty.call(process.env, "PORT")) {
         port = parseInt(process.env.PORT);
     }
-}
-
-function initializeControllers() {
-    app.use("/", new HealthController().router);
-    app.use("/", new IndexController().router);
-    app.use("/", new LoginController().router);
 }
 
 async function initializeDatabaseConnection() {
@@ -56,13 +60,47 @@ async function initializeDatabaseConnection() {
         })
 }
 
+function errorHandler(
+    err: unknown,
+    req: RequestTracing,
+    res: Response,
+    next: NextFunction
+): Response | void {
+    if (err instanceof ClippicError) {
+        return res.status(400).json(err.toJSON());
+    }
+    else if (err instanceof ValidateError) {
+        return res.status(400).json(new ValidationError([err.fields], getTraceId(req)));
+    }
+    console.error(err);
+    next();
+}
+
+function initializeSwaggerUi() {
+    app.use(express.static("public"));
+    app.use(
+        "/docs",
+        swaggerUi.serve,
+        swaggerUi.setup(undefined, {
+            swaggerOptions: {
+                url: "/swagger.json",
+            },
+        })
+    );
+    RegisterRoutes(app);
+
+    app.use(errorHandler);
+}
+
 async function main() {
     initializeExpress();
     enableMetrics();
     enableTracing();
     initializeTestEnvironment();
-    initializeControllers();
     // only start app when not running jest
+    if (process.env.NODE_ENV != "production") {
+        initializeSwaggerUi();
+    }
     if (process.env.NODE_ENV != "jest") {
         await initializeDatabaseConnection();
         app.listen(port, () => {
@@ -71,6 +109,6 @@ async function main() {
     }
 }
 
-main().then(r => {});
+main().then();
 
 module.exports = app;

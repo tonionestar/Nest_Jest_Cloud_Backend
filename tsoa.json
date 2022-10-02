@@ -1,0 +1,27 @@
+{
+  "entryFile": "./src/app.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["src/routes/v2/**/*.ts"],
+  "spec": {
+    "outputDirectory": "public",
+    "specVersion": 3
+  },
+  "routes": {
+    "routesDir": "src",
+    "middleware": "express",
+    "authenticationModule": "./src/authentication.ts"
+  },
+  "ignore": [
+    "node_modules/**"
+  ],
+  "host": "localhost:3000",
+  "outputDirectory": "./dist",
+  "schemes": [ "http", "https" ],
+  "securityDefinitions": {
+    "jwt": {
+      "type": "jwt",
+      "name": "x-access-token",
+      "in": "header"
+    }
+  }
+}

@@ -1,6 +1,8 @@
+import { CountryRecord } from "../models/Country";
+
 class Country {
     // Country details
-    countries: Record<string, any> = {
+    countries: Record<string, CountryRecord> = {
         "AD": {
             "id": 6,
             "name": "Andorra",
@@ -3397,16 +3399,16 @@ class Country {
     constructor() {
         const id_map = new Map();
         const iso3_map = new Map();
-        for (let item in this.countries) {
-            const current_country = this.countries[item];
-            current_country['iso2'] = item;
+        for (const item in this.countries) {
+            const current_country: CountryRecord = this.countries[item];
+            current_country["iso2"] = item;
             id_map.set(Number(this.countries[item].id), current_country);
             iso3_map.set(this.countries[item].iso3, current_country);
         }
         this.countriesByID = new Map([...id_map.entries()].sort((a, b) => {
-            if (a[0] > b[0]) return 1;
-            if (a[0] === b[0]) return 0;
-            if (a[0] < b[0]) return -1;
+            if (a[0] > b[0]) {return 1;}
+            if (a[0] === b[0]) {return 0;}
+            if (a[0] < b[0]) {return -1;}
         }));
         this.countriesByISO3 = new Map([...iso3_map.entries()].sort());
     }

@@ -1,5 +1,6 @@
-import {Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne} from "typeorm";
-import {Users} from "./Users";
+import { Column, CreateDateColumn, Entity, ManyToOne,PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+
+import { Users } from "./Users";
 
 export enum FriendsStatus {
     PENDING = "p",
@@ -11,7 +12,7 @@ export enum FriendsStatus {
 @Entity()
 export class UsersFriends {
 
-    @PrimaryGeneratedColumn("increment", {type: "int", unsigned: true})
+    @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
     id: number;
 
     @ManyToOne(() => Users, user => user.id)
@@ -28,10 +29,10 @@ export class UsersFriends {
     status: FriendsStatus;
 
     @CreateDateColumn()
-    @Column("timestamp", { nullable: false})
+    @Column("timestamp", { nullable: false })
     requested: string
 
     @UpdateDateColumn()
-    @Column("timestamp", { nullable: true})
+    @Column("timestamp", { nullable: true })
     updated: string
 }

@@ -1,5 +1,4 @@
-import {Column, Entity, OneToOne, PrimaryColumn} from "typeorm";
-import {Users} from "../entity/Users";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class UsersCRM {

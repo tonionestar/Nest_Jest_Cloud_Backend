@@ -1,21 +1,16 @@
-// 3rd party modules
-import * as express from "express";
+import { Controller, Get, Route, SuccessResponse, Tags } from "tsoa";
 
-class HealthController {
-  public path = "/health"
-  public router = express.Router();
+@Route("/health")
+export class HealthController extends Controller {
+  /**
+   * This route is used for Health checks and is just returning '200' code.
+   */
 
-  constructor() {
-    this.initializeRoutes();
-  }
-
-  public initializeRoutes() {
-    this.router.get(this.path, this.sendOK);
-  }
-
-  sendOK = (request: express.Request, response: express.Response) => {
-    response.status(200).send();
+  @Tags("Health")
+  @SuccessResponse("200", "")
+  @Get("/")
+  public async sendOK(): Promise<void> {
+    this.setStatus(200);
+    return Promise.resolve();
   }
 }
-
-export default HealthController;

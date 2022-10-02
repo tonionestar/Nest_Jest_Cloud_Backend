@@ -1,6 +1,7 @@
-import {Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn} from "typeorm";
-import {Users} from "./Users";
-import {ConstCountries} from "./ConstCountries";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
+import { ConstCountries } from "./ConstCountries";
+import { Users } from "./Users";
 
 export enum ShippingType {
     ADDRESS = "address",
@@ -11,7 +12,7 @@ export enum ShippingType {
 @Entity()
 export class UsersShipping {
 
-    @PrimaryGeneratedColumn("increment", {type: "int", unsigned: true})
+    @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
     id: number;
 
     @Column("varbinary", { length: 40 })

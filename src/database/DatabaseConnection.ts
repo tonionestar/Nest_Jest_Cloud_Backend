@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from "typeorm";
 
 
 let ClippicDataSource: DataSource;
@@ -11,7 +11,7 @@ const MariadbDataSource = new DataSource({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
     entities: [
-        __dirname + '/../**/entity/*{.js,.ts}',
+        __dirname + "/../**/entity/*{.js,.ts}",
     ],
 });
 
@@ -24,7 +24,7 @@ const SqliteDataSource = new DataSource ({
     database: "users",
     dropSchema: true,
     entities: [
-        __dirname + '/../**/entity/*{.js,.ts}',
+        __dirname + "/../**/entity/*{.js,.ts}",
     ],
     logging: false
 });

@@ -1,0 +1,1066 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"GetForenameResponseData": {
+				"properties": {
+					"forename": {
+						"type": "string",
+						"description": "The user's forename",
+						"example": "tester",
+						"maxLength": 100
+					}
+				},
+				"required": [
+					"forename"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetForenameResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/GetForenameResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutForenameResponseData": {
+				"properties": {
+					"forename": {
+						"type": "string",
+						"description": "The user's forename",
+						"example": "tester",
+						"maxLength": 100
+					}
+				},
+				"required": [
+					"forename"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutForenameResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PutForenameResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutForenameRequest": {
+				"description": "Create or update the users forename",
+				"properties": {
+					"forename": {
+						"type": "string",
+						"description": "The user's forename",
+						"example": "tester",
+						"minLength": 1,
+						"maxLength": 100
+					}
+				},
+				"required": [
+					"forename"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"username": "tester"
+				}
+			},
+			"LoginResponseData": {
+				"properties": {
+					"created": {
+						"type": "string",
+						"description": "The datetime string when the account was created.",
+						"format": "date"
+					},
+					"id": {
+						"type": "string",
+						"description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122)",
+						"format": "uuid",
+						"pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
+					},
+					"lastModified": {
+						"type": "string",
+						"description": "The datetime string when the account was last modified.",
+						"format": "date"
+					},
+					"token": {
+						"type": "string",
+						"description": "JWT access token."
+					}
+				},
+				"required": [
+					"created",
+					"id",
+					"lastModified",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PostLoginResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/LoginResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ClippicErrorInterface": {
+				"properties": {
+					"status": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"data": {
+						"items": {},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"trace": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message",
+					"code",
+					"trace"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MailFormatError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1022 | Error when access mode is not valid."
+			},
+			"UsernameOrMailRequiredError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1049 | Error when email or password is missing"
+			},
+			"PasswordWrongError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1025 | Error when password or mail is wrong."
+			},
+			"GetAuditError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1028 | Error when getting audit from database."
+			},
+			"PostLoginRequest": {
+				"description": "The user login request.",
+				"properties": {
+					"username": {
+						"type": "string",
+						"description": "The user's email address (mutual exclusive with username)",
+						"example": "tester",
+						"maxLength": 40
+					},
+					"email": {
+						"type": "string",
+						"description": "The user's username (mutual exclusive with username)",
+						"example": "tester@clippic.app",
+						"maxLength": 200
+					},
+					"pass": {
+						"type": "string",
+						"description": "The users password.",
+						"example": "Test1234#!"
+					}
+				},
+				"required": [
+					"pass"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"email": "tester@clippic.app",
+					"pass": "Test1234#!"
+				}
+			},
+			"GetSurnameResponseData": {
+				"properties": {
+					"surname": {
+						"type": "string",
+						"description": "The user's surname",
+						"example": "tester",
+						"maxLength": 100
+					}
+				},
+				"required": [
+					"surname"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetSurnameResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/GetSurnameResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutSurnameResponseData": {
+				"properties": {
+					"surname": {
+						"type": "string",
+						"description": "The user's surname",
+						"example": "tester",
+						"maxLength": 100
+					}
+				},
+				"required": [
+					"surname"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutSurnameResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PutSurnameResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutSurnameRequest": {
+				"description": "Create or update the users surname",
+				"properties": {
+					"surname": {
+						"type": "string",
+						"description": "The user's surname",
+						"example": "tester",
+						"minLength": 1,
+						"maxLength": 100
+					}
+				},
+				"required": [
+					"surname"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"surname": "tester"
+				}
+			},
+			"GetUsernameResponseData": {
+				"properties": {
+					"username": {
+						"type": "string",
+						"description": "The user's username",
+						"example": "tester",
+						"maxLength": 40
+					}
+				},
+				"required": [
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetUsernameResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/GetUsernameResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutUsernameResponseData": {
+				"properties": {
+					"username": {
+						"type": "string",
+						"description": "The user's username",
+						"example": "tester",
+						"maxLength": 40
+					}
+				},
+				"required": [
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutUsernameResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PutUsernameResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UsernameAlreadyExistsError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1048 | Error when username already exists."
+			},
+			"PutUsernameRequest": {
+				"description": "Create or update the users username",
+				"properties": {
+					"username": {
+						"type": "string",
+						"description": "The user's username",
+						"example": "tester",
+						"minLength": 6,
+						"maxLength": 40
+					}
+				},
+				"required": [
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"username": "tester"
+				}
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "@clippic/user-v2",
+		"version": "0.0.0",
+		"contact": {}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/health": {
+			"get": {
+				"operationId": "SendOK",
+				"responses": {
+					"200": {
+						"description": ""
+					}
+				},
+				"description": "This route is used for Health checks and is just returning '200' code.",
+				"tags": [
+					"Health"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/": {
+			"get": {
+				"operationId": "GetNotAllowed",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not allowed"
+					}
+				},
+				"description": "This routes are sending a '403 - Not allowed' for all methods on '/'.",
+				"tags": [
+					"Index"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "PostNotAllowed",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not allowed"
+					}
+				},
+				"tags": [
+					"Index"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"put": {
+				"operationId": "PutNotAllowed",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not allowed"
+					}
+				},
+				"tags": [
+					"Index"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"patch": {
+				"operationId": "PatchNotAllowed",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not allowed"
+					}
+				},
+				"tags": [
+					"Index"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"delete": {
+				"operationId": "DeleteNotAllowed",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Not allowed"
+					}
+				},
+				"tags": [
+					"Index"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/users/v2/forename": {
+			"get": {
+				"operationId": "GetForenameRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetForenameResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"forename": "tester"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will return the user's forename.",
+				"tags": [
+					"Forename"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "PutForenameRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PutForenameResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"forename": "tester"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will update or create if not exists the user's forename.",
+				"tags": [
+					"Forename"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PutForenameRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/v2/login": {
+			"post": {
+				"operationId": "Login",
+				"responses": {
+					"200": {
+						"description": "Login succeeded",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PostLoginResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "Login succeeded",
+											"data": [
+												{
+													"created": "2021-01-09T21:40:37.000Z",
+													"id": "52907745-7672-470e-a803-a2f8feb52944",
+													"lastModified": "2021-04-26T14:57:18.000Z",
+													"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAuditError"
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will login a user and return a JWT Token.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | MailFormatError             |\n| 400  | UsernameOrMailRequiredError |\n| 400  | PasswordWrongError          |\n| 400  | GetAuditError               |\n| 400  | GetAuditError               |",
+				"tags": [
+					"Login"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PostLoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/v2/surname": {
+			"get": {
+				"operationId": "GetSurnameRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetSurnameResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"surname": "tester"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will return the user's surname.",
+				"tags": [
+					"Surname"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "PutSurnameRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PutSurnameResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"surname": "tester"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will update or create if not exists the user's surname.",
+				"tags": [
+					"Surname"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PutSurnameRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/v2/username": {
+			"get": {
+				"operationId": "GetUsernameRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetUsernameResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"username": "tester"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will return the user's username.",
+				"tags": [
+					"Username"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "PutUsernameRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PutUsernameResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"username": "tester"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UsernameAlreadyExistsError"
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will update or create if not exists the user's username.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | UsernameAlreadyExistsError  |",
+				"tags": [
+					"Username"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PutUsernameRequest"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

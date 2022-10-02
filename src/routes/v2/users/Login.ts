@@ -1,36 +1,47 @@
-// 3rd party modules
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
 
 import {
-    BodyFieldIsNullError,
-    BodyFieldToLongError,
-    BodyFieldToShortError,
-    BodyKeyIsMissingError,
+    Body,
+    Controller,
+    Example,
+    Post,
+    Request,
+    Response,
+    Route,
+    SuccessResponse, Tags
+} from "tsoa";
+import {
     GetAuditError,
     MailFormatError,
     PasswordWrongError,
     UsernameOrMailRequiredError
 } from "@clippic/clippic-errors";
-import RequestTracing from "../../../classes/RequestTracing";
-import { UserQueries } from "../../../database/query/UserQueries";
-import {UsersLength} from "../../../database/length/UsersLength";
 import {
-    checkIfJsonContainsFieldAndReturnValue,
-    checkIfJsonContainsFieldAndReturnValueIfExists,
     generatePasswordHash,
-    getJWTSecret,
-    getTraceId,
-    validateField,
+    getJWTSecret, getTraceContext,
+    getTraceId
 } from "../../../classes/Common";
-import {validateEmail} from "../../../classes/Mailer";
 
-class LoginController {
-    public path = "/users/v2/login"
+import { AccessToken } from "../../../models/AccessToken";
+import { PostLoginRequest } from "../../../models/PostLoginRequest";
+import { PostLoginResponse } from "../../../models/PostLoginResponse";
+import { RequestTracing } from "../../../models/RequestTracing";
+import { SpanContext } from "opentracing";
+import { User } from "../../../models/User";
+import { UserAudit } from "../../../models/UserAudit";
+import { UserQueries } from "../../../database/query/UserQueries";
+import { validateEmail } from "../../../classes/Mailer";
+
+@Route("/users/v2/login")
+export class LoginController extends Controller {
+
     public router = express.Router();
     public db = new UserQueries();
 
+    private body: PostLoginRequest;
     private traceId: string;
+    private parentSpanContext: SpanContext;
 
     private password: string;
     private email: string;
@@ -42,33 +53,19 @@ class LoginController {
     private prove: string;
     private token: string;
 
-    private req: RequestTracing;
-    private res: express.Response;
-
-    constructor() {
-        this.initializeRoutes();
-    }
-
-    public initializeRoutes() {
-        this.router.post(this.path, this.login);
-    }
-
     private readPassword(): void {
-        this.password = checkIfJsonContainsFieldAndReturnValue(this.req, this.res, "pass");
-        validateField(this.req, this.res, this.password, "pass", 1);
+        this.password = this.body.pass;
     }
 
     private readEmail(): void {
-        this.email = checkIfJsonContainsFieldAndReturnValueIfExists(this.req, this.res, "email");
-        validateField(this.req, this.res, this.email, "email", 0, UsersLength.email);
+        this.email = this.body.email;
         if (this.email != null) {
-            validateEmail(this.req, this.res, this.email);
+            validateEmail(this.email, this.traceId);
         }
     }
 
     private readUsername(): void {
-        this.username = checkIfJsonContainsFieldAndReturnValueIfExists(this.req, this.res, "username");
-        validateField(this.req, this.res, this.username, "username", 0, UsersLength.username);
+        this.username = this.body.username;
     }
 
     private checkPassword() {
@@ -78,7 +75,7 @@ class LoginController {
     }
 
     private checkRequiredFieldsExists(): void  {
-        if ((this.email === null && this.username === null) || (this.email !== null && this.username !== null)) {
+        if ((this.email === undefined && this.username === undefined) || (this.email !== undefined && this.username !== undefined)) {
             throw new UsernameOrMailRequiredError(this.traceId);
         }
     }
@@ -90,7 +87,7 @@ class LoginController {
     }
 
     private async getUsersAudit() {
-        this.userAudit = await this.db.GetUsersAudit(this.user.id);
+        this.userAudit = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersAudit, this.user.id);
         if (this.userAudit == null) {
             throw new GetAuditError(this.traceId)
         }
@@ -98,108 +95,86 @@ class LoginController {
 
     private generateAccessToken() {
         const accessToken: AccessToken = {
-            userId: this.user.id,
-            session: this.user.salt
+            userId: this.user.id.toString(),
+            session: this.user.salt.toString()
         }
         this.token = jwt.sign(accessToken, getJWTSecret(), {});
     }
 
-    login = async (req: RequestTracing, res: express.Response) => {
-        this.req = req;
-        this.res = res;
+    /**
+     * This request will login a user and return a JWT Token.
+     *
+     * **Errors:**
+     *
+     * | Code | Description                 |
+     * |------|-----------------------------|
+     * | 400  | MailFormatError             |
+     * | 400  | UsernameOrMailRequiredError |
+     * | 400  | PasswordWrongError          |
+     * | 400  | GetAuditError               |
+     * | 400  | GetAuditError               |
+     */
+    @Tags("Login")
+    @Response<MailFormatError>(400)
+    @Response<UsernameOrMailRequiredError>(400)
+    @Response<PasswordWrongError>(400)
+    @Response<GetAuditError>(400)
+    @Example<PostLoginResponse>({
+        status: "success",
+        message: "Login succeeded",
+        data: [
+            {
+                "created": "2021-01-09T21:40:37.000Z",
+                "id": "52907745-7672-470e-a803-a2f8feb52944",
+                "lastModified": "2021-04-26T14:57:18.000Z",
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            }
+        ],
+        code: 200,
+        trace: "4ba373202a8e4807"
+    })
+    @SuccessResponse(200, "Login succeeded")
+    @Post("/")
+    public async login (@Request() req: RequestTracing, @Body() body: PostLoginRequest): Promise<PostLoginResponse> {
+        this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
+        this.body = body;
 
-        try {
-            this.readPassword();
-            this.readEmail();
-            this.readUsername();
-        } catch (e) {
-            if (e instanceof BodyFieldIsNullError) {
-                return res.status(409).send(e.toJSON())
-            } else if (e instanceof BodyFieldToShortError) {
-                return res.status(409).send(e.toJSON())
-            } else if (e instanceof BodyFieldToLongError) {
-                return res.status(409).send(e.toJSON())
-            } else if (e instanceof MailFormatError) {
-                return res.status(409).send(e.toJSON())
-            } else if (e instanceof BodyKeyIsMissingError) {
-                return res.status(422).send(e.toJSON())
-            } else {
-                return res.status(500).send();
-            }
+        this.readPassword();
+        this.readEmail();
+        this.readUsername();
+
+        this.checkRequiredFieldsExists();
+
+        if (this.email !== undefined) {
+            this.user = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersInformationByEMail, this.email);
+        } else {
+            this.user = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersInformationByUsername, this.username);
         }
 
-        try {
-            this.checkRequiredFieldsExists();
-        } catch (e) {
-            if (e instanceof UsernameOrMailRequiredError) {
-                return res.status(400).send(e.toJSON())
-            } else {
-                return res.status(500).send();
-            }
-        }
-
-        if (this.email !== null) {
-            this.user = await this.db.GetUsersInformationByEMail(this.email);
-        } else if (this.username !== null) {
-            this.user = await this.db.GetUsersInformationByUsername(this.username);
-        }
-
-        // Check if user exists
-        try {
-            this.checkIfUserExists();
-        } catch (e) {
-            if (e instanceof PasswordWrongError) {
-                return res.status(401).send(e.toJSON())
-            } else {
-                return res.status(500).send();
-            }
-        }
+        this.checkIfUserExists();
 
         // Get Audit
-        const auditAsync = this.getUsersAudit();
+        await this.getUsersAudit();
 
         // Generate a password hash by users password
         this.prove = generatePasswordHash(this.password, this.user.salt);
 
-        try {
-            await auditAsync;
-        } catch (e) {
-            if (e instanceof GetAuditError) {
-                return res.status(500).send(e.toJSON())
-            } else {
-                return res.status(500).send();
-            }
-        }
-
         this.generateAccessToken();
 
-        // Check if
-        try {
-            this.checkPassword();
+        this.checkPassword();
 
-            return res.status(200).send({
-                "status": "success",
-                "message": "",
-                "data": [{
-                    "created": this.userAudit.created,
-                    "id": this.user.id,
-                    "last_modified": this.userAudit.modified,
-                    "token": this.token,
-                }],
-                "code": 200,
-                "trace": this.traceId
-            });
-        } catch (e) {
-            if (e instanceof PasswordWrongError) {
-                return res.status(401).send(e.toJSON())
-            } else {
-                return res.status(500).send();
-            }
-        }
+        return Promise.resolve({
+            "status": "success",
+            "message": "Login succeeded",
+            "data": [{
+                "created": this.userAudit.created,
+                "id": this.user.id,
+                "lastModified": this.userAudit.modified,
+                "token": this.token,
+            }],
+            "code": 200,
+            "trace": this.traceId
+        });
     }
-}
-
-export {
-    LoginController
 }

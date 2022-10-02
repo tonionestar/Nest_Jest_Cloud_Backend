@@ -1,12 +1,13 @@
-import {MailFormatError} from "@clippic/clippic-errors";
-import {getTraceId} from "./Common";
-import RequestTracing from "./RequestTracing";
-import express from "express";
+import { MailFormatError } from "@clippic/clippic-errors";
+import { RequestTracing } from "../models/RequestTracing";
 
-export function validateEmail(req: RequestTracing, res: express.Response, email: string): void {
+import express from "express";
+import { getTraceId } from "./Common";
+
+export function validateEmail(email: string, traceId: string): void {
     const emailIsInvalid = !validateEmailRegex(email);
     if (emailIsInvalid) {
-        throw new MailFormatError(email, getTraceId(req));
+        throw new MailFormatError(email, traceId);
     }
 }
 

@@ -1,5 +1,6 @@
-import {Column, Entity, OneToOne, PrimaryColumn} from "typeorm";
-import {Users} from "./Users";
+import { Column, Entity, OneToOne, PrimaryColumn } from "typeorm";
+
+import { Users } from "./Users";
 
 @Entity()
 export class UsersStripe {

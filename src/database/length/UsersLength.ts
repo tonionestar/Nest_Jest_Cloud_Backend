@@ -1,10 +1,10 @@
 export class UsersLength {
-    public static id: number = 40;
-    public static username: number = 40;
-    public static email: number = 200;
-    public static salt: number = 32;
-    public static hash: number = 128;
-    public static forename: number = 100;
-    public static surname: number = 100;
+    public static id = 40;
+    public static username = 40;
+    public static email = 200;
+    public static salt = 32;
+    public static hash = 128;
+    public static forename = 100;
+    public static surname = 100;
 
 }

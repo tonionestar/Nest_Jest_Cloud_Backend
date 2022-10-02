@@ -1,12 +1,15 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import request from "supertest"
 
-let app: any = require("../../../src/app")
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const app = require("../../../src/app")
 
-describe('health', () => {
+describe("/health", () => {
 
-    it('should respond with 200', async () => {
+    it("should respond with 200", async () => {
         const result = await request(app)
-            .get(`/health`);
+            .get("/health");
 
         expect(result.status).toBe(200);
     })

@@ -1,6 +1,7 @@
-import {Column, Entity, ManyToOne, OneToOne, PrimaryColumn} from "typeorm";
-import {Users} from "./Users";
-import {ConstCountries} from "./ConstCountries";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryColumn } from "typeorm";
+
+import { ConstCountries } from "./ConstCountries";
+import { Users } from "./Users";
 
 @Entity()
 export class UsersBilling {

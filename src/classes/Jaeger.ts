@@ -18,18 +18,18 @@ function initTracer(serviceName: string) {
     };
     const options = {
         tags: {
-            'user.version': process.env.npm_package_version,
+            "user.version": process.env.npm_package_version,
         },
         logger: {
             info: function logInfo(msg: string) {
-                console.log('INFO  ', msg);
+                console.log("INFO  ", msg);
             },
             error: function logError(msg: string) {
-                console.log('ERROR ', msg);
+                console.log("ERROR ", msg);
             },
         },
     };
     return initJaegerTracer(config, options);
 }
 
-export default ( process.env.NODE_ENV === "jest" ) ? new opentracing.MockTracer : initTracer('user') as opentracing.Tracer;
+export default ( process.env.NODE_ENV === "jest" ) ? new opentracing.MockTracer : initTracer("user") as opentracing.Tracer;

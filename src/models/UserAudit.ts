@@ -1,4 +1,4 @@
-interface UserAudit {
+export interface UserAudit {
     id: number;
     user_id: string;
     modified: string;

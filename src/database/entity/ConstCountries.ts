@@ -1,9 +1,9 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Column,Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class ConstCountries {
 
-    @PrimaryGeneratedColumn("increment", {type: "smallint", unsigned: true})
+    @PrimaryGeneratedColumn("increment", { type: "smallint", unsigned: true })
     id: number;
 
     @Column("char", { length: 2, nullable: false })
