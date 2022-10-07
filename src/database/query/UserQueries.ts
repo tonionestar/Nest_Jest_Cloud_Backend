@@ -86,6 +86,14 @@ export class UserQueries {
             .getOne();
     }
 
+    GetIdByEmail(email: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .select("users.id")
+            .where("users.email = :email", { email: email })
+            .getOne();
+    }
+
     CheckIfUsernameAlreadyExists(username: string) {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")

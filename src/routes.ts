@@ -9,6 +9,8 @@ import { IndexController } from './routes/v2/index';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { ForenameController } from './routes/v2/users/Forename';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { IdController } from './routes/v2/users/Id';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { LoginController } from './routes/v2/users/Login';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SurnameController } from './routes/v2/users/Surname';
@@ -71,6 +73,43 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetIdResponseData": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"string","required":true,"validators":{"maxLength":{"value":36}}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "GetIdResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "status": {"dataType":"string","required":true},
+            "message": {"dataType":"string"},
+            "data": {"dataType":"array","array":{"dataType":"refObject","ref":"GetIdResponseData"},"required":true},
+            "code": {"dataType":"integer","required":true},
+            "trace": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ClippicErrorInterface": {
+        "dataType": "refObject",
+        "properties": {
+            "status": {"dataType":"string"},
+            "message": {"dataType":"string","required":true},
+            "data": {"dataType":"array","array":{"dataType":"any"}},
+            "code": {"dataType":"integer","required":true},
+            "trace": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "UserMailNotFoundError": {
+        "dataType": "refAlias",
+        "type": {"ref":"ClippicErrorInterface","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "LoginResponseData": {
         "dataType": "refObject",
         "properties": {
@@ -88,18 +127,6 @@ const models: TsoaRoute.Models = {
             "status": {"dataType":"string","required":true},
             "message": {"dataType":"string"},
             "data": {"dataType":"array","array":{"dataType":"refObject","ref":"LoginResponseData"},"required":true},
-            "code": {"dataType":"integer","required":true},
-            "trace": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ClippicErrorInterface": {
-        "dataType": "refObject",
-        "properties": {
-            "status": {"dataType":"string"},
-            "message": {"dataType":"string","required":true},
-            "data": {"dataType":"array","array":{"dataType":"any"}},
             "code": {"dataType":"integer","required":true},
             "trace": {"dataType":"string","required":true},
         },
@@ -440,6 +467,34 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.putForenameRequest.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/users/v2/id',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(IdController)),
+            ...(fetchMiddlewares<RequestHandler>(IdController.prototype.getIdByEMailRequest)),
+
+            function IdController_getIdByEMailRequest(request: any, response: any, next: any) {
+            const args = {
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    id: {"in":"header","name":"id","required":true,"dataType":"string"},
+                    email: {"in":"query","name":"email","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new IdController();
+
+
+              const promise = controller.getIdByEMailRequest.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

@@ -126,6 +126,88 @@
 					"username": "tester"
 				}
 			},
+			"GetIdResponseData": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The user's id",
+						"example": "52907745-7672-470e-a803-a2f8feb52944",
+						"maxLength": 36
+					}
+				},
+				"required": [
+					"id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetIdResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/GetIdResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ClippicErrorInterface": {
+				"properties": {
+					"status": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"data": {
+						"items": {},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"trace": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message",
+					"code",
+					"trace"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserMailNotFoundError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1030 | Error when user not found by mail."
+			},
 			"LoginResponseData": {
 				"properties": {
 					"created": {
@@ -189,34 +271,6 @@
 					"code",
 					"trace",
 					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ClippicErrorInterface": {
-				"properties": {
-					"status": {
-						"type": "string"
-					},
-					"message": {
-						"type": "string"
-					},
-					"data": {
-						"items": {},
-						"type": "array"
-					},
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"trace": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message",
-					"code",
-					"trace"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -764,6 +818,75 @@
 						}
 					}
 				}
+			}
+		},
+		"/users/v2/id": {
+			"get": {
+				"operationId": "GetIdByEMailRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetIdResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"id": "52907745-7672-470e-a803-a2f8feb52944"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserMailNotFoundError"
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will return the id of any kind of user by its email address. This can not be used to fetch your own\nuser id cause this route requires authorization.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | UserMailNotFoundError       |",
+				"tags": [
+					"Id"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/users/v2/login": {

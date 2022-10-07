@@ -22,9 +22,10 @@ import {
 import { UserQueries } from "../../../database/query/UserQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { User } from "../../../models/User";
-import {GetSurnameResponse} from "../../../models/GetSurnameResponse";
-import {PutSurnameRequest} from "../../../models/PutSurnameRequest";
-import {PutSurnameResponse} from "../../../models/PutSurnameResponse";
+import { GetSurnameResponse } from "../../../models/GetSurnameResponse";
+import { PutSurnameRequest } from "../../../models/PutSurnameRequest";
+import { PutSurnameResponse } from "../../../models/PutSurnameResponse";
+import {UserMailNotFoundError} from "../../../../../clippic-errors";
 
 @Route("/users/v2/surname")
 export class SurnameController extends Controller {

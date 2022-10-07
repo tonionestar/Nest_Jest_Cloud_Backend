@@ -140,8 +140,6 @@ describe(url, () => {
                     "pass": "Test123#"
                 });
 
-            console.log(result.body);
-
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(0)
@@ -161,8 +159,6 @@ describe(url, () => {
                 .send({
                     "username": "tester"
                 });
-
-            console.log(result.body);
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -184,8 +180,6 @@ describe(url, () => {
                 .send({
                     "password": "tester"
                 });
-
-            console.log(result.body);
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -215,8 +209,6 @@ describe(url, () => {
                     "pass": "tester"
                 });
 
-            console.log(result.body);
-
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(0)
@@ -237,8 +229,6 @@ describe(url, () => {
                     "email": "tester",
                     "pass": "Test123#"
                 });
-
-            console.log(result.body);
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -270,8 +260,6 @@ describe(url, () => {
                     "pass": "Test123#"
                 });
 
-            console.log(result.body);
-
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(0)
@@ -292,8 +280,6 @@ describe(url, () => {
                     "username": "01234567890123456789012345678901234567890123456789",
                     "pass": "Test123#"
                 });
-
-            console.log(result.body);
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -316,8 +302,6 @@ describe(url, () => {
                     "pass": "Test123#"
                 });
 
-            console.log(result.body);
-
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(1)
@@ -339,8 +323,6 @@ describe(url, () => {
                     "pass": null
                 });
 
-            console.log(result.body);
-
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(1)
@@ -361,8 +343,6 @@ describe(url, () => {
                     "username": "tester@test.de",
                     "pass": ""
                 });
-
-            console.log(result.body);
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
