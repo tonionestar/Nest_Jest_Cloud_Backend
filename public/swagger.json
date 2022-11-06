@@ -6,6 +6,265 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"UserAudit": {
+				"properties": {
+					"user_id": {
+						"type": "string",
+						"description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122)",
+						"format": "uuid",
+						"pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
+					},
+					"created": {
+						"type": "string",
+						"description": "When the user created the account",
+						"format": "date"
+					},
+					"modified": {
+						"type": "string",
+						"description": "When the user modified any of the tracked fields.",
+						"format": "date"
+					},
+					"username": {
+						"type": "string",
+						"description": "When the user modified his username.",
+						"format": "date"
+					},
+					"forename": {
+						"type": "string",
+						"description": "When the user modified his forename.",
+						"format": "date"
+					},
+					"surname": {
+						"type": "string",
+						"description": "When the user modified his surname.",
+						"format": "date"
+					},
+					"email": {
+						"type": "string",
+						"description": "When the user modified his email.",
+						"format": "date"
+					},
+					"salt": {
+						"type": "string",
+						"description": "When the user modified his salt/session.",
+						"format": "date"
+					},
+					"hash": {
+						"type": "string",
+						"description": "When the user modified his hash.",
+						"format": "date"
+					},
+					"billing": {
+						"type": "string",
+						"description": "When the user modified his billing data.",
+						"format": "date"
+					},
+					"shipping": {
+						"type": "string",
+						"description": "When the user modified his shipping data.",
+						"format": "date"
+					},
+					"quota": {
+						"type": "string",
+						"description": "When the user has change in quota.",
+						"format": "date"
+					}
+				},
+				"required": [
+					"user_id",
+					"created",
+					"modified"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetAuditResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/UserAudit"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetEmailResponseData": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user's email",
+						"example": "test@clippic.app",
+						"maxLength": 200
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetEmailResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/GetEmailResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutEmailResponseData": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user's email",
+						"example": "test@clippic.app",
+						"maxLength": 200
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PutEmailResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/PutEmailResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ClippicErrorInterface": {
+				"properties": {
+					"status": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
+					},
+					"data": {
+						"items": {},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"trace": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message",
+					"code",
+					"trace"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AccountAlreadyExistsError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1023 | Error when email already registered for an other account."
+			},
+			"PutEmailRequest": {
+				"description": "Update the users email",
+				"properties": {
+					"email": {
+						"type": "string",
+						"description": "The user's email",
+						"example": "testnew@clippic.app",
+						"minLength": 5,
+						"maxLength": 200
+					}
+				},
+				"required": [
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"email": "testnew@clippic.app"
+				}
+			},
 			"GetForenameResponseData": {
 				"properties": {
 					"forename": {
@@ -172,34 +431,6 @@
 					"code",
 					"trace",
 					"data"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ClippicErrorInterface": {
-				"properties": {
-					"status": {
-						"type": "string"
-					},
-					"message": {
-						"type": "string"
-					},
-					"data": {
-						"items": {},
-						"type": "array"
-					},
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"trace": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message",
-					"code",
-					"trace"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -708,6 +939,188 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/users/v2/audit": {
+			"get": {
+				"operationId": "GetAuditRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetAuditResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"user_id": "551efd1e-77c1-49a1-9a9b-c7fa15ce6acf",
+													"modified": "2022-11-06T11:14:00.000Z",
+													"created": "2022-11-06T11:14:00.000Z",
+													"username": null,
+													"forename": null,
+													"surname": null,
+													"email": null,
+													"salt": null,
+													"hash": null,
+													"billing": null,
+													"shipping": null,
+													"quota": null
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will return the user's last modified dates.",
+				"tags": [
+					"Audit"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/users/v2/email": {
+			"get": {
+				"operationId": "GetEmailRequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetEmailResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"email": "test@clippic.app"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will return the user's Email.",
+				"tags": [
+					"Email"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "PutEmailequest",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PutEmailResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "",
+											"data": [
+												{
+													"email": "testnew@clippic.app"
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AccountAlreadyExistsError"
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will update the user's email.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | AccountAlreadyExistsError   |",
+				"tags": [
+					"Email"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PutEmailRequest"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/users/v2/forename": {

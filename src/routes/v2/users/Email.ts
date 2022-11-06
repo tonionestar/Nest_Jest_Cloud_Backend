@@ -8,6 +8,7 @@ import {
     Header,
     Put,
     Request,
+    Response,
     Route,
     Security,
     Tags
@@ -22,12 +23,13 @@ import {
 import { UserQueries } from "../../../database/query/UserQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { User } from "../../../models/User";
-import { GetSurnameResponse } from "../../../models/surname/GetSurnameResponse";
-import { PutSurnameRequest } from "../../../models/surname/PutSurnameRequest";
-import { PutSurnameResponse } from "../../../models/surname/PutSurnameResponse";
+import {GetEmailResponse} from "../../../models/email/GetEmailResponse";
+import {PutEmailRequest} from "../../../models/email/PutEmailRequest";
+import {PutEmailResponse} from "../../../models/email/PutEmailResponse";
+import {AccountAlreadyExistsError} from "../../../../../clippic-errors";
 
-@Route("/users/v2/surname")
-export class SurnameController extends Controller {
+@Route("/users/v2/email")
+export class EmailController extends Controller {
 
     public router = express.Router();
     public db = new UserQueries();
@@ -43,17 +45,21 @@ export class SurnameController extends Controller {
         this.user = Object.assign(this.user, result);
     }
 
-    private async getUsersSurname() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetSurname, this.user.id);
+    private async getUsersEmail() {
+        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetEmail, this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
-    private async updateSurname(surname: string) {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateSurname, this.user.id, surname);
+    private async CheckIfEmailAlreadyExists(email: string): Promise<boolean> {
+        return await this.db.doQuery(this.parentSpanContext, this.db.CheckIfEmailAlreadyExists, email);
+    }
+
+    private async updateEmail(email: string) {
+        await this.db.doQuery(this.parentSpanContext, this.db.UpdateEmail, this.user.id, email);
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditSurname, this.user.id);
+        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditEmail, this.user.id);
     }
 
     private async checkRouteAccess() {
@@ -77,15 +83,15 @@ export class SurnameController extends Controller {
     }
 
     /**
-     * This request will return the user's surname.
+     * This request will return the user's Email.
      */
-    @Tags("Surname")
-    @Example<GetSurnameResponse>({
+    @Tags("Email")
+    @Example<GetEmailResponse>({
         status: "success",
         message: "",
         data: [
             {
-                "surname": "tester"
+                "email": "test@clippic.app"
             }
         ],
         code: 200,
@@ -93,16 +99,16 @@ export class SurnameController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getSurnameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetSurnameResponse> {
+    public async getEmailRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetEmailResponse> {
         await this.initialize(req, id);
 
-        await this.getUsersSurname();
+        await this.getUsersEmail();
 
         return Promise.resolve({
             "status": "success",
             "message": "",
             "data": [{
-                "surname": this.user.surname
+                "email": this.user.email
             }],
             "code": 200,
             "trace": this.traceId
@@ -110,31 +116,42 @@ export class SurnameController extends Controller {
     }
 
     /**
-     * This request will update or create if not exists the user's surname.
+     * This request will update the user's email.
+     *
+     * **Errors:**
+     *
+     * | Code | Description                 |
+     * |------|-----------------------------|
+     * | 400  | AccountAlreadyExistsError   |
      */
-    @Tags("Surname")
-    @Example<PutSurnameResponse>({
+    @Tags("Email")
+    @Example<PutEmailResponse>({
         status: "success",
         message: "",
         data: [
             {
-                "surname": "tester"
+                "email": "testnew@clippic.app"
             }
         ],
         code: 200,
         trace: "4ba373202a8e4807"
     })
+    @Response<AccountAlreadyExistsError>(400)
     @Security("jwt")
     @Put("/")
-    public async putSurnameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutSurnameRequest): Promise<PutSurnameResponse> {
+    public async putEmailRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutEmailRequest): Promise<PutEmailResponse> {
         await this.initialize(req, id);
 
-        await this.getUsersSurname();
+        await this.getUsersEmail();
 
-        if (this.user.surname != body.surname) {
+        if (this.user.email != body.email) {
+
+            if (await this.CheckIfEmailAlreadyExists(body.email)) {
+                throw new AccountAlreadyExistsError(body.email, this.traceId);
+            }
 
             await Promise.all([
-                this.updateSurname(req.body.surname),
+                this.updateEmail(body.email),
                 this.updateModified()
             ]);
         }
@@ -143,7 +160,7 @@ export class SurnameController extends Controller {
             "status": "success",
             "message": "",
             "data": [{
-                "surname": body.surname
+                "email": body.email
             }],
             "code": 200,
             "trace": this.traceId

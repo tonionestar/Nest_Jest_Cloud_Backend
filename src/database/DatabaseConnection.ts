@@ -15,7 +15,7 @@ const MariadbDataSource = new DataSource({
     ],
 });
 
-const SqliteDataSource = new DataSource ({
+const LocalDataSource = new DataSource ({
     type: "mariadb",
     host: "127.0.0.1",
     port: 3306,
@@ -26,11 +26,12 @@ const SqliteDataSource = new DataSource ({
     entities: [
         __dirname + "/../**/entity/*{.js,.ts}",
     ],
-    logging: false
+    logging: false,
+    synchronize: true
 });
 
-if (process.env.NODE_ENV === "jest") {
-    ClippicDataSource = SqliteDataSource;
+if (process.env.NODE_ENV === "jest" || process.env.NODE_ENV === "dev") {
+    ClippicDataSource = LocalDataSource;
 } else {
     ClippicDataSource = MariadbDataSource
 }

@@ -24,8 +24,8 @@ import {
 } from "../../../classes/Common";
 
 import { AccessToken } from "../../../models/AccessToken";
-import { PostLoginRequest } from "../../../models/PostLoginRequest";
-import { PostLoginResponse } from "../../../models/PostLoginResponse";
+import { PostLoginRequest } from "../../../models/login/PostLoginRequest";
+import { PostLoginResponse } from "../../../models/login/PostLoginResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";

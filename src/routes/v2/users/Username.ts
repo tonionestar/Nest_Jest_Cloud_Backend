@@ -22,9 +22,9 @@ import {
     getTraceId
 } from "../../../classes/Common";
 import { UserQueries } from "../../../database/query/UserQueries";
-import { GetUsernameResponse } from "../../../models/GetUsernameResponse";
-import { PutUsernameRequest } from "../../../models/PutUsernameRequest";
-import { PutUsernameResponse } from "../../../models/PutUsernameResponse";
+import { GetUsernameResponse } from "../../../models/username/GetUsernameResponse";
+import { PutUsernameRequest } from "../../../models/username/PutUsernameRequest";
+import { PutUsernameResponse } from "../../../models/username/PutUsernameResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { User } from "../../../models/User";
 
@@ -59,7 +59,7 @@ export class UsernameController extends Controller {
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAudit, this.user.id);
+        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditUsername, this.user.id);
     }
 
     private async checkRouteAccess() {

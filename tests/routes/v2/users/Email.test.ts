@@ -1,4 +1,4 @@
-import {createNewUser, generateAccessToken, testUsername} from "../../../classes/CommonTests";
+import {createNewUser, generateAccessToken, testEmail} from "../../../classes/CommonTests";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 
@@ -31,13 +31,13 @@ afterEach(async () => {
     await ClippicDataSource.dropDatabase();
 });
 
-const url = "/users/v2/username";
+const url = "/users/v2/email";
 
 describe(url, () => {
 
     describe("GET", () => {
 
-        it("should be possible to get username", async () => {
+        it("should be possible to get email", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
@@ -54,11 +54,11 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
 
             // check username
-            expect(result.body.data[0]).toHaveProperty("username");
-            expect(result.body.data[0].username).toBe(testUsername);
+            expect(result.body.data[0]).toHaveProperty("email");
+            expect(result.body.data[0].email).toBe(testEmail);
         });
 
-        it("should not be possible to get username when id is missing", async () => {
+        it("should not be possible to get email when id is missing", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
@@ -74,7 +74,7 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to get username when id is wrong", async () => {
+        it("should not be possible to get email when id is wrong", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
@@ -91,7 +91,7 @@ describe(url, () => {
             expect(result.body.code).toBe(1001);
         });
 
-        it("should not be possible to get username when access-token is missing", async () => {
+        it("should not be possible to get email when access-token is missing", async () => {
             const result = await request(app)
                 .get(url)
                 .set('id', "0");
@@ -108,16 +108,16 @@ describe(url, () => {
 
     describe("PUT", () => {
 
-        it("should be possible to change username", async () => {
+        it("should be possible to change email", async () => {
             const testUserId = await createNewUser({});
-            const newUserName = "new-fancy-username"
+            const newEmailAddress = "tester2@clippic.app"
 
             const result = await request(app)
                 .put(url)
                 .set('id', testUserId)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .send({
-                    username: newUserName
+                    email: newEmailAddress
                 });
 
             expect(result.status).toBe(200);
@@ -129,26 +129,26 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
 
             // check username
-            expect(result.body.data[0]).toHaveProperty("username");
-            expect(result.body.data[0].username).toBe(newUserName);
+            expect(result.body.data[0]).toHaveProperty("email");
+            expect(result.body.data[0].email).toBe(newEmailAddress);
 
             // check database
-            const databaseResult = await db.GetUsername(testUserId);
+            const databaseResult = await db.GetEmail(testUserId);
 
-            expect(databaseResult).toHaveProperty("username");
-            expect(databaseResult.username).toBe(newUserName);
+            expect(databaseResult).toHaveProperty("email");
+            expect(databaseResult.email).toBe(newEmailAddress);
         });
 
-        it("should be possible to change username with max chars", async () => {
+        it("should be possible to change email with max chars", async () => {
             const testUserId = await createNewUser({});
-            const newUserName = "new-fancy-username-which-is-very-long-12"
+            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app"
 
             const result = await request(app)
                 .put(url)
                 .set('id', testUserId)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .send({
-                    username: newUserName
+                    email: newEmailAddress
                 });
 
             expect(result.status).toBe(200);
@@ -160,26 +160,26 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
 
             // check username
-            expect(result.body.data[0]).toHaveProperty("username");
-            expect(result.body.data[0].username).toBe(newUserName);
+            expect(result.body.data[0]).toHaveProperty("email");
+            expect(result.body.data[0].email).toBe(newEmailAddress);
 
             // check database
-            const databaseResult = await db.GetUsername(testUserId);
+            const databaseResult = await db.GetEmail(testUserId);
 
-            expect(databaseResult).toHaveProperty("username");
-            expect(databaseResult.username).toBe(newUserName);
+            expect(databaseResult).toHaveProperty("email");
+            expect(databaseResult.email).toBe(newEmailAddress);
         });
 
-        it("should not be possible to change username with too many chars", async () => {
+        it("should not be possible to change email with too many chars", async () => {
             const testUserId = await createNewUser({});
-            const newUserName = "new-fancy-username-which-is-very-long-123"
+            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-1234@clippic.app"
 
             const result = await request(app)
                 .put(url)
                 .set('id', testUserId)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .send({
-                    username: newUserName
+                    email: newEmailAddress
                 });
 
             expect(result.status).toBe(400);
@@ -191,13 +191,13 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to change username when username already exists", async () => {
-            const newUserName = "new-fancy-username"
+        it("should not be possible to change email when email already exists", async () => {
+            const newEmailName = "tester2@clippic.app"
 
             const testUserId = await createNewUser({});
             await createNewUser({
-                username: newUserName,
-                email: "tester2@clippic.app"
+                username: "tester2",
+                email: newEmailName
             });
 
             const result = await request(app)
@@ -205,7 +205,7 @@ describe(url, () => {
                 .set('id', testUserId)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .send({
-                    username: newUserName
+                    email: newEmailName
                 });
 
             expect(result.status).toBe(400);
@@ -214,19 +214,19 @@ describe(url, () => {
 
             // check code
             expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1048);
+            expect(result.body.code).toBe(1023);
         });
 
-        it("should not be possible to change username with too few chars", async () => {
+        it("should not be possible to change email with too few chars", async () => {
             const testUserId = await createNewUser({});
-            const newUserName = "1"
+            const newEmailName = "a@a"
 
             const result = await request(app)
                 .put(url)
                 .set('id', testUserId)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .send({
-                    username: newUserName
+                    email: newEmailName
                 });
 
             expect(result.status).toBe(400);
@@ -238,7 +238,7 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to change username when username is missing", async () => {
+        it("should not be possible to change email when email is missing", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
@@ -256,14 +256,14 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to change username when id is missing", async () => {
+        it("should not be possible to change email when id is missing", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
                 .put(url)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .send({
-                    username: "newUserName"
+                    email: "tester2@clippic.app"
                 });
 
             expect(result.status).toBe(400);
@@ -275,14 +275,14 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to change username when access-token is missing", async () => {
+        it("should not be possible to change email when access-token is missing", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
                 .put(url)
                 .set('id', testUserId)
                 .send({
-                    username: "newUserName"
+                    email: "tester2@clippic.app"
                 });
 
             expect(result.status).toBe(400);

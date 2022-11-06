@@ -22,9 +22,9 @@ import {
 import { UserQueries } from "../../../database/query/UserQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { User } from "../../../models/User";
-import {GetForenameResponse} from "../../../models/GetForenameResponse";
-import {PutForenameRequest} from "../../../models/PutForenameRequest";
-import {PutForenameResponse} from "../../../models/PutForenameResponse";
+import {GetForenameResponse} from "../../../models/forename/GetForenameResponse";
+import {PutForenameRequest} from "../../../models/forename/PutForenameRequest";
+import {PutForenameResponse} from "../../../models/forename/PutForenameResponse";
 
 @Route("/users/v2/forename")
 export class ForenameController extends Controller {
@@ -53,7 +53,7 @@ export class ForenameController extends Controller {
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAudit, this.user.id);
+        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditForename, this.user.id);
     }
 
     private async checkRouteAccess() {

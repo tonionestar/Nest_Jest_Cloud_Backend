@@ -111,7 +111,7 @@ describe(url, () => {
         })
 
         it("should not be possible to login with wrong password", async () => {
-            createNewUser({});
+            await createNewUser({});
 
             const result = await request(app)
                 .post(url)

@@ -5,7 +5,6 @@ import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import request from "supertest"
-import {UserQueries} from "../../../../src/database/query/UserQueries";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app")
@@ -74,7 +73,7 @@ describe(url, () => {
                 .set('id', testUserId)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .query({
-                    "email": "blub"
+                    "email": "dumb"
                 });
 
             expect(result.status).toBe(400);
@@ -93,7 +92,7 @@ describe(url, () => {
                 .get(url)
                 .set('x-access-token', generateAccessToken(testUserId))
                 .query({
-                    "email": "blub"
+                    "email": "dumb"
                 });
 
             expect(result.status).toBe(400);
@@ -112,7 +111,7 @@ describe(url, () => {
                 .get(url)
                 .set('id', testUserId)
                 .query({
-                    "email": "blub"
+                    "email": "dumb"
                 });
 
             expect(result.status).toBe(400);

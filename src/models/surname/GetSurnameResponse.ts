@@ -1,4 +1,4 @@
-import { ClippicResponse } from "./ClippicResponse";
+import { ClippicResponse } from "../ClippicResponse";
 
 export interface GetSurnameResponse extends ClippicResponse{
 

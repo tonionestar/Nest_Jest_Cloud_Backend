@@ -54,10 +54,37 @@ export class UserQueries {
             .getOne();
     }
 
+    GetUsersAuditAll(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(UsersAudit, "users_audit")
+            .select("users_audit.modified")
+            .addSelect("users_audit.created")
+            .addSelect("users_audit.username")
+            .addSelect("users_audit.forename")
+            .addSelect("users_audit.surname")
+            .addSelect("users_audit.email")
+            .addSelect("users_audit.salt")
+            .addSelect("users_audit.hash")
+            .addSelect("users_audit.billing")
+            .addSelect("users_audit.shipping")
+            .addSelect("users_audit.quota")
+            .addSelect("users_audit.user_id")
+            .where("users_audit.user_id = :userId", { userId: userId })
+            .getOne();
+    }
+
     GetUsername(userId: string) {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")
             .select("users.username")
+            .where("users.id = :userId", { userId: userId })
+            .getOne();
+    }
+
+    GetEmail(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .select("users.email")
             .where("users.id = :userId", { userId: userId })
             .getOne();
     }
@@ -101,11 +128,28 @@ export class UserQueries {
             .getCount()
     }
 
+    CheckIfEmailAlreadyExists(email: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .where("users.email = :email", { email: email })
+            .getCount()
+    }
+
     UpdateUsername(userId: string, username: string) {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")
             .update(Users, {
                 username: username
+            })
+            .where("users.id = :userId", { userId: userId })
+            .execute();
+    }
+
+    UpdateEmail(userId: string, email: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .update(Users, {
+                email: email
             })
             .where("users.id = :userId", { userId: userId })
             .execute();
@@ -131,11 +175,45 @@ export class UserQueries {
             .execute();
     }
 
-    UpdateAudit(userId: string) {
+    UpdateAuditForename(userId: string) {
         return ClippicDataSource.manager
             .createQueryBuilder()
             .update(UsersAudit, {
-                modified: () => "CURRENT_TIMESTAMP"
+                modified: () => "CURRENT_TIMESTAMP",
+                forename: () => "CURRENT_TIMESTAMP"
+            })
+            .where("user_id = :userId", { userId: userId })
+            .execute()
+    }
+
+    UpdateAuditSurname(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .update(UsersAudit, {
+                modified: () => "CURRENT_TIMESTAMP",
+                surname: () => "CURRENT_TIMESTAMP"
+            })
+            .where("user_id = :userId", { userId: userId })
+            .execute()
+    }
+
+    UpdateAuditUsername(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .update(UsersAudit, {
+                modified: () => "CURRENT_TIMESTAMP",
+                username: () => "CURRENT_TIMESTAMP"
+            })
+            .where("user_id = :userId", { userId: userId })
+            .execute()
+    }
+
+    UpdateAuditEmail(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .update(UsersAudit, {
+                modified: () => "CURRENT_TIMESTAMP",
+                email: () => "CURRENT_TIMESTAMP"
             })
             .where("user_id = :userId", { userId: userId })
             .execute()

@@ -3,12 +3,12 @@ import { SpanContext } from "opentracing";
 import {
     Controller,
     Example,
-    Get, Header, Query,
+    Get,
+    Header,
     Request,
     Route,
     Security,
-    Tags,
-    Response
+    Tags
 } from "tsoa";
 
 import {
@@ -20,11 +20,11 @@ import {
 import { UserQueries } from "../../../database/query/UserQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { User } from "../../../models/User";
-import {GetIdResponse} from "../../../models/id/GetIdResponse";
-import {UserMailNotFoundError} from "../../../../../clippic-errors";
+import {GetAuditResponse} from "../../../models/audit/GetAuditResponse";
+import {UserAudit} from "../../../models/UserAudit";
 
-@Route("/users/v2/id")
-export class IdController extends Controller {
+@Route("/users/v2/audit")
+export class AuditController extends Controller {
 
     public router = express.Router();
     public db = new UserQueries();
@@ -34,20 +34,18 @@ export class IdController extends Controller {
     private parentSpanContext: SpanContext;
 
     private user: User = {};
+    private userAudit: UserAudit;
 
     private async getUsersSalt() {
         const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSalt, this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
-    private async getIdByEmail(email: string): Promise<User> {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetIdByEmail, email);
-        if (result === null) {
-            throw new UserMailNotFoundError(email, this.traceId);
-        }
-        const searchedUserEmail: User = {};
-        return Object.assign(searchedUserEmail, result);
+    private async getUsersAudit() {
+        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersAuditAll, this.user.id);
+        this.userAudit = Object.assign(result);
     }
+
 
     private async checkRouteAccess() {
         // check if user is allowed for this url
@@ -70,23 +68,26 @@ export class IdController extends Controller {
     }
 
     /**
-     * This request will return the id of any kind of user by its email address. This can not be used to fetch your own
-     * user id cause this route requires authorization.
-     *
-     * **Errors:**
-     *
-     * | Code | Description                 |
-     * |------|-----------------------------|
-     * | 400  | UserMailNotFoundError       |
+     * This request will return the user's last modified dates.
      */
-    @Tags("Id")
-    @Response<UserMailNotFoundError>(400)
-    @Example<GetIdResponse>({
+    @Tags("Audit")
+    @Example<GetAuditResponse>({
         status: "success",
         message: "",
         data: [
             {
-                "id": "52907745-7672-470e-a803-a2f8feb52944"
+                "user_id": "551efd1e-77c1-49a1-9a9b-c7fa15ce6acf",
+                "modified": "2022-11-06T11:14:00.000Z",
+                "created": "2022-11-06T11:14:00.000Z",
+                "username": null,
+                "forename": null,
+                "surname": null,
+                "email": null,
+                "salt": null,
+                "hash": null,
+                "billing": null,
+                "shipping": null,
+                "quota": null
             }
         ],
         code: 200,
@@ -94,19 +95,20 @@ export class IdController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getIdByEMailRequest(@Request() req: RequestTracing, @Header() id: string, @Query() email: string): Promise<GetIdResponse> {
+    public async getAuditRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetAuditResponse> {
         await this.initialize(req, id);
 
-        const searchedUserEmail: User = await this.getIdByEmail(email);
+        await this.getUsersAudit();
 
         return Promise.resolve({
             "status": "success",
             "message": "",
-            "data": [{
-                "id": searchedUserEmail.id
-            }],
+            "data": [
+                this.userAudit
+            ],
             "code": 200,
             "trace": this.traceId
         });
     }
+
 }
