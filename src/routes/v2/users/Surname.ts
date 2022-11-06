@@ -134,7 +134,7 @@ export class SurnameController extends Controller {
         if (this.user.surname != body.surname) {
 
             await Promise.all([
-                this.updateSurname(req.body.surname),
+                this.updateSurname(body.surname),
                 this.updateModified()
             ]);
         }

@@ -26,7 +26,8 @@ import { User } from "../../../models/User";
 import {GetEmailResponse} from "../../../models/email/GetEmailResponse";
 import {PutEmailRequest} from "../../../models/email/PutEmailRequest";
 import {PutEmailResponse} from "../../../models/email/PutEmailResponse";
-import {AccountAlreadyExistsError} from "../../../../../clippic-errors";
+import {AccountAlreadyExistsError, MailFormatError} from "../../../../../clippic-errors";
+import {validateEmail} from "../../../classes/Mailer";
 
 @Route("/users/v2/email")
 export class EmailController extends Controller {
@@ -123,6 +124,7 @@ export class EmailController extends Controller {
      * | Code | Description                 |
      * |------|-----------------------------|
      * | 400  | AccountAlreadyExistsError   |
+     * | 400  | MailFormatError             |
      */
     @Tags("Email")
     @Example<PutEmailResponse>({
@@ -137,10 +139,13 @@ export class EmailController extends Controller {
         trace: "4ba373202a8e4807"
     })
     @Response<AccountAlreadyExistsError>(400)
+    @Response<MailFormatError>(400)
     @Security("jwt")
     @Put("/")
     public async putEmailRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutEmailRequest): Promise<PutEmailResponse> {
         await this.initialize(req, id);
+
+        validateEmail(body.email, this.traceId);
 
         await this.getUsersEmail();
 

@@ -134,7 +134,7 @@ export class ForenameController extends Controller {
         if (this.user.forename != body.forename) {
 
             await Promise.all([
-                this.updateForename(req.body.forename),
+                this.updateForename(body.forename),
                 this.updateModified()
             ]);
         }

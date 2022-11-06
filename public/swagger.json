@@ -1054,7 +1054,7 @@
 				]
 			},
 			"put": {
-				"operationId": "PutEmailequest",
+				"operationId": "PutEmailRequest",
 				"responses": {
 					"200": {
 						"description": "Ok",

@@ -146,12 +146,12 @@ export class UsernameController extends Controller {
 
         if (this.user.username != body.username) {
 
-            if (await this.CheckIfUsernameAlreadyExists(req.body.username)) {
-                throw new UsernameAlreadyExistsError(req.body.username, this.traceId);
+            if (await this.CheckIfUsernameAlreadyExists(body.username)) {
+                throw new UsernameAlreadyExistsError(body.username, this.traceId);
             }
 
             await Promise.all([
-                this.updateUsername(req.body.username),
+                this.updateUsername(body.username),
                 this.updateModified()
             ]);
         }

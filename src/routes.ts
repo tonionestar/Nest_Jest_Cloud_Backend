@@ -563,9 +563,9 @@ export function RegisterRoutes(app: express.Router) {
         app.put('/users/v2/email',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(EmailController)),
-            ...(fetchMiddlewares<RequestHandler>(EmailController.prototype.putEmailequest)),
+            ...(fetchMiddlewares<RequestHandler>(EmailController.prototype.putEmailRequest)),
 
-            function EmailController_putEmailequest(request: any, response: any, next: any) {
+            function EmailController_putEmailRequest(request: any, response: any, next: any) {
             const args = {
                     req: {"in":"request","name":"req","required":true,"dataType":"object"},
                     id: {"in":"header","name":"id","required":true,"dataType":"string"},
@@ -581,7 +581,7 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new EmailController();
 
 
-              const promise = controller.putEmailequest.apply(controller, validatedArgs as any);
+              const promise = controller.putEmailRequest.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

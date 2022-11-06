@@ -139,6 +139,26 @@ describe(url, () => {
             expect(databaseResult.email).toBe(newEmailAddress);
         });
 
+        it("should not be possible to change email with invalid email format", async () => {
+            const testUserId = await createNewUser({});
+            const newEmailAddress = "testeratclippic.de"
+            const result = await request(app)
+                .put(url)
+                .set('id', testUserId)
+                .set('x-access-token', generateAccessToken(testUserId))
+                .send({
+                    email: newEmailAddress
+                });
+
+            expect(result.status).toBe(400);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(0);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(1022);
+        });
+
         it("should be possible to change email with max chars", async () => {
             const testUserId = await createNewUser({});
             const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app"
