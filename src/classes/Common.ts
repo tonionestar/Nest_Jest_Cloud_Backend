@@ -69,7 +69,7 @@ export function validatePasswordRegex(password: string): boolean {
 }
 
 export function validatePassword(password: string, traceId: string): void {
-    const passIsInvalid = !this.validatePasswordRegex(password);
+    const passIsInvalid = !validatePasswordRegex(password);
     if (passIsInvalid) {
         throw new PasswordInvalidError(traceId);
     }
@@ -302,7 +302,7 @@ export function checkJWTAuthenticationSession(req: RequestTracing, user: User) {
     const decodedToken: AccessToken = decode(token) as AccessToken;
 
     // Check if id from token is the same as from uri
-    if (user.salt != decodedToken.session) {
+    if (user.session != decodedToken.session) {
         throw new AccessTokenNotAllowedForUriError(getTraceId(req));
     }
 }

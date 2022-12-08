@@ -15,6 +15,9 @@ export class Users {
     @Column("varchar", { length: 32, nullable: false })
     salt: string;
 
+    @Column("varchar", { length: 32, nullable: false })
+    session: string;
+
     @Column("varchar", { length: 128, nullable: false })
     hash: string;
 

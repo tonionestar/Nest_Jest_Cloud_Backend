@@ -44,11 +44,6 @@
 						"description": "When the user modified his email.",
 						"format": "date"
 					},
-					"salt": {
-						"type": "string",
-						"description": "When the user modified his salt/session.",
-						"format": "date"
-					},
 					"hash": {
 						"type": "string",
 						"description": "When the user modified his hash.",
@@ -244,6 +239,10 @@
 			"AccountAlreadyExistsError": {
 				"$ref": "#/components/schemas/ClippicErrorInterface",
 				"description": "1023 | Error when email already registered for an other account."
+			},
+			"MailFormatError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1022 | Error when access mode is not valid."
 			},
 			"PutEmailRequest": {
 				"description": "Update the users email",
@@ -506,10 +505,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"MailFormatError": {
-				"$ref": "#/components/schemas/ClippicErrorInterface",
-				"description": "1022 | Error when access mode is not valid."
-			},
 			"UsernameOrMailRequiredError": {
 				"$ref": "#/components/schemas/ClippicErrorInterface",
 				"description": "1049 | Error when email or password is missing"
@@ -550,6 +545,57 @@
 				"additionalProperties": false,
 				"example": {
 					"email": "tester@clippic.app",
+					"pass": "Test1234#!"
+				}
+			},
+			"ClippicResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PasswordInvalidError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1033 | Error when password is not passing security RegEx."
+			},
+			"PutPasswordRequest": {
+				"description": "Update the users password.",
+				"properties": {
+					"pass": {
+						"type": "string",
+						"description": "The user's password.",
+						"example": "Test1234#!"
+					}
+				},
+				"required": [
+					"pass"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
 					"pass": "Test1234#!"
 				}
 			},
@@ -966,7 +1012,6 @@
 													"forename": null,
 													"surname": null,
 													"email": null,
-													"salt": null,
 													"hash": null,
 													"billing": null,
 													"shipping": null,
@@ -1086,13 +1131,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/AccountAlreadyExistsError"
+									"$ref": "#/components/schemas/MailFormatError"
 								}
 							}
 						}
 					}
 				},
-				"description": "This request will update the user's email.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | AccountAlreadyExistsError   |",
+				"description": "This request will update the user's email.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | AccountAlreadyExistsError   |\n| 400  | MailFormatError             |",
 				"tags": [
 					"Email"
 				],
@@ -1345,7 +1390,7 @@
 						}
 					}
 				},
-				"description": "This request will login a user and return a JWT Token.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | MailFormatError             |\n| 400  | UsernameOrMailRequiredError |\n| 400  | PasswordWrongError          |\n| 400  | GetAuditError               |\n| 400  | GetAuditError               |",
+				"description": "This request will login a user and return a JWT Token.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | MailFormatError             |\n| 400  | UsernameOrMailRequiredError |\n| 400  | PasswordWrongError          |\n| 400  | GetAuditError               |",
 				"tags": [
 					"Login"
 				],
@@ -1361,6 +1406,114 @@
 						}
 					}
 				}
+			}
+		},
+		"/users/v2/password": {
+			"put": {
+				"operationId": "ChangePassword",
+				"responses": {
+					"200": {
+						"description": "Password changed successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ClippicResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "Password changed successfully",
+											"data": [],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PasswordInvalidError"
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will update users password.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | PasswordInvalidError        |",
+				"tags": [
+					"Password"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PutPasswordRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "ForgotPassword",
+				"responses": {
+					"200": {
+						"description": "Password reset instructions has been sent if email address is registered.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ClippicResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "Password reset instructions has been sent if email address is registered.",
+											"data": [],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will reset passwort after forgotten.",
+				"tags": [
+					"Password"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "email",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/users/v2/surname": {

@@ -1,4 +1,4 @@
-import {createNewUser, generateAccessToken} from "../../../classes/CommonTests";
+import { createNewUser, generateAccessToken } from "../../../classes/CommonTests";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 
@@ -39,8 +39,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId));
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId));
 
             expect(result.status).toBe(200);
             expect(result.body).toHaveProperty("data");
@@ -61,7 +61,6 @@ describe(url, () => {
             expect(result.body.data[0]).toHaveProperty("forename");
             expect(result.body.data[0]).toHaveProperty("surname");
             expect(result.body.data[0]).toHaveProperty("email");
-            expect(result.body.data[0]).toHaveProperty("salt");
             expect(result.body.data[0]).toHaveProperty("hash");
             expect(result.body.data[0]).toHaveProperty("billing");
             expect(result.body.data[0]).toHaveProperty("shipping");
@@ -76,7 +75,7 @@ describe(url, () => {
 
         const result = await request(app)
             .get(url)
-            .set('x-access-token', generateAccessToken(testUserId));
+            .set("x-access-token", generateAccessToken(testUserId));
 
         expect(result.status).toBe(400);
         expect(result.body).toHaveProperty("data");
@@ -92,8 +91,8 @@ describe(url, () => {
 
         const result = await request(app)
             .get(url)
-            .set('id', "0")
-            .set('x-access-token', generateAccessToken(testUserId));
+            .set("id", "0")
+            .set("x-access-token", generateAccessToken(testUserId));
 
         expect(result.status).toBe(400);
         expect(result.body).toHaveProperty("data");
@@ -107,7 +106,7 @@ describe(url, () => {
     it("should not be possible to get audit data when access-token is missing", async () => {
         const result = await request(app)
             .get(url)
-            .set('id', "0");
+            .set("id", "0");
 
         expect(result.status).toBe(400);
         expect(result.body).toHaveProperty("data");

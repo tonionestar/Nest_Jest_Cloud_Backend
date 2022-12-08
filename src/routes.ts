@@ -17,6 +17,8 @@ import { IdController } from './routes/v2/users/Id';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { LoginController } from './routes/v2/users/Login';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { PasswordController } from './routes/v2/users/Password';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SurnameController } from './routes/v2/users/Surname';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UsernameController } from './routes/v2/users/Username';
@@ -39,7 +41,6 @@ const models: TsoaRoute.Models = {
             "forename": {"dataType":"string"},
             "surname": {"dataType":"string"},
             "email": {"dataType":"string"},
-            "salt": {"dataType":"string"},
             "hash": {"dataType":"string"},
             "billing": {"dataType":"string"},
             "shipping": {"dataType":"string"},
@@ -113,6 +114,11 @@ const models: TsoaRoute.Models = {
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AccountAlreadyExistsError": {
+        "dataType": "refAlias",
+        "type": {"ref":"ClippicErrorInterface","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "MailFormatError": {
         "dataType": "refAlias",
         "type": {"ref":"ClippicErrorInterface","validators":{}},
     },
@@ -221,11 +227,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "MailFormatError": {
-        "dataType": "refAlias",
-        "type": {"ref":"ClippicErrorInterface","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "UsernameOrMailRequiredError": {
         "dataType": "refAlias",
         "type": {"ref":"ClippicErrorInterface","validators":{}},
@@ -246,6 +247,31 @@ const models: TsoaRoute.Models = {
         "properties": {
             "username": {"dataType":"string","validators":{"maxLength":{"value":40}}},
             "email": {"dataType":"string","validators":{"maxLength":{"value":200}}},
+            "pass": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ClippicResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "status": {"dataType":"string","required":true},
+            "message": {"dataType":"string"},
+            "data": {"dataType":"any"},
+            "code": {"dataType":"integer","required":true},
+            "trace": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PasswordInvalidError": {
+        "dataType": "refAlias",
+        "type": {"ref":"ClippicErrorInterface","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PutPasswordRequest": {
+        "dataType": "refObject",
+        "properties": {
             "pass": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -691,6 +717,60 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.login.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, 200, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.put('/users/v2/password',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(PasswordController)),
+            ...(fetchMiddlewares<RequestHandler>(PasswordController.prototype.changePassword)),
+
+            function PasswordController_changePassword(request: any, response: any, next: any) {
+            const args = {
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    id: {"in":"header","name":"id","required":true,"dataType":"string"},
+                    body: {"in":"body","name":"body","required":true,"ref":"PutPasswordRequest"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new PasswordController();
+
+
+              const promise = controller.changePassword.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, 200, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/users/v2/password',
+            ...(fetchMiddlewares<RequestHandler>(PasswordController)),
+            ...(fetchMiddlewares<RequestHandler>(PasswordController.prototype.forgotPassword)),
+
+            function PasswordController_forgotPassword(request: any, response: any, next: any) {
+            const args = {
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    email: {"in":"header","name":"email","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new PasswordController();
+
+
+              const promise = controller.forgotPassword.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, 200, next);
             } catch (err) {
                 return next(err);

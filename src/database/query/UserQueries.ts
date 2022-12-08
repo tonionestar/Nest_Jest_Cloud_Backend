@@ -1,13 +1,13 @@
 import { Span, SpanContext } from "opentracing";
-import tracer from "../../classes/Jaeger";
 import { ClippicDataSource } from "../DatabaseConnection";
 import { Users } from "../entity/Users";
 import { UsersAudit } from "../entity/UsersAudit";
-
+import { UsersPasswordReset } from "../entity/UsersPasswordReset";
+import tracer from "../../classes/Jaeger";
 
 export class UserQueries {
 
-    async doQuery(parentSpanContext: SpanContext, callback: any, ...callbackArgs: string[]) {
+    async doQuery(parentSpanContext: SpanContext, callback: any, ...callbackArgs: any[]) {
         const span: Span = tracer.startSpan(callback.name, {
             childOf: parentSpanContext,
         });
@@ -26,6 +26,7 @@ export class UserQueries {
             .addSelect("users.forename")
             .addSelect("users.surname")
             .addSelect("users.salt")
+            .addSelect("users.session")
             .addSelect("users.hash")
             .where("users.email = :email", { email: email })
             .getOne();
@@ -40,8 +41,19 @@ export class UserQueries {
             .addSelect("users.forename")
             .addSelect("users.surname")
             .addSelect("users.salt")
+            .addSelect("users.session")
             .addSelect("users.hash")
             .where("users.username = :username", { username: username })
+            .getOne();
+    }
+
+    GetLoginData(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .select("users.salt")
+            .addSelect("users.session")
+            .addSelect("users.hash")
+            .where("users.id = :userId", { userId: userId })
             .getOne();
     }
 
@@ -63,7 +75,6 @@ export class UserQueries {
             .addSelect("users_audit.forename")
             .addSelect("users_audit.surname")
             .addSelect("users_audit.email")
-            .addSelect("users_audit.salt")
             .addSelect("users_audit.hash")
             .addSelect("users_audit.billing")
             .addSelect("users_audit.shipping")
@@ -109,6 +120,14 @@ export class UserQueries {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")
             .select("users.salt")
+            .where("users.id = :userId", { userId: userId })
+            .getOne();
+    }
+
+    GetUsersSession(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .select("users.session")
             .where("users.id = :userId", { userId: userId })
             .getOne();
     }
@@ -175,6 +194,26 @@ export class UserQueries {
             .execute();
     }
 
+    UpdateSession(userId: string, session: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .update(Users, {
+                session: session
+            })
+            .where("users.id = :userId", { userId: userId })
+            .execute();
+    }
+
+    UpdateHash(userId: string, hash: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .update(Users, {
+                hash: hash
+            })
+            .where("users.id = :userId", { userId: userId })
+            .execute();
+    }
+
     UpdateAuditForename(userId: string) {
         return ClippicDataSource.manager
             .createQueryBuilder()
@@ -183,7 +222,7 @@ export class UserQueries {
                 forename: () => "CURRENT_TIMESTAMP"
             })
             .where("user_id = :userId", { userId: userId })
-            .execute()
+            .execute();
     }
 
     UpdateAuditSurname(userId: string) {
@@ -217,5 +256,44 @@ export class UserQueries {
             })
             .where("user_id = :userId", { userId: userId })
             .execute()
+    }
+
+    UpdateAuditHash(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .update(UsersAudit, {
+                modified: () => "CURRENT_TIMESTAMP",
+                hash: () => "CURRENT_TIMESTAMP"
+            })
+            .where("user_id = :userId", { userId: userId })
+            .execute()
+    }
+
+    SetPasswordForgottenSecret(id: string, secret: number) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .insert()
+            .into(UsersPasswordReset)
+            .values({
+                user_id: id,
+                created: () => "CURRENT_TIMESTAMP",
+                expired: () => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 3 HOUR)",
+                secret: secret,
+                used: false
+            })
+            .orUpdate(["created", "expired", "secret", "used"])
+            .execute()
+    }
+
+    GetPasswordReset(id: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .from(UsersPasswordReset, "users_password_reset")
+            .select("users_password_reset.expired")
+            .addSelect("users_password_reset.created")
+            .addSelect("users_password_reset.secret")
+            .addSelect("users_password_reset.used")
+            .where("users_password_reset.user_id = :id", { id: id })
+            .getOne();
     }
 }

@@ -44,12 +44,6 @@ export interface UserAudit {
     email?: string;
 
     /**
-     * When the user modified his salt/session.
-     * @format date
-     */
-    salt?: string;
-
-    /**
      * When the user modified his hash.
      * @format date
      */

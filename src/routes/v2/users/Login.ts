@@ -96,7 +96,7 @@ export class LoginController extends Controller {
     private generateAccessToken() {
         const accessToken: AccessToken = {
             userId: this.user.id.toString(),
-            session: this.user.salt.toString()
+            session: this.user.session.toString()
         }
         this.token = jwt.sign(accessToken, getJWTSecret(), {});
     }
@@ -111,7 +111,6 @@ export class LoginController extends Controller {
      * | 400  | MailFormatError             |
      * | 400  | UsernameOrMailRequiredError |
      * | 400  | PasswordWrongError          |
-     * | 400  | GetAuditError               |
      * | 400  | GetAuditError               |
      */
     @Tags("Login")

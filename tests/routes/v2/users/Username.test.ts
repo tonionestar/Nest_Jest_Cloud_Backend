@@ -1,11 +1,9 @@
-import {createNewUser, generateAccessToken, testUsername} from "../../../classes/CommonTests";
-
+import { createNewUser, generateAccessToken, testUsername } from "../../../classes/CommonTests";
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
-
+import { UserQueries } from "../../../../src/database/query/UserQueries";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import request from "supertest"
-import {UserQueries} from "../../../../src/database/query/UserQueries";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app")
@@ -42,8 +40,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId));
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId));
 
             expect(result.status).toBe(200);
             expect(result.body).toHaveProperty("data");
@@ -63,7 +61,7 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('x-access-token', generateAccessToken(testUserId));
+                .set("x-access-token", generateAccessToken(testUserId));
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -79,8 +77,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('id', "0")
-                .set('x-access-token', generateAccessToken(testUserId));
+                .set("id", "0")
+                .set("x-access-token", generateAccessToken(testUserId));
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -94,7 +92,7 @@ describe(url, () => {
         it("should not be possible to get username when access-token is missing", async () => {
             const result = await request(app)
                 .get(url)
-                .set('id', "0");
+                .set("id", "0");
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -114,8 +112,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     username: newUserName
                 });
@@ -145,8 +143,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     username: newUserName
                 });
@@ -176,8 +174,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     username: newUserName
                 });
@@ -202,8 +200,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     username: newUserName
                 });
@@ -223,8 +221,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     username: newUserName
                 });
@@ -243,8 +241,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send()
 
             expect(result.status).toBe(400);
@@ -261,7 +259,7 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     username: "newUserName"
                 });
@@ -280,7 +278,7 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set('id', testUserId)
+                .set("id", testUserId)
                 .send({
                     username: "newUserName"
                 });

@@ -4,7 +4,9 @@ import {
     testEmail,
     testForename,
     testHash,
-    testSalt, testSurname,
+    testSalt,
+    testSession,
+    testSurname,
     testUsername
 } from "../../../classes/CommonTests";
 
@@ -49,7 +51,7 @@ describe(url, () => {
                 .post(url)
                 .send({
                     "email": "tester@clippic.app",
-                    "pass": "Test123#"
+                    "pass": "Test1234#"
                 });
 
             expect(result.status).toBe(200);
@@ -83,7 +85,7 @@ describe(url, () => {
                 .post(url)
                 .send({
                     "username": "tester",
-                    "pass": "Test123#"
+                    "pass": "Test1234#"
                 });
 
             expect(result.status).toBe(200);
@@ -163,7 +165,7 @@ describe(url, () => {
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(1)
-            expect(result.body.data[0]).toStrictEqual({"body.pass": {"message": "'pass' is required"}})
+            expect(result.body.data[0]).toStrictEqual({ "body.pass": { "message": "'pass' is required" } })
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1101);
@@ -184,7 +186,7 @@ describe(url, () => {
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
             expect(result.body.data).toHaveLength(1)
-            expect(result.body.data[0]).toStrictEqual({"body.pass": {"message": "'pass' is required"},
+            expect(result.body.data[0]).toStrictEqual({ "body.pass": { "message": "'pass' is required" },
                 "body.password": {
                     "message": "\"password\" is an excess property and therefore is not allowed",
                     "value": "password"
@@ -248,6 +250,7 @@ describe(url, () => {
                 testUsername,
                 testEmail,
                 testSalt,
+                testSession,
                 testHash,
                 testForename,
                 testSurname

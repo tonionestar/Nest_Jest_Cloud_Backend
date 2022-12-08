@@ -1,6 +1,4 @@
-import { UsernameAlreadyExistsError } from "@clippic/clippic-errors";
 import * as express from "express";
-import { SpanContext } from "opentracing";
 import {
     Body,
     Controller,
@@ -21,12 +19,14 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
-import { UserQueries } from "../../../database/query/UserQueries";
 import { GetUsernameResponse } from "../../../models/username/GetUsernameResponse";
 import { PutUsernameRequest } from "../../../models/username/PutUsernameRequest";
 import { PutUsernameResponse } from "../../../models/username/PutUsernameResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
+import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
+import { UserQueries } from "../../../database/query/UserQueries";
+import { UsernameAlreadyExistsError } from "@clippic/clippic-errors";
 
 @Route("/users/v2/username")
 export class UsernameController extends Controller {
@@ -40,8 +40,8 @@ export class UsernameController extends Controller {
 
     private user: User = {};
 
-    private async getUsersSalt() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSalt, this.user.id);
+    private async getUsersSession() {
+        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
@@ -66,8 +66,8 @@ export class UsernameController extends Controller {
         // check if user is allowed for this url
         checkJWTAuthenticationUserId(this.req, this.user);
 
-        // get salt from database
-        await this.getUsersSalt();
+        // get session from database
+        await this.getUsersSession();
 
         // check if user has correct session variable
         checkJWTAuthenticationSession(this.req, this.user);

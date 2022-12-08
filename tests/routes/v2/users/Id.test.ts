@@ -1,4 +1,4 @@
-import {createNewUser, generateAccessToken} from "../../../classes/CommonTests";
+import { createNewUser, generateAccessToken } from "../../../classes/CommonTests";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 
@@ -46,8 +46,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .query({
                     "email": newUserEmail
                 });
@@ -70,8 +70,8 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('id', testUserId)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
                 .query({
                     "email": "dumb"
                 });
@@ -90,7 +90,7 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('x-access-token', generateAccessToken(testUserId))
+                .set("x-access-token", generateAccessToken(testUserId))
                 .query({
                     "email": "dumb"
                 });
@@ -109,7 +109,7 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set('id', testUserId)
+                .set("id", testUserId)
                 .query({
                     "email": "dumb"
                 });

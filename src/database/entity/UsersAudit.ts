@@ -2,8 +2,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    Index, PrimaryColumn,
-    PrimaryGeneratedColumn,
+    PrimaryColumn,
     UpdateDateColumn
 } from "typeorm";
 
@@ -32,9 +31,6 @@ export class UsersAudit {
 
     @Column("timestamp", { nullable: true })
     email: string
-
-    @Column("timestamp", { nullable: true })
-    salt: string
 
     @Column("timestamp", { nullable: true })
     hash: string

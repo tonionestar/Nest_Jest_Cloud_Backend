@@ -1,5 +1,4 @@
 import * as express from "express";
-import { SpanContext } from "opentracing";
 import {
     Controller,
     Example,
@@ -17,11 +16,12 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { GetAuditResponse } from "../../../models/audit/GetAuditResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
+import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import {GetAuditResponse} from "../../../models/audit/GetAuditResponse";
-import {UserAudit} from "../../../models/UserAudit";
+import { UserAudit } from "../../../models/UserAudit";
+import { UserQueries } from "../../../database/query/UserQueries";
 
 @Route("/users/v2/audit")
 export class AuditController extends Controller {
@@ -36,8 +36,8 @@ export class AuditController extends Controller {
     private user: User = {};
     private userAudit: UserAudit;
 
-    private async getUsersSalt() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSalt, this.user.id);
+    private async getUsersSession() {
+        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
@@ -46,13 +46,12 @@ export class AuditController extends Controller {
         this.userAudit = Object.assign(result);
     }
 
-
     private async checkRouteAccess() {
         // check if user is allowed for this url
         checkJWTAuthenticationUserId(this.req, this.user);
 
-        // get salt from database
-        await this.getUsersSalt();
+        // get session from database
+        await this.getUsersSession();
 
         // check if user has correct session variable
         checkJWTAuthenticationSession(this.req, this.user);
@@ -83,7 +82,6 @@ export class AuditController extends Controller {
                 "forename": null,
                 "surname": null,
                 "email": null,
-                "salt": null,
                 "hash": null,
                 "billing": null,
                 "shipping": null,

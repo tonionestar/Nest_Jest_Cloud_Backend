@@ -3,6 +3,7 @@ export interface User {
     username?: string;
     email?: string;
     salt?: string;
+    session?: string;
     hash?: string;
     forename?: string;
     surname?: string;
