@@ -36,7 +36,7 @@ build:
     entrypoint: [ "" ]
   before_script:
     - "mkdir -p /kaniko/.docker"
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(echo -n $CI_DEPENDENCY_PROXY_USER:$CI_DEPENDENCY_PROXY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"},\"$(echo -n dependency-proxy-clippic.clippic.app | awk -F[:] '{print $1}')\":{\"auth\":\"$(echo -n $CI_DEPENDENCY_PROXY_USER:$CI_DEPENDENCY_PROXY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
   only:
     - "dev"
   script:
@@ -45,7 +45,7 @@ build:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}
-      --registry-mirror gitlab.clippic.app/clippic/backend/dependency_proxy/containers/
+      --registry-mirror dependency-proxy-clippic.clippic.app
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
