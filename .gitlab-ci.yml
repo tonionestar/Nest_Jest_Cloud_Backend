@@ -45,7 +45,7 @@ build:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}
-      # gitlab.clippic.app/clippic/backend/dependency_proxy/containers/
+      --registry-mirror gitlab.clippic.app/clippic/backend/dependency_proxy/containers/
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
