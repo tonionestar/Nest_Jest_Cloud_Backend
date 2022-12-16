@@ -45,7 +45,6 @@ build:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}
-      --registry-mirror dependency-proxy-clippic.clippic.app
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
@@ -55,7 +54,6 @@ build:
     name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine/helm"
     entrypoint: [""]
   before_script:
-    - "kubectl config use-context clippic/gitlab-agent:clippic-agent-1"
     - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/files/serviceAccountKey.json"
   environment:
     name: "${CI_COMMIT_REF_NAME}"
@@ -66,6 +64,7 @@ build:
       --install
       --namespace ${NAMESPACE}
       --create-namespace
+      --kube-context clippic/gitlab-agent:clippic-agent-1
       --set database.name=${DATABASE_NAME}
       --set database.user=${DATABASE_USER}
       --set database.pass=${DATABASE_PASSWORD}
