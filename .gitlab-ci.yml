@@ -1,11 +1,37 @@
 stages:
+  - prepare
   - build
   - deploy
 
+.common-semantic-release:
+  except:
+    - triggers
+    - tags
+  image: registry.clippic.app/infrastructure/semantic-release:latest
+  stage: prepare
+  variables:
+    GIT_STRATEGY: clone
+
+prepare:
+  artifacts:
+    reports:
+      dotenv: ${CI_PROJECT_DIR}/deploy.env
+  extends: .common-semantic-release
+  script:
+    - echo RELEASE_VERSION=$(semantic-release --dry-run --branches $CI_COMMIT_REF_NAME --plugins "@semantic-release/gitlab" | grep -oP "Published release [0-9]+\.[0-9]+\.[0-9]+ on" | grep -oP "[0-9]+\.[0-9]+\.[0-9]+") > ${CI_PROJECT_DIR}/deploy.env
+    - cat ${CI_PROJECT_DIR}/deploy.env
+  stage: prepare
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+    GIT_STRATEGY: clone
+    GIT_DEPTH: "500"
+
 build:
-  stage: build
+  dependencies:
+    - "prepare"
+  stage: "build"
   image:
-    name: gcr.io/kaniko-project/executor:debug
+    name: "gcr.io/kaniko-project/executor:debug"
     entrypoint: [ "" ]
   before_script:
     - mkdir -p /kaniko/.docker
@@ -18,69 +44,70 @@ build:
       /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+      --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}
+      # gitlab.clippic.app/clippic/backend/dependency_proxy/containers/
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
+      --build-arg APP_VERSION=${RELEASE_VERSION}
 
 .deploy:
   stage: deploy
   image:
-    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/bitnami/kubectl:latest
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine/helm
     entrypoint: [""]
   before_script:
     - kubectl config use-context clippic/gitlab-agent:clippic-agent-1
-    - kubectl delete --ignore-not-found=true namespace clippic-user-$CI_COMMIT_REF_SLUG
-    - kubectl create namespace clippic-user-$CI_COMMIT_REF_SLUG
-    - kubectl create secret docker-registry -n clippic-user-$CI_COMMIT_REF_SLUG clippic --docker-server=$CI_REGISTRY --docker-username=gitlab+deploy-token-6 --docker-password=$DEPLOY_TOKEN_PASSWORD
-    - kubectl create secret generic -n clippic-user-$CI_COMMIT_REF_SLUG fcm-json --from-file=serviceAccountKey.json=$FCM_SERVICE_ACCOUNT
+    - cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/files/serviceAccountKey.json
+  environment:
+    name: "${CI_COMMIT_REF_NAME}"
+    url: "https://${DOMAIN}/v2/user/docs"
   script:
-    - |
-      for VAR in DATABASE_USER DATABASE_PASSWORD DATABASE_NAME DATABASE_SERVER ORDER_BACKEND VIDEO_BACKEND
-      do
-        for FILE in k8s/*
-          do
-            if [ "$CI_COMMIT_REF_SLUG" = "master" ]; then
-              sed -i "s@__${VAR}__@${!VAR}@g" ${FILE}
-            elif [ "$CI_COMMIT_REF_SLUG" = "develop" ]; then
-              DEV_VAR="DEV_${VAR}"
-              sed -i "s@__${VAR}__@${!DEV_VAR}@g" ${FILE}
-            fi
-          done
-      done
-
-      # Replace default variables
-      for VAR in CI_COMMIT_SHORT_SHA CI_COMMIT_REF_SLUG CI_ENVIRONMENT_SLUG CI_PROJECT_PATH_SLUG CI_REGISTRY_IMAGE SMTP_SERVER SMTP_PASS SMTP_PORT JAEGER_ENDPOINT SUBDOMAIN
-        do
-          for FILE in k8s/*
-            do
-              sed -i "s@__${VAR}__@${!VAR}@g" ${FILE}
-            done
-        done
-      # Replaces variables which contains a '@'
-      for VAR in SMTP_USER
-        do
-          for FILE in k8s/*
-            do
-              sed -i "s/__${VAR}__/${!VAR}/g" ${FILE}
-            done
-        done
-    - kubectl apply -n clippic-user-$CI_COMMIT_REF_SLUG -f k8s/
+    - >
+      helm upgrade
+      --install
+      --namespace ${NAMESPACE}
+      --create-namespace
+      --set database.name=${DATABASE_NAME}
+      --set database.user=${DATABASE_USER}
+      --set database.pass=${DATABASE_PASSWORD}
+      --set smtp.pass=${SMTP_PASS} 
+      --set ingress.hosts[0].host=${DOMAIN}
+      --set imagePullSecret.password=${DEPLOY_TOKEN_PASSWORD}
+      user 
+      charts/user
 
 deploy-dev:
-  extends: .deploy
-  environment:
-    name: dev
-    url: https://${SUBDOMAIN}.clippic.app
+  extends: ".deploy"
   only:
-    - develop
+    - "dev"
   variables:
-    SUBDOMAIN: api-dev
+    DOMAIN: "api-dev.clippic.app"
+    DATABASE_NAME: "dev_clippic_user"
+    DATABASE_USER: "clippic_dev"
+    DATABASE_PASSWORD: "${DEV_DATABASE_PASSWORD}"
 
-deploy-production:
-  extends: .deploy
-  environment:
-    name: production
-    url: https://${SUBDOMAIN}.clippic.app
+deploy-main:
+  extends: ".deploy"
   only:
-    - master
+    - "main"
   variables:
-    SUBDOMAIN: api
+    DOMAIN: "api.clippic.app"
+    DATABASE_NAME: "clippic_user"
+    DATABASE_USER: "clippic_prod"
+    DATABASE_PASSWORD: "${MAIN_DATABASE_PASSWORD}"
+
+release:
+  artifacts:
+    paths:
+      - "CHANGELOG.md"
+  except:
+    - "web"
+  extends: ".common-semantic-release"
+  only:
+    - "main"
+  script:
+    - "semantic-release"
+  stage: "release"
+  variables:
+    GIT_SUBMODULE_STRATEGY: "none"
+    GIT_STRATEGY: "clone"
+    GIT_DEPTH: "500"

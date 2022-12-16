@@ -33,7 +33,7 @@ import { UserAudit } from "../../../models/UserAudit";
 import { UserQueries } from "../../../database/query/UserQueries";
 import { validateEmail } from "../../../classes/Mailer";
 
-@Route("/users/v2/login")
+@Route("/v2/users/login")
 export class LoginController extends Controller {
 
     public router = express.Router();

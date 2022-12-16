@@ -79,7 +79,7 @@ function errorHandler(
 function initializeSwaggerUi() {
     app.use(express.static("public"));
     app.use(
-        "/docs",
+        "/v2/users/docs",
         swaggerUi.serve,
         swaggerUi.setup(undefined, {
             swaggerOptions: {

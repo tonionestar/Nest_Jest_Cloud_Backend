@@ -37,7 +37,7 @@ afterEach(async () => {
     await ClippicDataSource.dropDatabase();
 });
 
-const url = "/users/v2/password";
+const url = "/v2/users/password";
 
 describe(url, () => {
     describe("PUT", () => {

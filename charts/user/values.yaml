@@ -1,0 +1,109 @@
+# Default values for user.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+database:
+  host: "10.234.0.211"
+  port: "3306"
+  name: ""
+  user: ""
+  pass: ""
+
+tracing:
+  endpoint: "http://clippic-jaeger-operator-jaeger-collector.jaeger:14268/api/traces"
+
+smtp:
+  host: "mail.brained.io"
+  port: "465"
+  user: "notifications@clippic.app"
+  pass: ""
+
+backend:
+  video: "http://video:3001"
+  order: "http://order:3002"
+
+image:
+  registry: "registry.clippic.app"
+  repository: "clippic/backend/user-v2/user"
+  pullPolicy: "IfNotPresent"
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecret:
+  username: "gitlab+deploy-token-6"
+  password: ""
+  registryURL: "registry.clippic.app"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: "ClusterIP"
+  ports:
+    api:
+      port: 3000
+      containerPort: 3000
+      protocol: "TCP"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: api.clippic.app
+      paths:
+        - path: /v2/users
+          pathType: Prefix
+  tls:
+    enabled: true
+    secretName:
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 3
+  periodSeconds: 1
+  failureThreshold: 15
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 3
+  periodSeconds: 2
+  failureThreshold: 2
+
+resources:
+  limits:
+    cpu: 1
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

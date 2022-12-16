@@ -31,7 +31,7 @@ import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
 import { validateEmail } from "../../../classes/Mailer";
 
-@Route("/users/v2/email")
+@Route("/v2/users/email")
 export class EmailController extends Controller {
 
     public router = express.Router();

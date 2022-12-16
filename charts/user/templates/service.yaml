@@ -1,0 +1,22 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- range $key, $value := .Values.service.ports }}
+    - name: {{ $key }}
+      port: {{ $value.port }}
+      targetPort: {{ $key }}
+      protocol: {{ $value.protocol }}
+      {{- if and (eq $.Values.service.type "NodePort") $value.nodePort }}
+      nodePort: {{ $value.nodePort }}
+      {{- end }}
+    {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+...

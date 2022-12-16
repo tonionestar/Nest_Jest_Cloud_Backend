@@ -28,7 +28,7 @@ import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
 import { UsernameAlreadyExistsError } from "@clippic/clippic-errors";
 
-@Route("/users/v2/username")
+@Route("/v2/users/username")
 export class UsernameController extends Controller {
 
     public router = express.Router();

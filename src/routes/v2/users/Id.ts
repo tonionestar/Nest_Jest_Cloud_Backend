@@ -24,7 +24,7 @@ import { User } from "../../../models/User";
 import { UserMailNotFoundError } from "@clippic/clippic-errors";
 import { UserQueries } from "../../../database/query/UserQueries";
 
-@Route("/users/v2/id")
+@Route("/v2/users/id")
 export class IdController extends Controller {
 
     public router = express.Router();

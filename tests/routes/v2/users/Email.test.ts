@@ -29,7 +29,7 @@ afterEach(async () => {
     await ClippicDataSource.dropDatabase();
 });
 
-const url = "/users/v2/email";
+const url = "/v2/users/email";
 
 describe(url, () => {
 

@@ -29,7 +29,7 @@ import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
 
-@Route("/users/v2/password")
+@Route("/v2/users/password")
 export class PasswordController extends Controller {
 
     public router = express.Router();

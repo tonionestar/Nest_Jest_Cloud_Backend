@@ -23,7 +23,7 @@ import { User } from "../../../models/User";
 import { UserAudit } from "../../../models/UserAudit";
 import { UserQueries } from "../../../database/query/UserQueries";
 
-@Route("/users/v2/audit")
+@Route("/v2/users/audit")
 export class AuditController extends Controller {
 
     public router = express.Router();

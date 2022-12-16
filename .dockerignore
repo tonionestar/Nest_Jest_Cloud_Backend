@@ -5,3 +5,8 @@ vendor
 .settings
 .project
 *.log
+dist
+coverage
+charts
+.idea
+tests

@@ -532,7 +532,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/audit',
+        app.get('/v2/users/audit',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(AuditController)),
             ...(fetchMiddlewares<RequestHandler>(AuditController.prototype.getAuditRequest)),
@@ -559,7 +559,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/email',
+        app.get('/v2/users/email',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(EmailController)),
             ...(fetchMiddlewares<RequestHandler>(EmailController.prototype.getEmailRequest)),
@@ -586,7 +586,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/users/v2/email',
+        app.put('/v2/users/email',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(EmailController)),
             ...(fetchMiddlewares<RequestHandler>(EmailController.prototype.putEmailRequest)),
@@ -614,7 +614,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/forename',
+        app.get('/v2/users/forename',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ForenameController)),
             ...(fetchMiddlewares<RequestHandler>(ForenameController.prototype.getForenameRequest)),
@@ -641,7 +641,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/users/v2/forename',
+        app.put('/v2/users/forename',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ForenameController)),
             ...(fetchMiddlewares<RequestHandler>(ForenameController.prototype.putForenameRequest)),
@@ -669,7 +669,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/id',
+        app.get('/v2/users/id',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(IdController)),
             ...(fetchMiddlewares<RequestHandler>(IdController.prototype.getIdByEMailRequest)),
@@ -697,7 +697,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/users/v2/login',
+        app.post('/v2/users/login',
             ...(fetchMiddlewares<RequestHandler>(LoginController)),
             ...(fetchMiddlewares<RequestHandler>(LoginController.prototype.login)),
 
@@ -723,7 +723,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/users/v2/password',
+        app.put('/v2/users/password',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(PasswordController)),
             ...(fetchMiddlewares<RequestHandler>(PasswordController.prototype.changePassword)),
@@ -751,7 +751,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/password',
+        app.get('/v2/users/password',
             ...(fetchMiddlewares<RequestHandler>(PasswordController)),
             ...(fetchMiddlewares<RequestHandler>(PasswordController.prototype.forgotPassword)),
 
@@ -777,7 +777,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/surname',
+        app.get('/v2/users/surname',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SurnameController)),
             ...(fetchMiddlewares<RequestHandler>(SurnameController.prototype.getSurnameRequest)),
@@ -804,7 +804,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/users/v2/surname',
+        app.put('/v2/users/surname',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SurnameController)),
             ...(fetchMiddlewares<RequestHandler>(SurnameController.prototype.putSurnameRequest)),
@@ -832,7 +832,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/users/v2/username',
+        app.get('/v2/users/username',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsernameController)),
             ...(fetchMiddlewares<RequestHandler>(UsernameController.prototype.getUsernameRequest)),
@@ -859,7 +859,7 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.put('/users/v2/username',
+        app.put('/v2/users/username',
             authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UsernameController)),
             ...(fetchMiddlewares<RequestHandler>(UsernameController.prototype.putUsernameRequest)),

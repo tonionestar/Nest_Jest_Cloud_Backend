@@ -26,7 +26,7 @@ import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
 
-@Route("/users/v2/forename")
+@Route("/v2/users/forename")
 export class ForenameController extends Controller {
 
     public router = express.Router();
