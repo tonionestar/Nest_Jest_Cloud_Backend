@@ -31,7 +31,7 @@ FROM dependencies AS build
 ARG APP_VERSION
 
 COPY src/ ./src
-RUN npm version ${APP_VERSION}
+RUN npm version --allow-same-version --no-commit-hooks --no-git-tag-version ${APP_VERSION}
 RUN npm run build
 
 #

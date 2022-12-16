@@ -1,26 +1,26 @@
 stages:
-  - prepare
-  - build
-  - deploy
+  - "prepare"
+  - "build"
+  - "deploy"
 
 .common-semantic-release:
   except:
-    - triggers
-    - tags
-  image: registry.clippic.app/infrastructure/semantic-release:latest
-  stage: prepare
+    - "triggers"
+    - "tags"
+  image: "registry.clippic.app/infrastructure/semantic-release:latest"
+  stage: "prepare"
   variables:
-    GIT_STRATEGY: clone
+    GIT_STRATEGY: "clone"
 
 prepare:
   artifacts:
     reports:
-      dotenv: ${CI_PROJECT_DIR}/deploy.env
-  extends: .common-semantic-release
+      dotenv: "${CI_PROJECT_DIR}/deploy.env"
+  extends: ".common-semantic-release"
   script:
     - echo RELEASE_VERSION=$(semantic-release --dry-run --branches $CI_COMMIT_REF_NAME --plugins "@semantic-release/gitlab" | grep -oP "Published release [0-9]+\.[0-9]+\.[0-9]+ on" | grep -oP "[0-9]+\.[0-9]+\.[0-9]+") > ${CI_PROJECT_DIR}/deploy.env
-    - cat ${CI_PROJECT_DIR}/deploy.env
-  stage: prepare
+    - "cat ${CI_PROJECT_DIR}/deploy.env"
+  stage: "prepare"
   variables:
     GIT_SUBMODULE_STRATEGY: none
     GIT_STRATEGY: clone
@@ -34,11 +34,10 @@ build:
     name: "gcr.io/kaniko-project/executor:debug"
     entrypoint: [ "" ]
   before_script:
-    - mkdir -p /kaniko/.docker
+    - "mkdir -p /kaniko/.docker"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(echo -n $CI_DEPENDENCY_PROXY_USER:$CI_DEPENDENCY_PROXY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
   only:
-    - develop
-    - master
+    - "dev"
   script:
     - >-
       /kaniko/executor
@@ -50,13 +49,13 @@ build:
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
 .deploy:
-  stage: deploy
+  stage: "deploy"
   image:
-    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine/helm
+    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine/helm"
     entrypoint: [""]
   before_script:
-    - kubectl config use-context clippic/gitlab-agent:clippic-agent-1
-    - cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/files/serviceAccountKey.json
+    - "kubectl config use-context clippic/gitlab-agent:clippic-agent-1"
+    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/files/serviceAccountKey.json"
   environment:
     name: "${CI_COMMIT_REF_NAME}"
     url: "https://${DOMAIN}/v2/user/docs"
@@ -72,6 +71,7 @@ build:
       --set smtp.pass=${SMTP_PASS} 
       --set ingress.hosts[0].host=${DOMAIN}
       --set imagePullSecret.password=${DEPLOY_TOKEN_PASSWORD}
+      --set image.tag=${RELEASE_VERSION}
       user 
       charts/user
 
@@ -96,15 +96,15 @@ deploy-main:
     DATABASE_PASSWORD: "${MAIN_DATABASE_PASSWORD}"
 
 release:
-  artifacts:
-    paths:
-      - "CHANGELOG.md"
+  dependencies:
+    - "prepare"
   except:
     - "web"
   extends: ".common-semantic-release"
   only:
     - "main"
   script:
+    - "npm version --allow-same-version --no-commit-hooks --no-git-tag-version ${RELEASE_VERSION}"
     - "semantic-release"
   stage: "release"
   variables:
