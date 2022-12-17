@@ -36,6 +36,11 @@ spec:
               containerPort: {{ $value.containerPort }}
               protocol: {{ $value.protocol }}
           {{- end }}
+          volumeMounts:
+            - name: fcm-service-account
+              readOnly: true
+              mountPath: /app/serviceAccountKey.json
+              subPath: serviceAccountKey.json
           {{- with .Values.readinessProbe }}
           {{- if .enabled }}
           readinessProbe:
@@ -60,6 +65,13 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: fcm-service-account
+          secret:
+            secretName: "{{ include "common.names.fullname" . }}-files"
+            items:
+              - key: serviceAccountKey.json
+                path: serviceAccountKey.json
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
