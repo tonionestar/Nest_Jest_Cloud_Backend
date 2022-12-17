@@ -73,11 +73,7 @@ ingress:
   enabled: true
   className: "nginx"
   annotations: {}
-  hosts:
-    - host: api.clippic.app
-      paths:
-        - path: /v2/users
-          pathType: Prefix
+  host: "api.clippic.app"
   tls:
     enabled: true
     secretName:

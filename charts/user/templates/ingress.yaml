@@ -16,22 +16,16 @@ spec:
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
-    {{- range .Values.ingress.hosts }}
-        - {{ .host | quote }}
-    {{- end }}
+        - {{ .Values.ingress.host | quote }}
       secretName: {{ .Values.ingress.tls.secretName | default (include "common.names.fullname" .) }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: {{ .Values.ingress.host | quote }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
+          - path: "/v2/users"
             {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
-            pathType: {{ .pathType }}
+            pathType: "Prefix"
             {{- end }}
             backend: {{- include "common.ingress.backend" (dict "serviceName" (include "common.names.fullname" $) "servicePort" "api" "context" $)  | nindent 14 }}
-          {{- end }}
-    {{- end }}
 {{- end }}
