@@ -32,7 +32,7 @@ image:
   tag: ""
 
 imagePullSecret:
-  username: "gitlab+deploy-token-6"
+  username: "pull-secret"
   password: ""
   registryURL: "registry.clippic.app"
 
