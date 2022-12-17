@@ -62,7 +62,7 @@ build:
     - >
       helm upgrade
       --install
-      --namespace ${NAMESPACE}
+      --namespace "clippic-${CI_COMMIT_REF_NAME}"
       --create-namespace
       --kube-context clippic/gitlab-agent:clippic-agent-1
       --set database.name=${DATABASE_NAME}
