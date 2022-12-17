@@ -80,19 +80,19 @@ ingress:
 
 readinessProbe:
   enabled: true
-  initialDelaySeconds: 3
-  periodSeconds: 1
+  initialDelaySeconds: 15
+  periodSeconds: 2
   failureThreshold: 15
 
 livenessProbe:
   enabled: true
-  initialDelaySeconds: 3
+  initialDelaySeconds: 45
   periodSeconds: 2
-  failureThreshold: 2
+  failureThreshold: 3
 
 resources:
   limits:
-    cpu: 1
+    cpu: 2
     memory: 512Mi
   requests:
     cpu: 100m
