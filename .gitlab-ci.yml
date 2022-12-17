@@ -54,7 +54,7 @@ build:
     name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine/helm"
     entrypoint: [""]
   before_script:
-    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/files/serviceAccountKey.json"
+    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/charts/user/files/serviceAccountKey.json"
   environment:
     name: "${CI_COMMIT_REF_NAME}"
     url: "https://${DOMAIN}/v2/user/docs"
