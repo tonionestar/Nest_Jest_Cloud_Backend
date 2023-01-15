@@ -73,14 +73,15 @@ export class Mailer {
     }
 
     public async sendPasswordResetCode(user: User, passwordResetCode: number) {
+        let salutation: string = (user.forename) ? user.forename : user.username;
         try {
             await this.email.send({
-                template: path.join(__dirname, '..', 'emails', 'password-forgotten'),
+                template: path.join(__dirname, '..', '..', 'emails', 'password-forgotten'),
                 message: {
                     to: user.email
                 },
                 locals: {
-                    forename: user.forename,
+                    forename: salutation,
                     passwordResetCode: passwordResetCode,
                 }
             });
@@ -90,14 +91,32 @@ export class Mailer {
     }
 
     public async sendPasswordChanged(user: User) {
+        let salutation: string = (user.forename) ? user.forename : user.username;
         try {
             await this.email.send({
-                template: path.join(__dirname, '..', 'emails', 'password-changed'),
+                template: path.join(__dirname, '..', '..', 'emails', 'password-changed'),
                 message: {
                     to: user.email
                 },
                 locals: {
-                    forename: user.forename,
+                    forename: salutation,
+                }
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    public async sendSignup(user: User) {
+        try {
+            await this.email.send({
+                template: path.join(__dirname, '..', '..', 'emails', 'signup'),
+                message: {
+                    to: user.email
+                },
+                locals: {
+                    username: user.username,
+                    email: user.email,
                 }
             });
         } catch (e) {

@@ -5,7 +5,7 @@ import { Users } from "./Users";
 @Entity()
 export class UsersQuota {
 
-    @PrimaryColumn("varbinary", { length: 40 })
+    @PrimaryColumn("uuid")
     @OneToOne(() => Users)
     user_id: string;
 

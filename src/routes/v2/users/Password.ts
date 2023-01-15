@@ -5,8 +5,9 @@ import * as jwt from "jsonwebtoken";
 import {
     Body,
     Controller,
-    Example, Get,
-    Header, Post,
+    Example,
+    Get,
+    Header,
     Put,
     Request,
     Response,
@@ -15,7 +16,7 @@ import {
 } from "tsoa";
 import {
     checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
+    checkJWTAuthenticationUserId, generateSession,
     getTraceContext,
     getTraceId, validatePassword
 } from "../../../classes/Common";
@@ -100,7 +101,7 @@ export class PasswordController extends Controller {
     }
 
     private generateSession() {
-        this.user.session = crypto.randomBytes(16).toString("hex");
+        this.user.session = generateSession();
     }
 
     private async sendPasswordForgottenMail(secret: number) {

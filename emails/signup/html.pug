@@ -1,0 +1,30 @@
+extends ../layout/clippic
+
+block title
+    title Welcome to the world of clippic, #{username}
+
+block content
+    - var username = username || "user"
+    - var email = email || "support@clippic.app"
+    h1.sm-hero-text(style="font-family: Helvetica, sans-serif; font-size: 20px; line-height: 28px; font-weight: 300; color:#292929; margin: 0; margin-bottom: 10px;")
+        | Hey
+    h1.sm-hero-text(style="font-family: Helvetica, sans-serif; font-size: 42px; line-height: 44px; font-weight: 500; color:#053076; margin: 0; margin-bottom: 15px;")
+        | #{username}!
+    .spacer.py-sm-20(style='line-height: 20px;') &zwnj;
+    h3.sm-hero-text(style="font-family: Helvetica, sans-serif; font-size: 18px; line-height: 18px; font-weight: 400; color:#292929; margin: 0; margin-bottom: 10px;")
+        | Nice to meet you 😊
+    p(style="font-family: Arial, sans-serif;font-size: 16px; line-height: 22px; font-weight: 400; color:#7E7E7E; margin: 0;")
+        | Thanks for joining clippic! You are now ready to print your videos and bring memories to life.
+    .spacer.py-sm-20(style='line-height: 20px;') &zwnj;
+    table(cellpadding="0" cellspacing="0" role="presentation" width="100%")
+        tr
+            td(class="col" width="200"  style="padding: 20px 0px 20px 30px;" bgcolor="#FAFAFA")
+                h3.sm-hero-text(style="font-family: Helvetica, sans-serif; font-size: 14px; line-height: 14px; font-weight: 500; color:#053076; margin: 0; margin-bottom: 5px;")
+                    | Username
+                p(style="font-family: Arial, sans-serif; font-size: 14px; line-height: 14px; font-weight: 400; color:#7E7E7E; margin: 0;")
+                    | #{username}
+            td(class="col" width="200"  style="padding: 20px 0px 20px 30px;" bgcolor="#FAFAFA")
+                h3.sm-hero-text(style="font-family: Helvetica, sans-serif; font-size: 14px; line-height: 14px; font-weight: 500; color:#053076; margin: 0; margin-bottom: 5px;")
+                    | Email
+                p(style="font-family: Arial, sans-serif; font-size: 14px; line-height: 14px; font-weight: 400; color:#7E7E7E; margin: 0;")
+                    | #{email}

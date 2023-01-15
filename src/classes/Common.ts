@@ -273,6 +273,12 @@ export function generatePasswordHash(password: string, salt: string) {
     return crypto.pbkdf2Sync(password, salt, 1000, 64, "sha512").toString("hex");
 }
 
+export function generateSalt() {
+    return crypto.randomBytes(16).toString('hex');
+}
+export function generateSession() {
+    return crypto.randomBytes(16).toString('hex');
+}
 
 export function getJWTTokenFromHeaders(req: RequestTracing): string {
     const tokenFromHeaders = req.headers["x-access-token"];
@@ -306,4 +312,3 @@ export function checkJWTAuthenticationSession(req: RequestTracing, user: User) {
         throw new AccessTokenNotAllowedForUriError(getTraceId(req));
     }
 }
-

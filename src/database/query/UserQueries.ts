@@ -1,9 +1,11 @@
 import { Span, SpanContext } from "opentracing";
+import { InsertResult } from "typeorm";
 import { ClippicDataSource } from "../DatabaseConnection";
 import { Users } from "../entity/Users";
 import { UsersAudit } from "../entity/UsersAudit";
 import { UsersPasswordReset } from "../entity/UsersPasswordReset";
 import tracer from "../../classes/Jaeger";
+import { UsersQuota } from "../entity/UsersQuota";
 
 export class UserQueries {
 
@@ -53,6 +55,17 @@ export class UserQueries {
             .select("users.salt")
             .addSelect("users.session")
             .addSelect("users.hash")
+            .where("users.id = :userId", { userId: userId })
+            .getOne();
+    }
+    GetSignupData(userId: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(Users, "users")
+            .select("users.salt")
+            .addSelect("users.session")
+            .addSelect("users.hash")
+            .addSelect("users.email")
+            .addSelect("users.username")
             .where("users.id = :userId", { userId: userId })
             .getOne();
     }
@@ -295,5 +308,52 @@ export class UserQueries {
             .addSelect("users_password_reset.used")
             .where("users_password_reset.user_id = :id", { id: id })
             .getOne();
+    }
+
+    InsertNewUser(username: string, email: string, salt: string, hash: string, session: string): Promise<InsertResult> {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .insert()
+            .into(Users)
+            .values({
+                username: username,
+                email: email,
+                salt: salt,
+                hash: hash,
+                session: session,
+            })
+            .returning(
+                "id"
+            )
+            .execute()
+    }
+
+    InsertInitialAudit(id: string) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .insert()
+            .into(UsersAudit)
+            .values({
+                user_id: id,
+                created: () => "CURRENT_TIMESTAMP",
+                username: () => "CURRENT_TIMESTAMP",
+                email: () => "CURRENT_TIMESTAMP",
+                hash: () => "CURRENT_TIMESTAMP",
+                quota: () => "CURRENT_TIMESTAMP",
+            })
+            .execute()
+    }
+
+    InsertInitialQuota(id: string, quota: number) {
+        return ClippicDataSource.manager
+            .createQueryBuilder()
+            .insert()
+            .into(UsersQuota)
+            .values({
+                user_id: id,
+                used_space: 0,
+                total_space: quota,
+            })
+            .execute()
     }
 }

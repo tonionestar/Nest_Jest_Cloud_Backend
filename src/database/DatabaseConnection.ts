@@ -2,6 +2,13 @@ import { DataSource } from "typeorm";
 
 
 let ClippicDataSource: DataSource;
+let synchronizeDatabase: boolean = false;
+
+if (process.env.DATABASE_SYNCHRONIZE == "true" || process.env.DATABASE_SYNCHRONIZE) {
+    synchronizeDatabase = true;
+    console.log("Data Source has been synchronized")
+}
+
 
 const MariadbDataSource = new DataSource({
     type: "mariadb",
@@ -13,6 +20,7 @@ const MariadbDataSource = new DataSource({
     entities: [
         __dirname + "/../**/entity/*{.js,.ts}",
     ],
+    synchronize: synchronizeDatabase,
 });
 
 const LocalDataSource = new DataSource ({

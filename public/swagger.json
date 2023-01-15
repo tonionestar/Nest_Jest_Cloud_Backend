@@ -599,6 +599,103 @@
 					"pass": "Test1234#!"
 				}
 			},
+			"SignupResponseData": {
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Stringified UUIDv4.\nSee [RFC 4112](https://tools.ietf.org/html/rfc4122)",
+						"format": "uuid",
+						"pattern": "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}"
+					},
+					"token": {
+						"type": "string",
+						"description": "JWT access token."
+					}
+				},
+				"required": [
+					"id",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PostSignupResponse": {
+				"properties": {
+					"status": {
+						"type": "string",
+						"description": "Respose status, either \"error\" or \"success\""
+					},
+					"message": {
+						"type": "string",
+						"description": "Custom response message."
+					},
+					"data": {
+						"items": {
+							"$ref": "#/components/schemas/SignupResponseData"
+						},
+						"type": "array"
+					},
+					"code": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP code or custom error code."
+					},
+					"trace": {
+						"type": "string",
+						"description": "OpenTracing tracing id for request."
+					}
+				},
+				"required": [
+					"status",
+					"code",
+					"trace",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UsernameAlreadyExistsError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1048 | Error when username already exists."
+			},
+			"IdAlreadyExistsError": {
+				"$ref": "#/components/schemas/ClippicErrorInterface",
+				"description": "1012 | Error when id already exists."
+			},
+			"PostSignupRequest": {
+				"description": "Create a new user account.",
+				"properties": {
+					"username": {
+						"type": "string",
+						"description": "The user's email address",
+						"example": "tester",
+						"maxLength": 40
+					},
+					"email": {
+						"type": "string",
+						"description": "The user's username",
+						"example": "tester@clippic.app",
+						"maxLength": 200
+					},
+					"pass": {
+						"type": "string",
+						"description": "The user's password.",
+						"example": "Test1234#!"
+					}
+				},
+				"required": [
+					"username",
+					"email",
+					"pass"
+				],
+				"type": "object",
+				"additionalProperties": false,
+				"example": {
+					"email": "tester@clippic.app",
+					"username": "tester",
+					"pass": "Test1234#!"
+				}
+			},
 			"GetSurnameResponseData": {
 				"properties": {
 					"surname": {
@@ -818,10 +915,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"UsernameAlreadyExistsError": {
-				"$ref": "#/components/schemas/ClippicErrorInterface",
-				"description": "1048 | Error when username already exists."
 			},
 			"PutUsernameRequest": {
 				"description": "Create or update the users username",
@@ -1514,6 +1607,65 @@
 						}
 					}
 				]
+			}
+		},
+		"/v2/users/signup": {
+			"post": {
+				"operationId": "Signup",
+				"responses": {
+					"200": {
+						"description": "Account creation succeeded",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PostSignupResponse"
+								},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"status": "success",
+											"message": "Account creation succeeded",
+											"data": [
+												{
+													"id": "52907745-7672-470e-a803-a2f8feb52944",
+													"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+												}
+											],
+											"code": 200,
+											"trace": "4ba373202a8e4807"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IdAlreadyExistsError"
+								}
+							}
+						}
+					}
+				},
+				"description": "This request will create a new user account.\n\n**Errors:**\n\n| Code | Description                 |\n|------|-----------------------------|\n| 400  | MailFormatError             |\n| 400  | AccountAlreadyExistsError   |\n| 400  | UsernameAlreadyExistsError  |\n| 400  | IdAlreadyExistsError        |",
+				"tags": [
+					"Signup"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PostSignupRequest"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/v2/users/surname": {
