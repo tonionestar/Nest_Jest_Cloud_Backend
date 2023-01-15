@@ -83,7 +83,7 @@ function initializeSwaggerUi() {
         swaggerUi.serve,
         swaggerUi.setup(undefined, {
             swaggerOptions: {
-                url: "/swagger.json",
+                url: "/v2/users/swagger.json",
             },
         })
     );
