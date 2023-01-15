@@ -12,6 +12,7 @@ COPY package.json \
      tsconfig.json \
      tsoa.json \
      .npmrc \
+     emails \
      ./
 
 #
@@ -40,6 +41,7 @@ FROM base AS release
 # copy production node_modules
 COPY --from=dependencies /app/prod_node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/public ./public
 
 # expose port and define CMD
 EXPOSE 3000

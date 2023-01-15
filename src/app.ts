@@ -77,13 +77,13 @@ function errorHandler(
 }
 
 function initializeSwaggerUi() {
-    app.use(express.static("public"));
+    app.use("/v2/users/public", express.static("public"));
     app.use(
         "/v2/users/docs",
         swaggerUi.serve,
         swaggerUi.setup(undefined, {
             swaggerOptions: {
-                url: "/v2/users/swagger.json",
+                url: "/v2/users/public/swagger.json",
             },
         })
     );
