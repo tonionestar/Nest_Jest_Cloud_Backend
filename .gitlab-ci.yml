@@ -44,7 +44,7 @@ build:
       /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}
+      --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_NAME}
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
@@ -71,7 +71,8 @@ build:
       --set smtp.pass=${SMTP_PASS}
       --set ingress.host=${DOMAIN}
       --set imagePullSecret.password=${DEPLOY_TOKEN_PASSWORD}
-      --set image.tag=${RELEASE_VERSION}
+      --set image.tag=${IMAGE_TAG}
+      --set additionalLabels.commit="${CI_COMMIT_SHA}"
       user
       charts/user
 
@@ -84,6 +85,7 @@ deploy-dev:
     DATABASE_NAME: "dev_clippic_user_v2"
     DATABASE_USER: "clippic_dev"
     DATABASE_PASSWORD: "${DEV_DATABASE_PASSWORD}"
+    IMAGE_TAG: "${RELEASE_VERSION}-${CI_COMMIT_REF_NAME}"
 
 deploy-main:
   extends: ".deploy"
@@ -94,6 +96,7 @@ deploy-main:
     DATABASE_NAME: "clippic_user"
     DATABASE_USER: "clippic_prod"
     DATABASE_PASSWORD: "${MAIN_DATABASE_PASSWORD}"
+    IMAGE_TAG: "${RELEASE_VERSION}"
 
 release:
   dependencies:

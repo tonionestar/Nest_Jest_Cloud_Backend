@@ -12,7 +12,7 @@ database:
   pass: ""
 
 tracing:
-  endpoint: "http://clippic-jaeger-operator-jaeger-collector.jaeger:14268/api/traces"
+  endpoint: "https://jaeger-api.brained.io/api/traces"
 
 smtp:
   host: "mail.brained.io"
@@ -27,7 +27,7 @@ backend:
 image:
   registry: "registry.clippic.app"
   repository: "clippic/backend/user-v2"
-  pullPolicy: "IfNotPresent"
+  pullPolicy: "Always"
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -47,6 +47,8 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+
+additionalLabels: {}
 
 podAnnotations: {}
 
