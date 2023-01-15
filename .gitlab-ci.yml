@@ -68,11 +68,11 @@ build:
       --set database.name=${DATABASE_NAME}
       --set database.user=${DATABASE_USER}
       --set database.pass=${DATABASE_PASSWORD}
-      --set smtp.pass=${SMTP_PASS} 
+      --set smtp.pass=${SMTP_PASS}
       --set ingress.host=${DOMAIN}
       --set imagePullSecret.password=${DEPLOY_TOKEN_PASSWORD}
       --set image.tag=${RELEASE_VERSION}
-      user 
+      user
       charts/user
 
 deploy-dev:
@@ -81,7 +81,7 @@ deploy-dev:
     - "dev"
   variables:
     DOMAIN: "api-dev.clippic.app"
-    DATABASE_NAME: "dev_clippic_user"
+    DATABASE_NAME: "dev_clippic_user_v2"
     DATABASE_USER: "clippic_dev"
     DATABASE_PASSWORD: "${DEV_DATABASE_PASSWORD}"
 
