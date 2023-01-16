@@ -6,7 +6,11 @@ import express from "express";
 import tracer from "../classes/Jaeger";
 
 function JaegerMiddleware(request: RequestTracing, response: express.Response, next: any) {
-    // set parent context if needed
+    if (request.path == "/health") {
+        next();
+        return;
+    }
+
     const parentSpanContext = tracer.extract(FORMAT_HTTP_HEADERS, request.headers);
     request.span = tracer.startSpan(`${request.method}: ${request.path}`, {
         childOf: parentSpanContext,
