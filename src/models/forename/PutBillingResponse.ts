@@ -7,8 +7,30 @@ export interface PutBillingResponse extends ClippicResponse {
 export interface PutBillingResponseData {
 
     /**
+     * Company
+     * @example "tabs vs. spaces UG"
+     * @maxLength 150
+     */
+    company?: string;
+
+    /**
+     * Forename/Prename
+     * @example "Max"
+     * @maxLength 100
+     */
+    forename?: string;
+
+    /**
+     * Surname/Lastname
+     * @example "Mustermann"
+     * @maxLength 100
+     */
+    surname?: string;
+
+    /**
      * Address zip code
      * @example "45968"
+     * @minLength 1
      * @maxLength 20
      */
     zip: string;
@@ -16,6 +38,7 @@ export interface PutBillingResponseData {
     /**
      * Address city
      * @example "Gladbeck"
+     * @minLength 1
      * @maxLength 50
      */
     city: string;
@@ -37,14 +60,14 @@ export interface PutBillingResponseData {
     /**
      * Address street
      * @example "Stargarder Str."
-     * @maxLength 50
+     * @maxLength 150
      */
     street?: string;
 
     /**
      * Address house number
      * @example "34"
-     * @maxLength 50
+     * @maxLength 20
      */
     streetNumber?: string;
 
@@ -69,5 +92,4 @@ export interface PutBillingResponseData {
      * @example "Germany"
      */
     countryName: string;
-
 }

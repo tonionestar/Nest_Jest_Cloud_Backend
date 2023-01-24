@@ -1,6 +1,8 @@
 /**
  * Create or update the user's billing address.
  * @example {
+ *  "forename": "Max",
+ *  "surname": "Mustermann",
  *  "street": "Stargarder Str.",
  *  "streetNumber": "34",
  *  "zip": "45968",
@@ -10,6 +12,7 @@
  * }
  *
  * @example {
+ *  "company:": "tabs vs. spaces UG",
  *  "box": "PO 234",
  *  "zip": "45968",
  *  "city": "Gladbeck",
@@ -18,9 +21,32 @@
  * }
  */
 export interface PutBillingRequest {
+
+    /**
+     * Company
+     * @example "tabs vs. spaces UG"
+     * @maxLength 150
+     */
+    company?: string;
+
+    /**
+     * Forename/Prename
+     * @example "Max"
+     * @maxLength 100
+     */
+    forename?: string;
+
+    /**
+     * Surname/Lastname
+     * @example "Mustermann"
+     * @maxLength 100
+     */
+    surname?: string;
+
     /**
      * Address zip code
      * @example "45968"
+     * @minLength 1
      * @maxLength 20
      */
     zip: string;
@@ -28,6 +54,7 @@ export interface PutBillingRequest {
     /**
      * Address city
      * @example "Gladbeck"
+     * @minLength 1
      * @maxLength 50
      */
     city: string;
@@ -49,14 +76,14 @@ export interface PutBillingRequest {
     /**
      * Address street
      * @example "Stargarder Str."
-     * @maxLength 50
+     * @maxLength 150
      */
     street?: string;
 
     /**
      * Address house number
      * @example "34"
-     * @maxLength 50
+     * @maxLength 20
      */
     streetNumber?: string;
 

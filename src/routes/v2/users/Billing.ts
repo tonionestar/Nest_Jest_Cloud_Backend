@@ -18,6 +18,7 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import { UserBilling } from "../../../models/UserBilling";
 import { GetBillingResponse } from "../../../models/forename/GetBillingResponse";
 import { PutBillingRequest } from "../../../models/forename/PutBillingRequest";
 import { PutBillingResponse } from "../../../models/forename/PutBillingResponse";
@@ -37,23 +38,16 @@ export class BillingController extends Controller {
     private parentSpanContext: SpanContext;
 
     private user: User = {};
+    private userBilling: UserBilling = {};
 
     private async getUsersSession() {
         const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
-    private async getUsersForename() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetForename, this.user.id);
-        this.user = Object.assign(this.user, result);
-    }
-
-    private async updateForename(forename: string) {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateForename, this.user.id, forename);
-    }
-
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditForename, this.user.id);
+
+        // await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditBilling, this.user.id); @TODO
     }
 
     private async checkRouteAccess() {
@@ -77,7 +71,7 @@ export class BillingController extends Controller {
     }
 
     /**
-     * This request will return the user's forename.
+     * This request will return the user's billing address.
      */
     @Tags("Billing")
     @Example<GetBillingResponse>({
@@ -85,7 +79,16 @@ export class BillingController extends Controller {
         message: "",
         data: [
             {
-                "forename": "tester"
+                "forename": "Max",
+                "surname": "Mustermann",
+                "street": "Stargarder Str.",
+                "streetNumber": "34",
+                "zip": "45968",
+                "city": "Gladbeck",
+                "state": "North Rhine-Westphalia",
+                "countryISO2": "DE",
+                "countryISO3": "DEU",
+                "countryName": "Germany",
             }
         ],
         code: 200,
@@ -96,54 +99,24 @@ export class BillingController extends Controller {
     public async getBillingRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
         await this.initialize(req, id);
 
-        await this.getUsersForename();
+        // Implement get logic here
 
         return Promise.resolve({
             "status": "success",
             "message": "",
             "data": [{
-                "forename": this.user.forename
-            }],
-            "code": 200,
-            "trace": this.traceId
-        });
-    }
-
-    /**
-     * This request will update or create if not exists the user's forename.
-     */
-    @Tags("Forename")
-    @Example<PutBillingResponse>({
-        status: "success",
-        message: "",
-        data: [
-            {
-                "forename": "tester"
-            }
-        ],
-        code: 200,
-        trace: "4ba373202a8e4807"
-    })
-    @Security("jwt")
-    @Put("/")
-    public async putForenameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutBillingRequest): Promise<PutBillingResponse> {
-        await this.initialize(req, id);
-
-        await this.getUsersForename();
-
-        if (this.user.forename != body.forename) {
-
-            await Promise.all([
-                this.updateForename(body.forename),
-                this.updateModified()
-            ]);
-        }
-
-        return Promise.resolve({
-            "status": "success",
-            "message": "",
-            "data": [{
-                "forename": body.forename
+                "company": this.userBilling.company,
+                "forename": this.userBilling.forename,
+                "surname": this.userBilling.surname,
+                "box": this.userBilling.box,
+                "street": this.userBilling.street,
+                "streetNumber": this.userBilling.streetNumber,
+                "zip": this.userBilling.zip,
+                "city": this.userBilling.city,
+                "state": this.userBilling.state,
+                "countryISO2": "@TODO",
+                "countryISO3": "@TODO",
+                "countryName": "@TODO",
             }],
             "code": 200,
             "trace": this.traceId
