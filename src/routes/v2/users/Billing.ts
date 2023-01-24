@@ -26,8 +26,8 @@ import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
 
-@Route("/v2/users/forename")
-export class ForenameController extends Controller {
+@Route("/v2/users/billing")
+export class BillingController extends Controller {
 
     public router = express.Router();
     public db = new UserQueries();
@@ -79,7 +79,7 @@ export class ForenameController extends Controller {
     /**
      * This request will return the user's forename.
      */
-    @Tags("Forename")
+    @Tags("Billing")
     @Example<GetBillingResponse>({
         status: "success",
         message: "",
@@ -93,7 +93,7 @@ export class ForenameController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getForenameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
+    public async getBillingRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
         await this.initialize(req, id);
 
         await this.getUsersForename();

@@ -6,9 +6,17 @@ import { Users } from "./Users";
 @Entity()
 export class UsersBilling {
 
-    @PrimaryColumn("varbinary", { length: 40 })
-    @OneToOne(() => Users)
-    id: string;
+    @PrimaryColumn("uuid")
+    user_id: string;
+
+    @Column("varchar", { length: 150, nullable: true })
+    company: string;
+
+    @Column("varchar", { length: 100, nullable: true })
+    forename: string;
+
+    @Column("varchar", { length: 100, nullable: true })
+    surname: string;
 
     @Column("varchar", { length: 50, nullable: true })
     box: string;
