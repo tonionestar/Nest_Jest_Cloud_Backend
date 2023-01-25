@@ -19,9 +19,9 @@ import {
     getTraceId
 } from "../../../classes/Common";
 import { UserBilling } from "../../../models/UserBilling";
-import { GetBillingResponse } from "../../../models/forename/GetBillingResponse";
-import { PutBillingRequest } from "../../../models/forename/PutBillingRequest";
-import { PutBillingResponse } from "../../../models/forename/PutBillingResponse";
+import { GetBillingResponse } from "../../../models/billing/GetBillingResponse";
+import { PutBillingRequest } from "../../../models/billing/PutBillingRequest";
+import { PutBillingResponse } from "../../../models/billing/PutBillingResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";

@@ -18,9 +18,9 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
-import { GetBillingResponse } from "../../../models/forename/GetBillingResponse";
-import { PutBillingRequest } from "../../../models/forename/PutBillingRequest";
-import { PutBillingResponse } from "../../../models/forename/PutBillingResponse";
+import { GetForenameResponse } from "../../../models/forename/GetForenameResponse";
+import { PutForenameRequest } from "../../../models/forename/PutForenameRequest";
+import { PutForenameResponse } from "../../../models/forename/PutForenameResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
@@ -80,7 +80,7 @@ export class ForenameController extends Controller {
      * This request will return the user's forename.
      */
     @Tags("Forename")
-    @Example<GetBillingResponse>({
+    @Example<GetForenameResponse>({
         status: "success",
         message: "",
         data: [
@@ -93,7 +93,7 @@ export class ForenameController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getForenameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
+    public async getForenameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetForenameResponse> {
         await this.initialize(req, id);
 
         await this.getUsersForename();
@@ -113,7 +113,7 @@ export class ForenameController extends Controller {
      * This request will update or create if not exists the user's forename.
      */
     @Tags("Forename")
-    @Example<PutBillingResponse>({
+    @Example<PutForenameResponse>({
         status: "success",
         message: "",
         data: [
@@ -126,7 +126,7 @@ export class ForenameController extends Controller {
     })
     @Security("jwt")
     @Put("/")
-    public async putForenameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutBillingRequest): Promise<PutBillingResponse> {
+    public async putForenameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutForenameRequest): Promise<PutForenameResponse> {
         await this.initialize(req, id);
 
         await this.getUsersForename();
