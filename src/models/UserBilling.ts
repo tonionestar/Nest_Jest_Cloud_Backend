@@ -1,5 +1,5 @@
 export interface UserBilling {
-    user_id?: string;
+    userId?: string;
     company?: string;
     forename?: string;
     surname?: string;

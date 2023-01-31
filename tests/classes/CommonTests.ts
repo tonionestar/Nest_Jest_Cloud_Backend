@@ -1,10 +1,14 @@
 import * as jwt from "jsonwebtoken";
+import Country from "../../src/classes/Country";
+import { UsersBilling } from "../../src/database/entity/UsersBilling";
 import { AccessToken } from "../../src/models/AccessToken";
 import { ClippicDataSource } from "../../src/database/DatabaseConnection";
 import { User } from "../../src/models/User";
 import { Users } from "../../src/database/entity/Users";
 import { UsersAudit } from "../../src/database/entity/UsersAudit";
 import { getJWTSecret } from "../../src/classes/Common";
+import crypto from "crypto";
+
 
 export const testUsername = "tester";
 export const testEmail = "tester@clippic.app";
@@ -30,6 +34,40 @@ export async function createNewUser({
     await insertAudit(userId);
 
     return userId;
+}
+
+export async function createNewBilling({
+                                           company,
+                                           forename,
+                                           surname,
+                                           zip,
+                                           city,
+                                           state,
+                                           box,
+                                           street,
+                                           streetNumber,
+                                           country
+                                       }: Partial<UsersBilling>): Promise<string> {
+    const userId = await createNewUser({})
+    const allCountries = new Country();
+    const usaId = allCountries.getIDFromISO3("USA")
+    const newBilling: UsersBilling = {
+        userId,
+        company,
+        forename,
+        surname,
+        zip,
+        city,
+        state,
+        box,
+        street,
+        streetNumber,
+        country: country || usaId
+    }
+
+    const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
+    await BillingRepository.save({ ...newBilling })
+    return newBilling.userId
 }
 
 export async function insertUser(
@@ -63,6 +101,7 @@ export function generateAccessToken(userId: string, session: string = testSessio
 export async function insertAudit(userId: string) {
     await ClippicDataSource.createQueryBuilder().insert().into(UsersAudit).values({
         user_id: userId,
-        created: "CURRENT_TIMESTAMP"
+        created: "CURRENT_TIMESTAMP",
+        modified: "CURRENT_TIMESTAMP"
     }).execute();
 }
