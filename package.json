@@ -24,6 +24,7 @@
     "firebase-admin": "11.5.0",
     "jaeger-client": "3.19.0",
     "jsonwebtoken": "9.0.0",
+    "mysql": "2.18.1",
     "nodemailer": "6.9.1",
     "opentracing": "0.14.7",
     "prom-client": "14.1.1",

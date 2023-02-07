@@ -8,7 +8,6 @@ WORKDIR /app
 ENTRYPOINT ["/sbin/tini", "--"]
 # copy project file
 COPY package.json \
-     package-lock.json \
      tsconfig.json \
      tsoa.json \
      .npmrc \
