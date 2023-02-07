@@ -93,7 +93,6 @@ function initializeSwaggerUi() {
 }
 
 async function main() {
-    console.log(process.env)
     initializeExpress();
     enableMetrics();
     enableTracing();

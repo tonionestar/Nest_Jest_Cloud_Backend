@@ -13,7 +13,7 @@ export class UsersAudit {
     user_id: string;
 
     @UpdateDateColumn()
-    @Column("timestamp", { nullable: false })
+    @Column("timestamp", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
     modified: string
 
     @CreateDateColumn()
