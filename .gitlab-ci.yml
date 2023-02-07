@@ -85,10 +85,11 @@ test:
         - "junit.xml"
   before_script:
     - "npm ci"
+    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/files/serviceAccountKey.json"
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18-alpine"
   script:
-    - "npm run test"
+    - "npm run test:ci"
   services:
     - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/mariadb:10.10"
       alias: "mariadb"
