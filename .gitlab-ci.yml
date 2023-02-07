@@ -85,6 +85,7 @@ test:
         - "junit.xml"
   before_script:
     - "npm i"
+    - "npm run build"
     - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/serviceAccountKey.json"
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18-alpine"
