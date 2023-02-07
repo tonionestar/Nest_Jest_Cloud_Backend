@@ -1,5 +1,6 @@
 stages:
   - "prepare"
+  - "test"
   - "build"
   - "deploy"
   - "release"
@@ -76,14 +77,12 @@ build:
       user
       charts/user
 
-
 test:
   artifacts:
     when: "always"
     reports:
       junit:
         - "junit.xml"
-      cobertura: "coverage/cobertura-coverage.xml"
   before_script:
     - "npm ci"
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
