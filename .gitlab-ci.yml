@@ -93,7 +93,6 @@ test:
     - "npm run test:ci"
   services:
     - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/mariadb:10.10"
-      alias: "mariadb"
       variables:
         MARIADB_USER: "jest"
         MARIADB_PASSWORD: "jest"
@@ -101,11 +100,6 @@ test:
         MARIADB_DATABASE: "users"
   stage: "test"
   variables:
-    DATABASE_NAME: "jest"
-    DATABASE_PASSWORD: "jest"
-    DATABASE_PORT: "3306"
-    DATABASE_SERVER: "mariadb"
-    DATABASE_USER: "jest"
     JAEGER_ENDPOINT: "https://jaeger-api.brained.io/api/traces"
     SMTP_PASS: "password"
     SMTP_PORT: "465"
@@ -113,7 +107,7 @@ test:
     SMTP_USER: "notifications@clippic.app"
     VIDEO_BACKEND: "http://localhost:3001/"
     ORDER_BACKEND: "http://localhost:3003/"
-    CI: "true"
+    NODE_ENV: "jest"
 
 deploy-dev:
   extends: ".deploy"
