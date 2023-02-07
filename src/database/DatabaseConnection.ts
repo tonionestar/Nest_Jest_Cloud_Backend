@@ -25,7 +25,7 @@ const MariadbDataSource = new DataSource({
 
 const LocalDataSource = new DataSource ({
     type: "mariadb",
-    host: "127.0.0.1",
+    host: process.env.CI ? "mariadb" : "127.0.0.1",
     port: 3306,
     username: "jest",
     password: "jest",

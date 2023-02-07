@@ -8,6 +8,7 @@
     "start": "node dist/app.js",
     "dev":  "npm run build; npm run start",
     "test": "jest",
+    "test:ci": "jest --collectCoverage --coverageDirectory=\"./coverage\" --ci --reporters=default --reporters=jest-junit --watchAll=false",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -49,6 +50,7 @@
     "moment": "2.29.4",
     "multer": "1.4.5-lts.1",
     "jest": "29.3.1",
+    "jest-junit": "15.0.0",
     "supertest": "6.3.2",
     "ts-jest": "29.0.3",
     "ts-node": "10.9.1",
@@ -64,6 +66,8 @@
     "moduleNameMapper": {
       "^@App/(.*)$": "<rootDir>/src/$1"
     },
+    "coverageReporters": ["html", "text", "text-summary", "cobertura"],
+    "collectCoverageFrom": ["src/**/*.js", "!**/node_modules/**"],
     "setupFiles": [
       "<rootDir>/jest/setEnvVars.js"
     ]

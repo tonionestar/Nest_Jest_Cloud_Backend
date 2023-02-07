@@ -76,6 +76,44 @@ build:
       user
       charts/user
 
+
+test:
+  artifacts:
+    when: "always"
+    reports:
+      junit:
+        - "junit.xml"
+      cobertura: "coverage/cobertura-coverage.xml"
+  before_script:
+    - "npm ci"
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18-alpine"
+  script:
+    - "npm run test"
+  services:
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/mariadb:10.10"
+      alias: "mariadb"
+      variables:
+        MARIADB_USER: "jest"
+        MARIADB_PASSWORD: "jest"
+        MARIADB_ROOT_PASSWORD: "test12345"
+        MARIADB_DATABASE: "users"
+  stage: "test"
+  variables:
+    DATABASE_NAME: "jest"
+    DATABASE_PASSWORD: "jest"
+    DATABASE_PORT: "3306"
+    DATABASE_SERVER: "mariadb"
+    DATABASE_USER: "jest"
+    JAEGER_ENDPOINT: "https://jaeger-api.brained.io/api/traces"
+    SMTP_PASS: "password"
+    SMTP_PORT: "465"
+    SMTP_SERVER: "localhost"
+    SMTP_USER: "notifications@clippic.app"
+    VIDEO_BACKEND: "http://localhost:3001/"
+    ORDER_BACKEND: "http://localhost:3003/"
+    CI: "true"
+
 deploy-dev:
   extends: ".deploy"
   only:
