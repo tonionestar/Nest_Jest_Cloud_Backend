@@ -66,8 +66,8 @@
     "moduleNameMapper": {
       "^@App/(.*)$": "<rootDir>/src/$1"
     },
-    "coverageReporters": ["html", "text", "text-summary", "cobertura"],
-    "collectCoverageFrom": ["src/**/*.js", "!**/node_modules/**"],
+    "coverageReporters": ["text", "text-summary"],
+    "collectCoverageFrom": ["src/routes/**/*.ts", "!**/node_modules/**"],
     "setupFiles": [
       "<rootDir>/jest/setEnvVars.js"
     ]
