@@ -1,5 +1,6 @@
 stages:
   - "prepare"
+  - "test"
   - "build"
   - "deploy"
   - "release"
@@ -75,6 +76,38 @@ build:
       --set additionalLabels.commit="${CI_COMMIT_SHA}"
       user
       charts/user
+
+test:
+  artifacts:
+    when: "always"
+    reports:
+      junit:
+        - "junit.xml"
+  before_script:
+    - "npm i"
+    - "npm run build"
+    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/serviceAccountKey.json"
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18-slim"
+  script:
+    - "npm run test:ci"
+  services:
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/mariadb:10.10"
+      variables:
+        MARIADB_USER: "jest"
+        MARIADB_PASSWORD: "jest"
+        MARIADB_ROOT_PASSWORD: "test12345"
+        MARIADB_DATABASE: "users"
+  stage: "test"
+  variables:
+    JAEGER_ENDPOINT: "https://jaeger-api.brained.io/api/traces"
+    SMTP_PASS: "password"
+    SMTP_PORT: "465"
+    SMTP_SERVER: "localhost"
+    SMTP_USER: "notifications@clippic.app"
+    VIDEO_BACKEND: "http://localhost:3001/"
+    ORDER_BACKEND: "http://localhost:3003/"
+    NODE_ENV: "jest"
 
 deploy-dev:
   extends: ".deploy"
