@@ -7,8 +7,6 @@ import { User } from "../../src/models/User";
 import { Users } from "../../src/database/entity/Users";
 import { UsersAudit } from "../../src/database/entity/UsersAudit";
 import { getJWTSecret } from "../../src/classes/Common";
-import crypto from "crypto";
-
 
 export const testUsername = "tester";
 export const testEmail = "tester@clippic.app";
@@ -18,6 +16,14 @@ export const testHash = "3d5e381ad0eab4871413523de5a591c0c939c6c9358edfb53a2155f
 export const testForename = "Mr";
 export const testSurname = "Tester";
 export const testPassword = "Test1234#"
+export const testCompany = "Example Corp Inc"
+export const testZip = "1234"
+export const testCity = "LA"
+export const testState = "California"
+export const testBox = "PO Box 5"
+export const testStreet = "Arbitrary Steet"
+export const testStreetNumber = "230a"
+export const testCountry = "USA"
 
 export async function createNewUser({
                                         username = testUsername,

@@ -1,4 +1,7 @@
-import { ClippicError, UserIdNotFoundError } from "@clippic/clippic-errors";
+import {
+    BodyFieldCombinationInvalidError,
+    UserIdNotFoundError
+} from "@clippic/clippic-errors";
 import {
     Body,
     Controller,
@@ -7,6 +10,7 @@ import {
     Header,
     Put,
     Request,
+    Response,
     Route,
     Security,
     Tags
@@ -43,6 +47,12 @@ export class BillingController extends Controller {
 
     /**
      * This request will return the user's billing address.
+     *
+     * **Errors:**
+     *
+     * | Code | Description         |
+     * |------|---------------------|
+     * | 400  | UserIdNotFoundError |
      */
     @Tags("Billing")
     @Example<GetBillingResponse>({
@@ -66,6 +76,7 @@ export class BillingController extends Controller {
         trace: "4ba373202a8e4807"
     })
     @Security("jwt")
+    @Response<UserIdNotFoundError>(400)
     @Get("/")
     public async getBillingRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
         await this.initialize(req, id);
@@ -102,6 +113,12 @@ export class BillingController extends Controller {
 
     /**
      * This request will update or create if not exists the user's billing address.
+     *
+     * **Errors:**
+     *
+     * | Code | Description                      |
+     * |------|----------------------------------|
+     * | 400  | BodyFieldCombinationInvalidError |
      */
     @Tags("Billing")
     @Example<PutBillingResponse>({
@@ -123,6 +140,7 @@ export class BillingController extends Controller {
         trace: "4ba373202a8e4807"
     })
     @Security("jwt")
+    @Response<BodyFieldCombinationInvalidError>(400)
     @Put("/")
     public async putBillingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutBillingRequest): Promise<PutBillingResponse> {
         await this.initialize(req, id);
@@ -190,15 +208,11 @@ export class BillingController extends Controller {
     }
 
     private checkSemiOptionalValues(billingRequestData: PutBillingRequest) {
-        let errorsMsg = ""
         if (!billingRequestData.company && !(billingRequestData.forename && billingRequestData.surname)) {
-            errorsMsg += "either company, or forename + surname are required "
+            throw new BodyFieldCombinationInvalidError("either company, or forename + surname are required", this.traceId);
         }
         if (!(billingRequestData.street && billingRequestData.state && billingRequestData.streetNumber) && !billingRequestData.box) {
-            errorsMsg += "either box, or state, street and street number are required "
-        }
-        if (errorsMsg.length > 0) {
-            throw new ClippicError({ message: errorsMsg, trace: this.traceId, code: 0 })
+            throw new BodyFieldCombinationInvalidError("either box, or state, street and street number are required", this.traceId)
         }
     }
 

@@ -7,6 +7,15 @@ import {
     createNewBilling,
     createNewUser,
     generateAccessToken,
+    testBox,
+    testCity,
+    testCompany, testCountry,
+    testForename,
+    testState,
+    testStreet,
+    testStreetNumber,
+    testSurname,
+    testZip,
 } from "../../../classes/CommonTests";
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { UserQueries } from "../../../../src/database/query/UserQueries";
@@ -53,6 +62,13 @@ describe(BILLING_ROUTE, () => {
                 .set("x-access-token", generateAccessToken(newBillingId));
 
             expect(result.status).toBe(200);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+
         });
 
         it("should return 400 when querying with non-exiting billingId", async () => {
@@ -64,6 +80,14 @@ describe(BILLING_ROUTE, () => {
                 .set("x-access-token", generateAccessToken(userId));
 
             expect(result.status).toBe(400);
+
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(0);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(1024);
+
         });
 
         it("should return the relevant country data for the billing", async () => {
@@ -76,6 +100,15 @@ describe(BILLING_ROUTE, () => {
                 .set("id", newBillingId)
                 .set("x-access-token", generateAccessToken(newBillingId));
 
+
+            expect(result.status).toBe(200);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+
             const billing = result.body.data[0]
             const expectedCountryData: Partial<GetBillingResponseData> = {
                 countryName: usa.name,
@@ -87,15 +120,15 @@ describe(BILLING_ROUTE, () => {
 
         it("should return all the expected billing properties for a billing", async () => {
             const newBilling: Partial<UsersBilling> = {
-                company: "Apple",
-                forename: "Steve",
-                surname: "Jobs",
-                zip: "5567",
-                city: "LA",
-                state: "California",
-                box: "5acc",
-                street: "Iphone st.",
-                streetNumber: "3",
+                company: testCompany,
+                forename: testForename,
+                surname: testSurname,
+                zip: testZip,
+                city: testCity,
+                state: testState,
+                box: testBox,
+                street: testStreet,
+                streetNumber: testStreetNumber,
             }
 
             const newBillingId = await createNewBilling(newBilling)
@@ -104,6 +137,14 @@ describe(BILLING_ROUTE, () => {
                 .get(BILLING_ROUTE)
                 .set("id", newBillingId)
                 .set("x-access-token", generateAccessToken(newBillingId));
+
+            expect(result.status).toBe(200);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
 
             const createdBilling = result.body.data[0]
             expect(createdBilling).toMatchObject(newBilling)
@@ -114,22 +155,30 @@ describe(BILLING_ROUTE, () => {
         it("should create the billing and return billing response", async () => {
             const userId = await createNewUser({})
             const billingRequest: PutBillingRequest = {
-                company: "Apple",
-                forename: "john",
-                surname: "smith",
-                zip: "5ac",
-                city: "LA",
-                state: "California",
-                box: "a",
-                street: "sunset",
-                streetNumber: "15",
-                country: "USA"
+                company: testCompany,
+                forename: testForename,
+                surname: testSurname,
+                zip: testZip,
+                city: testCity,
+                state: testState,
+                box: testBox,
+                street: testStreet,
+                streetNumber: testStreetNumber,
+                country: testCountry,
             }
             const result = await request(app)
                 .put(BILLING_ROUTE)
                 .set("id", userId)
                 .set("x-access-token", generateAccessToken(userId))
                 .send(billingRequest);
+
+            expect(result.status).toBe(200);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
 
             const billingResponse: PutBillingResponse = result.body.data[0]
             const allCountries = new Country();
@@ -146,23 +195,31 @@ describe(BILLING_ROUTE, () => {
 
         it("should only update the modified fields", async () => {
             const existingBillingId = await createNewBilling({
-                forename: "John",
-                surname: "Smith",
+                forename: testForename,
+                surname: testSurname,
             })
 
             const updateBillingRequest: PutBillingRequest = {
                 forename: "Rachel",
                 surname: "Smith",
-                country: "USA",
-                zip: "5ac",
-                city: "LA",
-                box: "a"
+                country: testCountry,
+                zip: testZip,
+                city: testCity,
+                box: testBox,
             }
             const result = await request(app)
                 .put(BILLING_ROUTE)
                 .set("id", existingBillingId)
                 .set("x-access-token", generateAccessToken(existingBillingId))
                 .send(updateBillingRequest);
+
+            expect(result.status).toBe(200);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
 
             const billingResponse: PutBillingResponse = result.body.data[0]
             expect(billingResponse).toMatchObject({
@@ -174,17 +231,17 @@ describe(BILLING_ROUTE, () => {
         //This test waits 1s to assert that the audit timestamp has been updated.
         it("should update the audit timestamp in audit table", async () => {
             const newBillingId = await createNewBilling({
-                forename: "John",
-                surname: "Smith",
+                forename: testForename,
+                surname: testSurname,
             })
             const initialAudit = await db.GetUsersAuditAll(newBillingId)
 
             const updateBillingRequest: PutBillingRequest = {
-                company: "Apple",
-                country: "USA",
-                zip: "5ac",
-                city: "LA",
-                box: "a"
+                company: testCompany,
+                country: testCountry,
+                zip: testZip,
+                city: testCity,
+                box: testBox,
             }
             await waitSeconds(1);
 
@@ -212,10 +269,10 @@ describe(BILLING_ROUTE, () => {
                 it("should return error when creating billing with both company and forename + surname missing", async () => {
                     const userId = await createNewUser({})
                     const billingRequest: PutBillingRequest = {
-                        country: "USA",
-                        zip: "5ac",
-                        city: "LA",
-                        box: "a",
+                        country: testCountry,
+                        zip: testZip,
+                        city: testCity,
+                        box: testBox,
                     }
 
                     const result = await request(app)
@@ -225,17 +282,23 @@ describe(BILLING_ROUTE, () => {
                         .send(billingRequest);
 
                     expect(result.status).toBe(400);
-                    expect(JSON.parse(result.text).message).toBe("either company, or forename + surname are required ");
+                    expect(result.body).toHaveProperty("data");
+                    expect(result.body.data).toHaveLength(0);
+
+                    // check code
+                    expect(result.body).toHaveProperty("code");
+                    expect(result.body.code).toBe(1102);
+                    expect(JSON.parse(result.text).message).toBe("It seems, that you provided an an invalid combination of fields in request body: either company, or forename + surname are required");
                 })
 
                 it("should create billing when company is provided even when forename and surname are missing", async () => {
                     const userId = await createNewUser({})
                     const billingRequest: PutBillingRequest = {
-                        country: "USA",
-                        zip: "5ac",
-                        city: "LA",
-                        box: "a",
-                        company: "apple"
+                        country: testCountry,
+                        zip: testZip,
+                        city: testCity,
+                        box: testBox,
+                        company: testCompany,
                     }
 
                     const result = await request(app)
@@ -245,17 +308,23 @@ describe(BILLING_ROUTE, () => {
                         .send(billingRequest);
 
                     expect(result.status).toBe(200);
+                    expect(result.body).toHaveProperty("data");
+                    expect(result.body.data).toHaveLength(1);
+
+                    // check code
+                    expect(result.body).toHaveProperty("code");
+                    expect(result.body.code).toBe(200);
                 })
 
                 it("should create billing when forename + surname are provided even when company is missing", async () => {
                     const userId = await createNewUser({})
                     const billingRequest: PutBillingRequest = {
-                        country: "USA",
-                        zip: "5ac",
-                        city: "LA",
-                        box: "a",
-                        forename: "John",
-                        surname: "Smith"
+                        country: testCountry,
+                        zip: testZip,
+                        city: testCity,
+                        box: testBox,
+                        forename: testForename,
+                        surname: testSurname,
                     }
 
                     const result = await request(app)
@@ -265,16 +334,22 @@ describe(BILLING_ROUTE, () => {
                         .send(billingRequest);
 
                     expect(result.status).toBe(200);
+                    expect(result.body).toHaveProperty("data");
+                    expect(result.body.data).toHaveLength(1);
+
+                    // check code
+                    expect(result.body).toHaveProperty("code");
+                    expect(result.body.code).toBe(200);
                 })
             })
             describe("box, state, street and street number validation", () => {
                 it("should return error when creating billing with both box and state + street + street number missing", async () => {
                     const userId = await createNewUser({})
                     const billingRequest: PutBillingRequest = {
-                        country: "USA",
-                        zip: "5ac",
-                        city: "LA",
-                        company: "apple"
+                        country: testCountry,
+                        zip: testZip,
+                        city: testCity,
+                        company: testCompany,
                     }
 
                     const result = await request(app)
@@ -284,17 +359,23 @@ describe(BILLING_ROUTE, () => {
                         .send(billingRequest);
 
                     expect(result.status).toBe(400);
-                    expect(JSON.parse(result.text).message).toBe("either box, or state, street and street number are required ");
+                    expect(result.body).toHaveProperty("data");
+                    expect(result.body.data).toHaveLength(0);
+
+                    // check code
+                    expect(result.body).toHaveProperty("code");
+                    expect(result.body.code).toBe(1102);
+                    expect(JSON.parse(result.text).message).toBe("It seems, that you provided an an invalid combination of fields in request body: either box, or state, street and street number are required");
                 })
 
                 it("should create billing when box is provided even when state + street + street number are missing", async () => {
                     const userId = await createNewUser({})
                     const billingRequest: PutBillingRequest = {
-                        country: "USA",
-                        zip: "5ac",
-                        city: "LA",
-                        company: "apple",
-                        box: "a"
+                        country: testCountry,
+                        zip: testZip,
+                        city: testCity,
+                        company: testCompany,
+                        box: testBox,
                     }
 
                     const result = await request(app)
@@ -304,18 +385,24 @@ describe(BILLING_ROUTE, () => {
                         .send(billingRequest);
 
                     expect(result.status).toBe(200);
+                    expect(result.body).toHaveProperty("data");
+                    expect(result.body.data).toHaveLength(1);
+
+                    // check code
+                    expect(result.body).toHaveProperty("code");
+                    expect(result.body.code).toBe(200);
                 })
 
                 it("should create billing when state + street + street number provided even when box is missing", async () => {
                     const userId = await createNewUser({})
                     const billingRequest: PutBillingRequest = {
-                        country: "USA",
-                        zip: "5ac",
-                        city: "LA",
-                        company: "Apple",
-                        state: "California",
-                        street: "Sunset Blvd.",
-                        streetNumber: "12"
+                        country: testCountry,
+                        zip: testZip,
+                        city: testCity,
+                        company: testCompany,
+                        state: testState,
+                        street: testStreet,
+                        streetNumber: testStreetNumber,
                     }
 
                     const result = await request(app)
@@ -325,6 +412,12 @@ describe(BILLING_ROUTE, () => {
                         .send(billingRequest);
 
                     expect(result.status).toBe(200);
+                    expect(result.body).toHaveProperty("data");
+                    expect(result.body.data).toHaveLength(1);
+
+                    // check code
+                    expect(result.body).toHaveProperty("code");
+                    expect(result.body.code).toBe(200);
                 })
             })
         })
@@ -332,17 +425,13 @@ describe(BILLING_ROUTE, () => {
         describe("min and max length validations", () => {
             it("should return error when creating billing with company length over 150 chars", async () => {
                 const userId = await createNewUser({})
-                let longCompanyName = "";
-                for (let i = 0; i < 151; i++) {
-                    longCompanyName += "a"
-                }
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "5ac",
-                    city: "LA",
-                    company: longCompanyName,
-                    box: "a"
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    company: "x".repeat(151),
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -351,22 +440,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with forename length over 100 chars", async () => {
                 const userId = await createNewUser({})
-                let longForename = "";
-                for (let i = 0; i < 101; i++) {
-                    longForename += "a"
-                }
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "5ac",
-                    city: "LA",
-                    forename: longForename,
-                    surname: "smith",
-                    box: "a"
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    forename: "x".repeat(101),
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -375,22 +466,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with surname length over 100 chars", async () => {
                 const userId = await createNewUser({})
-                let longSurname = "";
-                for (let i = 0; i < 101; i++) {
-                    longSurname += "a"
-                }
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "5ac",
-                    city: "LA",
-                    forename: "john",
-                    surname: longSurname,
-                    box: "a"
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: "x".repeat(101),
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -399,22 +492,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with zip length over 20 chars", async () => {
                 const userId = await createNewUser({})
-                let longZip = "";
-                for (let i = 0; i < 21; i++) {
-                    longZip += "a"
-                }
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: longZip,
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a"
+                    country: testCountry,
+                    zip: "x".repeat(21),
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -423,18 +518,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with zip length under 1 chars", async () => {
                 const userId = await createNewUser({})
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
+                    country: testCountry,
                     zip: "",
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a"
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -443,22 +544,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with city length over 50 chars", async () => {
-                let longCityName = "";
-                for (let i = 0; i < 51; i++) {
-                    longCityName += "a"
-                }
                 const userId = await createNewUser({})
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "aa",
-                    city: longCityName,
-                    forename: "john",
-                    surname: "smith",
-                    box: "a"
+                    country: testCountry,
+                    zip: testZip,
+                    city: "x".repeat(51),
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -467,18 +570,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with city length under 1 chars", async () => {
                 const userId = await createNewUser({})
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "a",
+                    country: testCountry,
+                    zip: testZip,
                     city: "",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a"
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -487,23 +596,25 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with state length over 50 chars", async () => {
-                let longStateName = "";
-                for (let i = 0; i < 51; i++) {
-                    longStateName += "a"
-                }
                 const userId = await createNewUser({})
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "aa",
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a",
-                    state: longStateName
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
+                    state: "x".repeat(51),
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -512,22 +623,24 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with box length over 50 chars", async () => {
-                let longBoxName = "";
-                for (let i = 0; i < 51; i++) {
-                    longBoxName += "a"
-                }
                 const userId = await createNewUser({})
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "aa",
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: longBoxName
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: "x".repeat(51),
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -536,22 +649,25 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with street length over 150 chars", async () => {
                 const userId = await createNewUser({})
-                let longStreetName = "";
-                for (let i = 0; i < 151; i++) {
-                    longStreetName += "a"
-                }
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "5ac",
-                    city: "LA",
-                    company: "Apple",
-                    box: "a",
-                    street: longStreetName
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
+                    street: "x".repeat(151),
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -560,23 +676,25 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with streetNumber length over 20 chars", async () => {
                 const userId = await createNewUser({})
-                let longStreetNumber = "";
-                for (let i = 0; i < 21; i++) {
-                    longStreetNumber += "5"
-                }
 
                 const billingRequest: PutBillingRequest = {
-                    country: "USA",
-                    zip: "a",
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a",
-                    streetNumber: longStreetNumber
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
+                    streetNumber: "x".repeat(21),
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -585,6 +703,12 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with country length over 3 chars", async () => {
@@ -592,11 +716,11 @@ describe(BILLING_ROUTE, () => {
 
                 const billingRequest: PutBillingRequest = {
                     country: "ABCD",
-                    zip: "a",
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a",
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -605,6 +729,12 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
 
             it("should return error when creating billing with country length under 2 chars", async () => {
@@ -612,11 +742,11 @@ describe(BILLING_ROUTE, () => {
 
                 const billingRequest: PutBillingRequest = {
                     country: "A",
-                    zip: "a",
-                    city: "LA",
-                    forename: "john",
-                    surname: "smith",
-                    box: "a",
+                    zip: testZip,
+                    city: testCity,
+                    forename: testForename,
+                    surname: testSurname,
+                    box: testBox,
                 }
                 const result = await request(app)
                     .put(BILLING_ROUTE)
@@ -625,6 +755,12 @@ describe(BILLING_ROUTE, () => {
                     .send(billingRequest);
 
                 expect(result.status).toBe(400);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(1101);
             })
         })
     })
