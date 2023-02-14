@@ -5,14 +5,14 @@ import { Users } from "./Users";
 @Entity()
 export class UsersQuota {
 
-    @PrimaryColumn("uuid")
+    @PrimaryColumn("uuid", { name: " user_id" })
     @OneToOne(() => Users)
-    user_id: string;
+    userId: string;
 
-    @Column("bigint", { unsigned: true, nullable: false })
-    used_space: number;
+    @Column("bigint", { name: "used_space", unsigned: true, nullable: false })
+    usedSpace: number;
 
-    @Column("bigint", { unsigned: true, nullable: false })
-    total_space: number;
+    @Column("bigint", { name: "total_space", unsigned: true, nullable: false })
+    totalSpace: number;
 
 }

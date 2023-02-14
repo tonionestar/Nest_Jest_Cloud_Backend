@@ -8,9 +8,8 @@ import {
 
 @Entity()
 export class UsersAudit {
-    //@ManyToOne(() => Users, (users) => users.id)
-    @PrimaryColumn("uuid")
-    user_id: string;
+    @PrimaryColumn("uuid", { name: " user_id" })
+    userId: string;
 
     @UpdateDateColumn()
     @Column("timestamp", { nullable: false, default: () => "CURRENT_TIMESTAMP" })

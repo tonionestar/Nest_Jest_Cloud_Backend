@@ -7,8 +7,8 @@ import {
 
 @Entity()
 export class UsersPasswordReset {
-    @PrimaryColumn("uuid")
-    user_id: string;
+    @PrimaryColumn("uuid", { name: " user_id" })
+    userId: string;
 
     @CreateDateColumn()
     @Column("timestamp", { nullable: false })
@@ -22,5 +22,4 @@ export class UsersPasswordReset {
 
     @Column("tinyint")
     used: boolean
-
 }

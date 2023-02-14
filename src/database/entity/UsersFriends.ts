@@ -16,10 +16,12 @@ export class UsersFriends {
     id: number;
 
     @ManyToOne(() => Users, user => user.id)
-    user_id: Users;
+    @Column("varchar", { name: " user_id" })
+    userId: Users;
 
     @ManyToOne(() => Users, user => user.id)
-    friend_user_id: Users;
+    @Column("varchar", { name: "friend_user_id" })
+    friendUserId: Users;
 
     @Column({
         type: "enum",

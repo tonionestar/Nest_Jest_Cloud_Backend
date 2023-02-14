@@ -12,7 +12,8 @@ export class UsersFirebase {
     token: string;
 
     @ManyToOne(() => Users, user => user.id)
-    user_id: Users;
+    @Column("varchar", { name: " user_id" })
+    userId: Users;
 
     @CreateDateColumn()
     @Column("timestamp", { nullable: false })

@@ -5,11 +5,11 @@ import { Users } from "./Users";
 @Entity()
 export class UsersStripe {
 
-    @PrimaryColumn("varbinary", { length: 40 })
+    @PrimaryColumn("varbinary", { name: " user_id", length: 40 })
     @OneToOne(() => Users)
-    user_id: string;
+    userId: string;
 
-    @Column("varchar", { length: 50, nullable: true })
-    stripe_id: string;
+    @Column("varchar", { name: "stripe_id", length: 50, nullable: true })
+    stripeId: string;
 
 }

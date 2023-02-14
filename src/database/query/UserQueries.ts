@@ -80,7 +80,7 @@ export class UserQueries {
             .createQueryBuilder(UsersAudit, "users_audit")
             .select("users_audit.modified")
             .addSelect("users_audit.created")
-            .where("users_audit.user_id = :userId", { userId: userId })
+            .where("users_audit.userId = :userId", { userId: userId })
             .getOne();
     }
 
@@ -97,8 +97,8 @@ export class UserQueries {
             .addSelect("users_audit.billing")
             .addSelect("users_audit.shipping")
             .addSelect("users_audit.quota")
-            .addSelect("users_audit.user_id")
-            .where("users_audit.user_id = :userId", { userId: userId })
+            .addSelect("users_audit.userId")
+            .where("users_audit.userId = :userId", { userId: userId })
             .getOne();
     }
 
@@ -239,7 +239,7 @@ export class UserQueries {
                 modified: () => "CURRENT_TIMESTAMP",
                 forename: () => "CURRENT_TIMESTAMP"
             })
-            .where("user_id = :userId", { userId: userId })
+            .where("userId = :userId", { userId: userId })
             .execute();
     }
 
@@ -250,7 +250,7 @@ export class UserQueries {
                 modified: () => "CURRENT_TIMESTAMP",
                 surname: () => "CURRENT_TIMESTAMP"
             })
-            .where("user_id = :userId", { userId: userId })
+            .where("userId = :userId", { userId: userId })
             .execute()
     }
 
@@ -261,7 +261,7 @@ export class UserQueries {
                 modified: () => "CURRENT_TIMESTAMP",
                 username: () => "CURRENT_TIMESTAMP"
             })
-            .where("user_id = :userId", { userId: userId })
+            .where("userId = :userId", { userId: userId })
             .execute()
     }
 
@@ -272,7 +272,7 @@ export class UserQueries {
                 modified: () => "CURRENT_TIMESTAMP",
                 email: () => "CURRENT_TIMESTAMP"
             })
-            .where("user_id = :userId", { userId: userId })
+            .where("userId = :userId", { userId: userId })
             .execute()
     }
 
@@ -283,7 +283,7 @@ export class UserQueries {
                 modified: () => "CURRENT_TIMESTAMP",
                 hash: () => "CURRENT_TIMESTAMP"
             })
-            .where("user_id = :userId", { userId: userId })
+            .where("userId = :userId", { userId: userId })
             .execute()
     }
 
@@ -301,7 +301,7 @@ export class UserQueries {
             .insert()
             .into(UsersPasswordReset)
             .values({
-                user_id: id,
+                userId: id,
                 created: () => "CURRENT_TIMESTAMP",
                 expired: () => "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 3 HOUR)",
                 secret: secret,
@@ -319,7 +319,7 @@ export class UserQueries {
             .addSelect("users_password_reset.created")
             .addSelect("users_password_reset.secret")
             .addSelect("users_password_reset.used")
-            .where("users_password_reset.user_id = :id", { id: id })
+            .where("users_password_reset.userId = :id", { id: id })
             .getOne();
     }
 
@@ -347,7 +347,7 @@ export class UserQueries {
             .insert()
             .into(UsersAudit)
             .values({
-                user_id: id,
+                userId: id,
                 created: () => "CURRENT_TIMESTAMP",
                 modified: () => "CURRENT_TIMESTAMP",
                 username: () => "CURRENT_TIMESTAMP",
@@ -364,9 +364,9 @@ export class UserQueries {
             .insert()
             .into(UsersQuota)
             .values({
-                user_id: id,
-                used_space: 0,
-                total_space: quota,
+                userId: id,
+                usedSpace: 0,
+                totalSpace: quota,
             })
             .execute()
     }

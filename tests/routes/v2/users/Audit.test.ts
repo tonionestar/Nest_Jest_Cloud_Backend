@@ -51,8 +51,8 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
 
             // check audit fields
-            expect(result.body.data[0]).toHaveProperty("user_id");
-            expect(result.body.data[0].user_id).toBe(testUserId);
+            expect(result.body.data[0]).toHaveProperty("userId");
+            expect(result.body.data[0].userId).toBe(testUserId);
             expect(result.body.data[0]).toHaveProperty("modified");
             expect(result.body.data[0].modified).not.toBeNull();
             expect(result.body.data[0]).toHaveProperty("created");

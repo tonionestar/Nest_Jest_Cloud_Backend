@@ -106,7 +106,7 @@ export function generateAccessToken(userId: string, session: string = testSessio
 
 export async function insertAudit(userId: string) {
     await ClippicDataSource.createQueryBuilder().insert().into(UsersAudit).values({
-        user_id: userId,
+        userId: userId,
         created: "CURRENT_TIMESTAMP",
         modified: "CURRENT_TIMESTAMP"
     }).execute();
