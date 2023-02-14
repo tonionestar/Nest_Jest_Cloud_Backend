@@ -1,6 +1,5 @@
 import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import { ConstCountries } from "./ConstCountries";
 import { Users } from "./Users";
 
 export enum ShippingType {
@@ -53,7 +52,7 @@ export class UsersShipping {
     @Column("varchar", { length: 50, nullable: true })
     state: string;
 
-    @ManyToOne(() => ConstCountries, country => country.id)
+    @Column("int", { nullable: true })
     country: number;
 
     @Column("varchar", { length: 10, nullable: true })

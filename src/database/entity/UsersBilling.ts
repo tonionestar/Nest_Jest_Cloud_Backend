@@ -1,14 +1,19 @@
 import { Column, Entity, ManyToOne, OneToOne, PrimaryColumn } from "typeorm";
 
-import { ConstCountries } from "./ConstCountries";
-import { Users } from "./Users";
-
 @Entity()
 export class UsersBilling {
 
-    @PrimaryColumn("varbinary", { length: 40 })
-    @OneToOne(() => Users)
-    id: string;
+    @PrimaryColumn("uuid", { name: "user_id" })
+    userId: string;
+
+    @Column("varchar", { length: 150, nullable: true })
+    company: string;
+
+    @Column("varchar", { length: 100, nullable: true })
+    forename: string;
+
+    @Column("varchar", { length: 100, nullable: true })
+    surname: string;
 
     @Column("varchar", { length: 50, nullable: true })
     box: string;
@@ -16,8 +21,8 @@ export class UsersBilling {
     @Column("varchar", { length: 150, nullable: true })
     street: string;
 
-    @Column("varchar", { length: 20, nullable: true })
-    street_number: string;
+    @Column("varchar", { name: "street_number", length: 20, nullable: true })
+    streetNumber: string;
 
     @Column("varchar", { length: 20, nullable: true })
     zip: string;
@@ -28,6 +33,6 @@ export class UsersBilling {
     @Column("varchar", { length: 50, nullable: true })
     state: string;
 
-    @ManyToOne(() => ConstCountries, country => country.id)
+    @Column("int", { nullable: true })
     country: number;
 }

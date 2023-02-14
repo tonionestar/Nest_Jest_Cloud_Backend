@@ -1,8 +1,12 @@
 import { Span, SpanContext } from "opentracing";
-import { InsertResult } from "typeorm";
+import { InsertResult, UpdateResult } from "typeorm";
+import Country from "../../classes/Country";
+import { GetBillingResponse } from "../../models/billing/GetBillingResponse";
+import { PutBillingRequest } from "../../models/billing/PutBillingRequest";
 import { ClippicDataSource } from "../DatabaseConnection";
 import { Users } from "../entity/Users";
 import { UsersAudit } from "../entity/UsersAudit";
+import { UsersBilling } from "../entity/UsersBilling";
 import { UsersPasswordReset } from "../entity/UsersPasswordReset";
 import tracer from "../../classes/Jaeger";
 import { UsersQuota } from "../entity/UsersQuota";
@@ -58,6 +62,7 @@ export class UserQueries {
             .where("users.id = :userId", { userId: userId })
             .getOne();
     }
+
     GetSignupData(userId: string) {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")
@@ -282,6 +287,14 @@ export class UserQueries {
             .execute()
     }
 
+    updateAuditBilling(userId: string): Promise<UpdateResult> {
+        const auditRepository = ClippicDataSource.getRepository(UsersAudit)
+        return auditRepository.update(userId, {
+            modified: () => "CURRENT_TIMESTAMP",
+            billing: () => "CURRENT_TIMESTAMP"
+        })
+    }
+
     SetPasswordForgottenSecret(id: string, secret: number) {
         return ClippicDataSource.manager
             .createQueryBuilder()
@@ -336,6 +349,7 @@ export class UserQueries {
             .values({
                 user_id: id,
                 created: () => "CURRENT_TIMESTAMP",
+                modified: () => "CURRENT_TIMESTAMP",
                 username: () => "CURRENT_TIMESTAMP",
                 email: () => "CURRENT_TIMESTAMP",
                 hash: () => "CURRENT_TIMESTAMP",
@@ -355,5 +369,22 @@ export class UserQueries {
                 total_space: quota,
             })
             .execute()
+    }
+
+    GetBilling(userId: string): Promise<UsersBilling> {
+        const BillingRepository = ClippicDataSource.getRepository(UsersBilling)
+        return BillingRepository.findOneBy({ userId })
+    }
+
+    async CreateOrUpdateBilling(userId: string, billingRequestData: PutBillingRequest): Promise<UsersBilling> {
+        const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
+        const countryId = this.getCountryIdByIso(billingRequestData.country);
+        await BillingRepository.save({ userId, ...billingRequestData, country: countryId })
+        return BillingRepository.findOneBy({ userId })
+    }
+
+    private getCountryIdByIso(iso: string): number {
+        const allCountries = new Country();
+        return iso.length == 2 ? allCountries.getIDFromISO2(iso) : allCountries.getIDFromISO3(iso)
     }
 }

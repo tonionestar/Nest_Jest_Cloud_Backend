@@ -2,7 +2,7 @@ import { CountryRecord } from "../models/Country";
 
 class Country {
     // Country details
-    countries: Record<string, CountryRecord> = {
+    private countries: Record<string, CountryRecord> = {
         "AD": {
             "id": 6,
             "name": "Andorra",
@@ -3393,8 +3393,8 @@ class Country {
             "iso3": "ZWE"
         }
     }
-    countriesByID: Record<string, any>;
-    countriesByISO3: Record<string, any>;
+    private countriesByID: Record<string, any>;
+    private countriesByISO3: Record<string, any>;
 
     constructor() {
         const id_map = new Map();
@@ -3426,6 +3426,15 @@ class Country {
         }
         return null;
     }
+
+    getCountryById(id: number): CountryRecord {
+        return this.countriesByID.get(id);
+    }
+
+    getCountryByISO3(iso3: string): CountryRecord {
+        return this.countriesByISO3.get(iso3);
+    }
+
 }
 
 export default Country;
