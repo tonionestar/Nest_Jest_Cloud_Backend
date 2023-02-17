@@ -30,7 +30,6 @@ const LocalDataSource = new DataSource ({
     username: "jest",
     password: "jest",
     database: "users",
-    dropSchema: true,
     entities: [
         __dirname + "/../**/entity/*{.js,.ts}",
     ],

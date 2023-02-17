@@ -1,0 +1,15 @@
+[
+  {
+  "userId": "1",
+  "company": "Apple",
+  "forename": "Bradly",
+  "surname": "Cooper",
+  "box": "5A",
+  "street": "sunshine st.",
+  "streetNumber": "7",
+  "zip": "54321",
+  "city": "Los Angeles",
+  "state": "California",
+  "country": 239
+  }
+]

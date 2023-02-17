@@ -1,0 +1,22 @@
+[
+  {
+    "id": "1",
+    "username": "John Doe",
+    "email": "johnDoe@gmail.com",
+    "salt": "string",
+    "session": "string",
+    "hash": "string",
+    "forename": "John",
+    "surname": "Doe"
+  },
+  {
+    "id": "2",
+    "username": "Jane Smith",
+    "email": "janesmith@gmail.com",
+    "salt": "string",
+    "session": "string",
+    "hash": "string",
+    "forename": "Jane",
+    "surname": "Smith"
+  }
+]
