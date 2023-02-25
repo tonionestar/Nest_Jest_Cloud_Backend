@@ -1,7 +1,9 @@
 import { Users } from "../entity/Users";
 import { UsersBilling } from "../entity/UsersBilling";
+import { UsersShipping } from "../entity/UsersShipping";
 import seedUsers from "./entities/users.json"
 import seedBillings from "./entities/billing.json"
+import seedShippings from "./entities/shipping.json"
 import { ClippicDataSource } from "../../database/DatabaseConnection";
 
 if (process.env.NODE_ENV === "dev") {
@@ -19,6 +21,9 @@ async function seedData() {
 
     const billingRepo = ClippicDataSource.getRepository(UsersBilling)
     await billingRepo.save(seedBillings)
+
+    const shippingRepo = ClippicDataSource.getRepository(UsersShipping)
+    await shippingRepo.save(seedShippings)
 
     await ClippicDataSource.destroy()
     console.log("Seed db finished successfully")

@@ -32,6 +32,7 @@ import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
+import { validateCompanyForenameSurename, validateStreetStateStreetnumber } from "../../../logic/optionalValuesValidation";
 
 @Route("/v2/users/billing")
 export class BillingController extends Controller {
@@ -208,12 +209,8 @@ export class BillingController extends Controller {
     }
 
     private checkSemiOptionalValues(billingRequestData: PutBillingRequest) {
-        if (!billingRequestData.company && !(billingRequestData.forename && billingRequestData.surname)) {
-            throw new BodyFieldCombinationInvalidError("either company, or forename + surname are required", this.traceId);
-        }
-        if (!(billingRequestData.street && billingRequestData.state && billingRequestData.streetNumber) && !billingRequestData.box) {
-            throw new BodyFieldCombinationInvalidError("either box, or state, street and street number are required", this.traceId)
-        }
+        validateCompanyForenameSurename(billingRequestData, this.traceId)
+        validateStreetStateStreetnumber(billingRequestData, this.traceId)
     }
 
     private async CreateOrUpdateBilling(billingRequestData: PutBillingRequest): Promise<void> {
@@ -222,7 +219,7 @@ export class BillingController extends Controller {
     }
 
     private async updateAuditTimestamp() {
-        return this.db.doQuery(this.parentSpanContext, this.db.updateAuditBilling, this.user.id);
+        return this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditBilling, this.user.id);
     }
 
     private isBillingNotFound() {

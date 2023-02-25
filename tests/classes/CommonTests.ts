@@ -1,12 +1,14 @@
 import * as jwt from "jsonwebtoken";
+import { getJWTSecret } from "../../src/classes/Common";
 import Country from "../../src/classes/Country";
-import { UsersBilling } from "../../src/database/entity/UsersBilling";
-import { AccessToken } from "../../src/models/AccessToken";
 import { ClippicDataSource } from "../../src/database/DatabaseConnection";
-import { User } from "../../src/models/User";
 import { Users } from "../../src/database/entity/Users";
 import { UsersAudit } from "../../src/database/entity/UsersAudit";
-import { getJWTSecret } from "../../src/classes/Common";
+import { UsersBilling } from "../../src/database/entity/UsersBilling";
+import { ShippingType, UsersShipping } from "../../src/database/entity/UsersShipping";
+import { AccessToken } from "../../src/models/AccessToken";
+import { PostShippingRequest } from "../../src/models/shipping/PostShippingRequest";
+import { User } from "../../src/models/User";
 
 export const testUsername = "tester";
 export const testEmail = "tester@clippic.app";
@@ -24,6 +26,9 @@ export const testBox = "PO Box 5"
 export const testStreet = "Arbitrary Steet"
 export const testStreetNumber = "230a"
 export const testCountry = "USA"
+
+export const testPackstation = "5553";
+export const testPostnumber = "534598745874";
 
 export async function createNewUser({
                                         username = testUsername,
@@ -72,8 +77,47 @@ export async function createNewBilling({
     }
 
     const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
-    await BillingRepository.save({ ...newBilling })
+    await BillingRepository.save(newBilling)
     return newBilling.userId
+}
+
+export async function createNewShipping({
+                                            userId,
+                                            name,
+                                            shippingType,
+                                            company,
+                                            forename,
+                                            surname,
+                                            zip,
+                                            city,
+                                            state,
+                                            box,
+                                            street,
+                                            streetNumber,
+                                            country
+                                        }: Partial<UsersShipping>): Promise<UsersShipping> {
+    userId = userId || await createNewUser({})
+    const allCountries = new Country();
+    const usaId = allCountries.getIDFromISO3("USA")
+
+    const newShipping: Partial<UsersShipping> = {
+        userId,
+        name,
+        shippingType,
+        company,
+        forename,
+        surname,
+        zip,
+        city,
+        state,
+        box,
+        street,
+        streetNumber,
+        country: country || usaId
+    }
+
+    const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
+    return ShippingRepository.save(newShipping)
 }
 
 export async function insertUser(

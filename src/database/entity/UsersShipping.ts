@@ -1,25 +1,27 @@
-import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 import { Users } from "./Users";
 
 export enum ShippingType {
     ADDRESS = "address",
-    BOX = "box",
     PACKSTATION = "packstation"
 }
 
 @Entity()
 export class UsersShipping {
 
-    @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
-    @Column("varbinary", { name: "user_id", length: 40 })
-    @OneToOne(() => Users)
+    @Column("uuid", { name: "user_id" })
+    @ManyToOne(() => Users)
     userId: string;
 
     @Column("varchar", { length: 50, nullable: true })
     name: string;
+
+    @Column("varchar", { length: 150, nullable: true })
+    company: string;
 
     @Column("varchar", { length: 100, nullable: true })
     forename: string;
