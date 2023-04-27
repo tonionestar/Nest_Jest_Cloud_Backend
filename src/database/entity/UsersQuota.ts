@@ -5,7 +5,7 @@ import { Users } from "./Users";
 @Entity()
 export class UsersQuota {
 
-    @PrimaryColumn("uuid", { name: " user_id" })
+    @PrimaryColumn("uuid", { name: "user_id" })
     @OneToOne(() => Users)
         userId: string;
 

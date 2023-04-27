@@ -8,6 +8,7 @@ import { User } from "../../src/models/User";
 import { Users } from "../../src/database/entity/Users";
 import { UsersAudit } from "../../src/database/entity/UsersAudit";
 import { UsersBilling } from "../../src/database/entity/UsersBilling";
+import { UsersQuota } from "../../src/database/entity/UsersQuota";
 import { UsersShipping } from "../../src/database/entity/UsersShipping";
 
 export const testUsername = "tester";
@@ -26,6 +27,9 @@ export const testBox = "PO Box 5";
 export const testStreet = "Arbitrary Steet";
 export const testStreetNumber = "230a";
 export const testCountry = "USA";
+
+export const testUsedSpace = 300;
+export const testTotalSpace = 700;
 
 export const testPackstation = "5553";
 export const testPostnumber = "534598745874";
@@ -79,6 +83,22 @@ export async function createNewBilling({
     const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
     await BillingRepository.save(newBilling);
     return newBilling.userId;
+}
+
+export async function createNewQuota({
+    usedSpace,
+    totalSpace
+}: Partial<UsersQuota>): Promise<string> {
+    const userId = await createNewUser({})
+    const newQuota: UsersQuota = {
+        userId,
+        usedSpace,
+        totalSpace
+    }
+
+    const QuotaRepository = ClippicDataSource.getRepository(UsersQuota);
+    await QuotaRepository.save(newQuota)
+    return newQuota.userId
 }
 
 export async function createNewShipping({
