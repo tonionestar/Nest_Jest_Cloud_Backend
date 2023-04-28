@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import request from "supertest"
+import request from "supertest";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../src/app")
+const app = require("../../../src/app");
 
 describe("/health", () => {
 
@@ -12,5 +12,5 @@ describe("/health", () => {
             .get("/health");
 
         expect(result.status).toBe(200);
-    })
-})
+    });
+});

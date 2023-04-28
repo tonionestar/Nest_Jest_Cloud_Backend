@@ -4,21 +4,21 @@ import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import request from "supertest"
+import request from "supertest";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
+const app = require("../../../../src/app");
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -35,8 +35,8 @@ describe(url, () => {
     describe("GET", () => {
 
         it("should be possible to get id of other user", async () => {
-            const newUserName = "new-fancy-username"
-            const newUserEmail = "tester2@clippic.app"
+            const newUserName = "new-fancy-username";
+            const newUserEmail = "tester2@clippic.app";
 
             const testUserId = await createNewUser({});
             const testUser2Id = await createNewUser({

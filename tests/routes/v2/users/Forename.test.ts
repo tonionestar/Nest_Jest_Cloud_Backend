@@ -1,25 +1,29 @@
-import { createNewUser, generateAccessToken, testForename } from "../../../classes/CommonTests";
+import {
+    createNewUser,
+    generateAccessToken,
+    testForename
+} from "../../../classes/CommonTests";
+
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { UserQueries } from "../../../../src/database/query/UserQueries";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import request from "supertest"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
+const app = require("../../../../src/app");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require("supertest");
 
 const db = new UserQueries();
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -108,7 +112,7 @@ describe(url, () => {
 
         it("should be possible to change forename", async () => {
             const testUserId = await createNewUser({});
-            const newForename = "new-fancy-forename"
+            const newForename = "new-fancy-forename";
 
             const result = await request(app)
                 .put(url)
@@ -139,7 +143,7 @@ describe(url, () => {
 
         it("should be possible to change forename with max chars", async () => {
             const testUserId = await createNewUser({});
-            const newForename = "new-fancy-forename-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-12"
+            const newForename = "new-fancy-forename-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-12";
 
             const result = await request(app)
                 .put(url)
@@ -170,7 +174,7 @@ describe(url, () => {
 
         it("should not be possible to change forename with too many chars", async () => {
             const testUserId = await createNewUser({});
-            const newForename = "new-fancy-forename-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123"
+            const newForename = "new-fancy-forename-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123";
 
             const result = await request(app)
                 .put(url)
@@ -191,7 +195,7 @@ describe(url, () => {
 
         it("should not be possible to change forename with too few chars", async () => {
             const testUserId = await createNewUser({});
-            const newForename = ""
+            const newForename = "";
 
             const result = await request(app)
                 .put(url)
@@ -217,7 +221,7 @@ describe(url, () => {
                 .put(url)
                 .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
-                .send()
+                .send();
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");

@@ -7,7 +7,8 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
   "env": {
     "es2021": true,
@@ -17,10 +18,15 @@
   },
   "rules": {
     "curly": "error",
+    "eol-last": ["error", "always"],
+    "indent": "error",
+    "linebreak-style": ["error", "unix"],
+    "no-trailing-spaces": "error",
+    "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "double"],
-    "object-curly-spacing": ["error","always"],
+    "semi": ["error", "always"],
     "sort-imports": ["error", {
-      "ignoreCase": false,
+      "ignoreCase": true,
       "ignoreDeclarationSort": false,
       "ignoreMemberSort": false,
       "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],

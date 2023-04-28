@@ -7,12 +7,12 @@ export class UsersQuota {
 
     @PrimaryColumn("uuid", { name: " user_id" })
     @OneToOne(() => Users)
-    userId: string;
+        userId: string;
 
     @Column("bigint", { name: "used_space", unsigned: true, nullable: false })
-    usedSpace: number;
+        usedSpace: number;
 
     @Column("bigint", { name: "total_space", unsigned: true, nullable: false })
-    totalSpace: number;
+        totalSpace: number;
 
 }

@@ -1,8 +1,4 @@
 import {
-    BodyFieldCombinationInvalidError,
-    UserIdNotFoundError
-} from "@clippic/clippic-errors";
-import {
     Body,
     Controller,
     Example,
@@ -15,24 +11,31 @@ import {
     Security,
     Tags
 } from "tsoa";
-
+import {
+    BodyFieldCombinationInvalidError,
+    UserIdNotFoundError
+} from "@clippic/clippic-errors";
 import {
     checkJWTAuthenticationSession,
     checkJWTAuthenticationUserId,
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import {
+    validateCompanyForenameSurename,
+    validateStreetStateStreetnumber
+} from "../../../logic/optionalValuesValidation";
+
 import Country from "../../../classes/Country";
 import { CountryRecord } from "../../../models/Country";
-import { UserBilling } from "../../../models/UserBilling";
 import { GetBillingResponse } from "../../../models/billing/GetBillingResponse";
 import { PutBillingRequest } from "../../../models/billing/PutBillingRequest";
 import { PutBillingResponse } from "../../../models/billing/PutBillingResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
+import { UserBilling } from "../../../models/UserBilling";
 import { UserQueries } from "../../../database/query/UserQueries";
-import { validateCompanyForenameSurename, validateStreetStateStreetnumber } from "../../../logic/optionalValuesValidation";
 
 @Route("/v2/users/billing")
 export class BillingController extends Controller {
@@ -82,13 +85,13 @@ export class BillingController extends Controller {
     public async getBillingRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
         await this.initialize(req, id);
 
-        await this.getUsersBilling()
+        await this.getUsersBilling();
 
         if (this.isBillingNotFound()) {
             throw new UserIdNotFoundError(this.user.id, this.traceId);
         }
 
-        const country = this.getCountry()
+        const country = this.getCountry();
 
         return {
             "status": "success",
@@ -145,10 +148,10 @@ export class BillingController extends Controller {
     @Put("/")
     public async putBillingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutBillingRequest): Promise<PutBillingResponse> {
         await this.initialize(req, id);
-        this.checkSemiOptionalValues(body)
+        this.checkSemiOptionalValues(body);
         await this.CreateOrUpdateBilling(body);
-        await this.updateAuditTimestamp()
-        const country = await this.getCountry()
+        await this.updateAuditTimestamp();
+        const country = await this.getCountry();
 
         return {
             "status": "success",
@@ -205,12 +208,12 @@ export class BillingController extends Controller {
     private getCountry(): CountryRecord {
         const countryId = this.userBilling.country;
         const allCountries = new Country();
-        return allCountries.getCountryById(countryId)
+        return allCountries.getCountryById(countryId);
     }
 
     private checkSemiOptionalValues(billingRequestData: PutBillingRequest) {
-        validateCompanyForenameSurename(billingRequestData, this.traceId)
-        validateStreetStateStreetnumber(billingRequestData, this.traceId)
+        validateCompanyForenameSurename(billingRequestData, this.traceId);
+        validateStreetStateStreetnumber(billingRequestData, this.traceId);
     }
 
     private async CreateOrUpdateBilling(billingRequestData: PutBillingRequest): Promise<void> {

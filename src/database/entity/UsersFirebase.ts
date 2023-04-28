@@ -6,20 +6,20 @@ import { Users } from "./Users";
 export class UsersFirebase {
 
     @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
-    id: number;
+        id: number;
 
     @Column("varchar", { length: 600 })
-    token: string;
+        token: string;
 
     @ManyToOne(() => Users, user => user.id)
     @Column("varchar", { name: " user_id" })
-    userId: Users;
+        userId: Users;
 
     @CreateDateColumn()
     @Column("timestamp", { nullable: false })
-    created: string
+        created: string;
 
     @UpdateDateColumn()
     @Column("timestamp", { nullable: false })
-    modified: string
+        modified: string;
 }

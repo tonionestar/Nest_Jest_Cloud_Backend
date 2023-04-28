@@ -1,6 +1,7 @@
 stages:
   - "prepare"
   - "test"
+  - "lint"
   - "build"
   - "deploy"
   - "release"
@@ -19,6 +20,7 @@ prepare:
     reports:
       dotenv: "${CI_PROJECT_DIR}/deploy.env"
   extends: ".common-semantic-release"
+  needs: []
   script:
     - echo RELEASE_VERSION=$(semantic-release --dry-run --branches $CI_COMMIT_REF_NAME --plugins "@semantic-release/gitlab" | grep -oP "Published release [0-9]+\.[0-9]+\.[0-9]+ on" | grep -oP "[0-9]+\.[0-9]+\.[0-9]+") > ${CI_PROJECT_DIR}/deploy.env
     - "cat ${CI_PROJECT_DIR}/deploy.env"
@@ -30,6 +32,8 @@ prepare:
 
 build:
   dependencies:
+    - "prepare"
+  needs:
     - "prepare"
   stage: "build"
   image:
@@ -52,13 +56,15 @@ build:
 .deploy:
   stage: "deploy"
   image:
-    name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine/helm"
+    name: "registry.clippic.app/infrastructure/docker-external-cache/alpine/helm"
     entrypoint: [""]
   before_script:
     - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/charts/user/files/serviceAccountKey.json"
   environment:
     name: "${CI_COMMIT_REF_NAME}"
     url: "https://${DOMAIN}/v2/user/docs"
+  needs:
+    - "build"
   script:
     - >
       helm upgrade
@@ -88,11 +94,12 @@ test:
     - "npm run build"
     - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/serviceAccountKey.json"
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:18-slim"
+  image: "registry.clippic.app/infrastructure/docker-external-cache/node:18-slim"
+  needs: []
   script:
     - "npm run test:ci"
   services:
-    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/mariadb:10.10"
+    - name: "registry.clippic.app/infrastructure/docker-external-cache/mariadb:10.10"
       variables:
         MARIADB_USER: "jest"
         MARIADB_PASSWORD: "jest"
@@ -108,6 +115,20 @@ test:
     VIDEO_BACKEND: "http://localhost:3001/"
     ORDER_BACKEND: "http://localhost:3003/"
     NODE_ENV: "jest"
+
+eslint:
+  artifacts:
+    when: "always"
+    reports:
+      codequality:
+        - "gl-codequality.json"
+  before_script:
+    - "npm i"
+  image: "registry.clippic.app/infrastructure/docker-external-cache/node:18-slim"
+  needs: []
+  script:
+    - "npx eslint --format gitlab ."
+  stage: "lint"
 
 deploy-dev:
   extends: ".deploy"
@@ -137,6 +158,9 @@ release:
   except:
     - "web"
   extends: ".common-semantic-release"
+  needs:
+    - "prepare"
+    - "build"
   only:
     - "main"
   script:

@@ -1,21 +1,28 @@
-import { Span, SpanContext } from "opentracing";
-import { InsertResult, UpdateResult } from "typeorm";
-import Country from "../../classes/Country";
-import { GetBillingResponse } from "../../models/billing/GetBillingResponse";
-import { PutBillingRequest } from "../../models/billing/PutBillingRequest";
-import { PostShippingRequest } from "../../models/shipping/PostShippingRequest";
-import { PutShippingRequest } from "../../models/shipping/PutShippingRequest";
+import {
+    InsertResult,
+    UpdateResult
+} from "typeorm";
+import {
+    Span,
+    SpanContext
+} from "opentracing";
+
 import { ClippicDataSource } from "../DatabaseConnection";
+import Country from "../../classes/Country";
+import { PostShippingRequest } from "../../models/shipping/PostShippingRequest";
+import { PutBillingRequest } from "../../models/billing/PutBillingRequest";
+import { PutShippingRequest } from "../../models/shipping/PutShippingRequest";
+import tracer from "../../classes/Jaeger";
 import { Users } from "../entity/Users";
 import { UsersAudit } from "../entity/UsersAudit";
 import { UsersBilling } from "../entity/UsersBilling";
 import { UsersPasswordReset } from "../entity/UsersPasswordReset";
-import tracer from "../../classes/Jaeger";
 import { UsersQuota } from "../entity/UsersQuota";
 import { UsersShipping } from "../entity/UsersShipping";
 
 export class UserQueries {
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async doQuery(parentSpanContext: SpanContext, callback: any, ...callbackArgs: any[]) {
         const span: Span = tracer.startSpan(callback.name, {
             childOf: parentSpanContext,
@@ -165,14 +172,14 @@ export class UserQueries {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")
             .where("users.username = :username", { username: username })
-            .getCount()
+            .getCount();
     }
 
     CheckIfEmailAlreadyExists(email: string) {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")
             .where("users.email = :email", { email: email })
-            .getCount()
+            .getCount();
     }
 
     UpdateUsername(userId: string, username: string) {
@@ -254,7 +261,7 @@ export class UserQueries {
                 surname: () => "CURRENT_TIMESTAMP"
             })
             .where("userId = :userId", { userId: userId })
-            .execute()
+            .execute();
     }
 
     UpdateAuditUsername(userId: string) {
@@ -265,7 +272,7 @@ export class UserQueries {
                 username: () => "CURRENT_TIMESTAMP"
             })
             .where("userId = :userId", { userId: userId })
-            .execute()
+            .execute();
     }
 
     UpdateAuditEmail(userId: string) {
@@ -276,7 +283,7 @@ export class UserQueries {
                 email: () => "CURRENT_TIMESTAMP"
             })
             .where("userId = :userId", { userId: userId })
-            .execute()
+            .execute();
     }
 
     UpdateAuditHash(userId: string) {
@@ -287,23 +294,23 @@ export class UserQueries {
                 hash: () => "CURRENT_TIMESTAMP"
             })
             .where("userId = :userId", { userId: userId })
-            .execute()
+            .execute();
     }
 
     UpdateAuditBilling(userId: string): Promise<UpdateResult> {
-        const auditRepository = ClippicDataSource.getRepository(UsersAudit)
+        const auditRepository = ClippicDataSource.getRepository(UsersAudit);
         return auditRepository.update(userId, {
             modified: () => "CURRENT_TIMESTAMP",
             billing: () => "CURRENT_TIMESTAMP"
-        })
+        });
     }
 
     UpdateAuditShipping(userId: string): Promise<UpdateResult> {
-        const auditRepository = ClippicDataSource.getRepository(UsersAudit)
+        const auditRepository = ClippicDataSource.getRepository(UsersAudit);
         return auditRepository.update(userId, {
             modified: () => "CURRENT_TIMESTAMP",
             shipping: () => "CURRENT_TIMESTAMP"
-        })
+        });
     }
 
     SetPasswordForgottenSecret(id: string, secret: number) {
@@ -319,7 +326,7 @@ export class UserQueries {
                 used: false
             })
             .orUpdate(["created", "expired", "secret", "used"])
-            .execute()
+            .execute();
     }
 
     GetPasswordReset(id: string) {
@@ -349,7 +356,7 @@ export class UserQueries {
             .returning(
                 "id"
             )
-            .execute()
+            .execute();
     }
 
     InsertInitialAudit(id: string) {
@@ -366,7 +373,7 @@ export class UserQueries {
                 hash: () => "CURRENT_TIMESTAMP",
                 quota: () => "CURRENT_TIMESTAMP",
             })
-            .execute()
+            .execute();
     }
 
     InsertInitialQuota(id: string, quota: number) {
@@ -379,57 +386,58 @@ export class UserQueries {
                 usedSpace: 0,
                 totalSpace: quota,
             })
-            .execute()
+            .execute();
     }
 
     GetBilling(userId: string): Promise<UsersBilling> {
-        const BillingRepository = ClippicDataSource.getRepository(UsersBilling)
-        return BillingRepository.findOneBy({ userId })
+        const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
+        return BillingRepository.findOneBy({ userId });
     }
 
     async CreateOrUpdateBilling(userId: string, billingRequestData: PutBillingRequest): Promise<UsersBilling> {
         const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
         const countryId = this.getCountryIdByIso(billingRequestData.country);
-        await BillingRepository.save({ userId, ...billingRequestData, country: countryId })
-        return BillingRepository.findOneBy({ userId })
+        await BillingRepository.save({ userId, ...billingRequestData, country: countryId });
+        return BillingRepository.findOneBy({ userId });
     }
 
     private getCountryIdByIso(iso: string): number {
         const allCountries = new Country();
-        return iso.length == 2 ? allCountries.getIDFromISO2(iso) : allCountries.getIDFromISO3(iso)
+        return iso.length == 2 ? allCountries.getIDFromISO2(iso) : allCountries.getIDFromISO3(iso);
     }
 
     GetShippings(userId: string): Promise<UsersShipping[]> {
-        const ShippingRepository = ClippicDataSource.getRepository(UsersShipping)
-        return ShippingRepository.findBy({ userId })
+        const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
+        return ShippingRepository.findBy({ userId });
     }
 
     GetShippingById(shippingId: string): Promise<UsersShipping[]> {
-        const ShippingRepository = ClippicDataSource.getRepository(UsersShipping)
-        return ShippingRepository.findBy({ id: shippingId })
+        const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
+        return ShippingRepository.findBy({ id: shippingId });
     }
 
     CreateShipping(userId: string, shippingRequestData: PostShippingRequest): Promise<UsersShipping> {
         const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
-        const entityShippingRequest = this.convertRequestToEntity(shippingRequestData)
-        return ShippingRepository.save(entityShippingRequest)
+        const entityShippingRequest = this.convertRequestToEntity(shippingRequestData);
+        return ShippingRepository.save(entityShippingRequest);
     }
 
     async UpdateShipping(userId: string, shippingRequestData: PutShippingRequest): Promise<UsersShipping> {
         const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
-        const entityShippingRequest = this.convertRequestToEntity(shippingRequestData)
-        await ShippingRepository.update(shippingRequestData.id, entityShippingRequest)
-        return ShippingRepository.findOneBy({ id: shippingRequestData.id })
+        const entityShippingRequest = this.convertRequestToEntity(shippingRequestData);
+        await ShippingRepository.update(shippingRequestData.id, entityShippingRequest);
+        return ShippingRepository.findOneBy({ id: shippingRequestData.id });
     }
 
 
     private convertRequestToEntity(shippingRequestData: PostShippingRequest | PutShippingRequest): Partial<UsersShipping> {
         if (shippingRequestData.country) {
             const countryId = this.getCountryIdByIso(shippingRequestData.country);
-            return { ...shippingRequestData, country: countryId }
+            return { ...shippingRequestData, country: countryId };
         } else {
-            const requestData: any = { ...shippingRequestData }
-            return requestData
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const requestData: any = { ...shippingRequestData };
+            return requestData;
         }
     }
 }

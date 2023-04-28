@@ -1,12 +1,17 @@
+import {
+    createNewUser,
+    testEmail,
+    testPassword,
+    testUsername
+} from "../../../classes/CommonTests";
+
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { UserQueries } from "../../../../src/database/query/UserQueries";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import request from "supertest"
-import { createNewUser, testEmail, testPassword, testUsername } from "../../../classes/CommonTests";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
+const app = require("../../../../src/app");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require("supertest");
 
 const db = new UserQueries();
 
@@ -15,13 +20,13 @@ jest.mock("email-templates");
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -78,7 +83,7 @@ describe(url, () => {
         });
 
         it("should be possible to signup with max username chars", async () => {
-            const username: string = "testerwithmax40charstesterwithmax40chars";
+            const username = "testerwithmax40charstesterwithmax40chars";
             const email: string = testEmail;
 
             const result = await request(app)
@@ -120,7 +125,7 @@ describe(url, () => {
 
         it("should be possible to signup with max email chars", async () => {
             const username: string = testUsername;
-            const email: string = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app"
+            const email = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app";
 
             const result = await request(app)
                 .post(url)
@@ -160,7 +165,7 @@ describe(url, () => {
         });
 
         it("should not be possible to signup with username containing too many chars", async () => {
-            const username: string = "new-fancy-username-which-is-very-long-123";
+            const username = "new-fancy-username-which-is-very-long-123";
             const email: string = testEmail;
 
             const result = await request(app)
@@ -182,7 +187,7 @@ describe(url, () => {
 
         it("should not be possible to signup with email containing too many chars", async () => {
             const username: string = testUsername;
-            const email: string = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-1234@clippic.app"
+            const email = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-1234@clippic.app";
 
             const result = await request(app)
                 .post(url)

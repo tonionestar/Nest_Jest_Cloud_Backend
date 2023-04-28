@@ -1,5 +1,5 @@
-import { MailFormatError } from "@clippic/clippic-errors";
 import Email from "email-templates";
+import { MailFormatError } from "@clippic/clippic-errors";
 import nodemailer from "nodemailer";
 import path from "path";
 import { User } from "../models/User";
@@ -17,14 +17,15 @@ export function validateEmail(email: string, traceId: string): void {
  * @returns {boolean}
  */
 export function validateEmailRegex(email: string): boolean {
+    // eslint-disable-next-line no-useless-escape
     const regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return regex.test(email);
 }
 
 export class Mailer {
-    private sender: string = "\"clippic\" <notification@clippic.app>";
+    private sender = "\"clippic\" <notification@clippic.app>";
     private smtpServer:string = process.env.SMTP_SERVER;
-    private smtpPort:number = Number(process.env.SMTP_PORT);
+    private smtpPort = Number(process.env.SMTP_PORT);
     private smtpUser:string = process.env.SMTP_USER;
     private smtpPass:string = process.env.SMTP_PASS;
 
@@ -73,10 +74,10 @@ export class Mailer {
     }
 
     public async sendPasswordResetCode(user: User, passwordResetCode: number) {
-        let salutation: string = (user.forename) ? user.forename : user.username;
+        const salutation: string = (user.forename) ? user.forename : user.username;
         try {
             await this.email.send({
-                template: path.join(__dirname, '..', '..', 'emails', 'password-forgotten'),
+                template: path.join(__dirname, "..", "..", "emails", "password-forgotten"),
                 message: {
                     to: user.email
                 },
@@ -86,15 +87,15 @@ export class Mailer {
                 }
             });
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
 
     public async sendPasswordChanged(user: User) {
-        let salutation: string = (user.forename) ? user.forename : user.username;
+        const salutation: string = (user.forename) ? user.forename : user.username;
         try {
             await this.email.send({
-                template: path.join(__dirname, '..', '..', 'emails', 'password-changed'),
+                template: path.join(__dirname, "..", "..", "emails", "password-changed"),
                 message: {
                     to: user.email
                 },
@@ -103,14 +104,14 @@ export class Mailer {
                 }
             });
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
 
     public async sendSignup(user: User) {
         try {
             await this.email.send({
-                template: path.join(__dirname, '..', '..', 'emails', 'signup'),
+                template: path.join(__dirname, "..", "..", "emails", "signup"),
                 message: {
                     to: user.email
                 },
@@ -120,7 +121,7 @@ export class Mailer {
                 }
             });
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
 }

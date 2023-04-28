@@ -1,4 +1,5 @@
 import * as express from "express";
+
 import {
     Body,
     Controller,
@@ -12,21 +13,21 @@ import {
     Security,
     Tags
 } from "tsoa";
-
 import {
     checkJWTAuthenticationSession,
     checkJWTAuthenticationUserId,
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+
 import { GetUsernameResponse } from "../../../models/username/GetUsernameResponse";
 import { PutUsernameRequest } from "../../../models/username/PutUsernameRequest";
 import { PutUsernameResponse } from "../../../models/username/PutUsernameResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
 import { UsernameAlreadyExistsError } from "@clippic/clippic-errors";
+import { UserQueries } from "../../../database/query/UserQueries";
 
 @Route("/v2/users/username")
 export class UsernameController extends Controller {

@@ -2,6 +2,12 @@ import * as express from "express";
 import * as jwt from "jsonwebtoken";
 
 import {
+    AccountAlreadyExistsError,
+    IdAlreadyExistsError,
+    MailFormatError,
+    UsernameAlreadyExistsError,
+} from "@clippic/clippic-errors";
+import {
     Body,
     Controller,
     Example,
@@ -13,15 +19,6 @@ import {
     Tags
 } from "tsoa";
 import {
-    AccountAlreadyExistsError,
-    IdAlreadyExistsError,
-    MailFormatError,
-    UsernameAlreadyExistsError,
-} from "@clippic/clippic-errors";
-import { Mailer,
-    validateEmail
-} from "../../../classes/Mailer";
-import {
     generatePasswordHash,
     generateSalt,
     generateSession,
@@ -29,12 +26,15 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import { Mailer,
+    validateEmail
+} from "../../../classes/Mailer";
 
 import { AccessToken } from "../../../models/AccessToken";
-import { RequestTracing } from "../../../models/RequestTracing";
-import { SpanContext } from "opentracing";
 import { PostSignupRequest } from "../../../models/signup/PostSignupRequest";
 import { PostSignupResponse } from "../../../models/signup/PostSignupResponse";
+import { RequestTracing } from "../../../models/RequestTracing";
+import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserQueries } from "../../../database/query/UserQueries";
 
@@ -107,12 +107,12 @@ export class SignupController extends Controller {
         const accessToken: AccessToken = {
             userId: this.user.id.toString(),
             session: this.user.session.toString()
-        }
+        };
         this.token = jwt.sign(accessToken, getJWTSecret(), {});
     }
 
     private async sendSignupMail() {
-        await this.mailer.sendSignup(this.user)
+        await this.mailer.sendSignup(this.user);
     }
 
     /**

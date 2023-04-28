@@ -1,25 +1,29 @@
-import { createNewUser, generateAccessToken, testEmail } from "../../../classes/CommonTests";
+import {
+    createNewUser,
+    generateAccessToken,
+    testEmail
+} from "../../../classes/CommonTests";
+
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { UserQueries } from "../../../../src/database/query/UserQueries";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import request from "supertest"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
+const app = require("../../../../src/app");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require("supertest");
 
 const db = new UserQueries();
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -108,7 +112,7 @@ describe(url, () => {
 
         it("should be possible to change email", async () => {
             const testUserId = await createNewUser({});
-            const newEmailAddress = "tester2@clippic.app"
+            const newEmailAddress = "tester2@clippic.app";
 
             const result = await request(app)
                 .put(url)
@@ -139,7 +143,7 @@ describe(url, () => {
 
         it("should not be possible to change email with invalid email format", async () => {
             const testUserId = await createNewUser({});
-            const newEmailAddress = "testeratclippic.de"
+            const newEmailAddress = "testeratclippic.de";
             const result = await request(app)
                 .put(url)
                 .set("id", testUserId)
@@ -159,7 +163,7 @@ describe(url, () => {
 
         it("should be possible to change email with max chars", async () => {
             const testUserId = await createNewUser({});
-            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app"
+            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app";
 
             const result = await request(app)
                 .put(url)
@@ -190,7 +194,7 @@ describe(url, () => {
 
         it("should not be possible to change email with too many chars", async () => {
             const testUserId = await createNewUser({});
-            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-1234@clippic.app"
+            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-1234@clippic.app";
 
             const result = await request(app)
                 .put(url)
@@ -210,7 +214,7 @@ describe(url, () => {
         });
 
         it("should not be possible to change email when email already exists", async () => {
-            const newEmailName = "tester2@clippic.app"
+            const newEmailName = "tester2@clippic.app";
 
             const testUserId = await createNewUser({});
             await createNewUser({
@@ -237,7 +241,7 @@ describe(url, () => {
 
         it("should not be possible to change email with too few chars", async () => {
             const testUserId = await createNewUser({});
-            const newEmailName = "a@a"
+            const newEmailName = "a@a";
 
             const result = await request(app)
                 .put(url)
@@ -263,7 +267,7 @@ describe(url, () => {
                 .put(url)
                 .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
-                .send()
+                .send();
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");

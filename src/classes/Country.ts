@@ -3392,9 +3392,9 @@ class Country {
             ],
             "iso3": "ZWE"
         }
-    }
-    private countriesByID: Record<string, any>;
-    private countriesByISO3: Record<string, any>;
+    };
+    private countriesByID: Map<number, CountryRecord>;
+    private countriesByISO3: Map<string, CountryRecord>;
 
     constructor() {
         const id_map = new Map();
@@ -3414,6 +3414,7 @@ class Country {
     }
 
     getIDFromISO2(iso2: string) {
+        // eslint-disable-next-line no-prototype-builtins
         if (this.countries.hasOwnProperty(iso2)) {
             return this.countries[iso2].id;
         }

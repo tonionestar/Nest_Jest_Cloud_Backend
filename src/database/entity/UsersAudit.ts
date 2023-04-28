@@ -9,37 +9,37 @@ import {
 @Entity()
 export class UsersAudit {
     @PrimaryColumn("uuid", { name: " user_id" })
-    userId: string;
+        userId: string;
 
     @UpdateDateColumn()
     @Column("timestamp", { nullable: false, default: () => "CURRENT_TIMESTAMP" })
-    modified: string
+        modified: string;
 
     @CreateDateColumn()
     @Column("timestamp", { nullable: false })
-    created: string
+        created: string;
 
     @Column("timestamp", { nullable: true })
-    username: string
+        username: string;
 
     @Column("timestamp", { nullable: true })
-    forename: string
+        forename: string;
 
     @Column("timestamp", { nullable: true })
-    surname: string
+        surname: string;
 
     @Column("timestamp", { nullable: true })
-    email: string
+        email: string;
 
     @Column("timestamp", { nullable: true })
-    hash: string
+        hash: string;
 
     @Column("timestamp", { nullable: true })
-    billing: string
+        billing: string;
 
     @Column("timestamp", { nullable: true })
-    shipping: string
+        shipping: string;
 
     @Column("timestamp", { nullable: true })
-    quota: string
+        quota: string;
 }

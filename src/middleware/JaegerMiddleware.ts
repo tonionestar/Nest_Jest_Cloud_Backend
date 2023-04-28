@@ -1,10 +1,13 @@
-import { FORMAT_HTTP_HEADERS,Tags } from "opentracing";
-
-import { RequestTracing } from "../models/RequestTracing";
+import {
+    FORMAT_HTTP_HEADERS,
+    Tags
+} from "opentracing";
 
 import express from "express";
+import { RequestTracing } from "../models/RequestTracing";
 import tracer from "../classes/Jaeger";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function JaegerMiddleware(request: RequestTracing, response: express.Response, next: any) {
     if (request.path == "/health") {
         next();

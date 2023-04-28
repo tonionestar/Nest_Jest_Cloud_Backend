@@ -1,4 +1,9 @@
-import { Column, Entity, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn
+} from "typeorm";
 
 import { Users } from "./Users";
 
@@ -11,23 +16,23 @@ export enum ShippingType {
 export class UsersShipping {
 
     @PrimaryGeneratedColumn("uuid")
-    id: string;
+        id: string;
 
     @Column("uuid", { name: "user_id" })
     @ManyToOne(() => Users)
-    userId: string;
+        userId: string;
 
     @Column("varchar", { length: 50, nullable: true })
-    name: string;
+        name: string;
 
     @Column("varchar", { length: 150, nullable: true })
-    company: string;
+        company: string;
 
     @Column("varchar", { length: 100, nullable: true })
-    forename: string;
+        forename: string;
 
     @Column("varchar", { length: 100, nullable: true })
-    surname: string;
+        surname: string;
 
     @Column({
         type: "enum",
@@ -35,32 +40,32 @@ export class UsersShipping {
         default: ShippingType.ADDRESS,
         name: "shipping_type"
     })
-    shippingType: ShippingType;
+        shippingType: ShippingType;
 
     @Column("varchar", { length: 50, nullable: true })
-    box: string;
+        box: string;
 
     @Column("varchar", { length: 150, nullable: true })
-    street: string;
+        street: string;
 
     @Column("varchar", { name: "street_number", length: 20, nullable: true })
-    streetNumber: string;
+        streetNumber: string;
 
     @Column("varchar", { length: 20, nullable: true })
-    zip: string;
+        zip: string;
 
     @Column("varchar", { length: 50, nullable: true })
-    city: string;
+        city: string;
 
     @Column("varchar", { length: 50, nullable: true })
-    state: string;
+        state: string;
 
     @Column("int", { nullable: true })
-    country: number;
+        country: number;
 
     @Column("varchar", { length: 10, nullable: true })
-    packstation: string;
+        packstation: string;
 
     @Column("varchar", { length: 20, nullable: true })
-    postnumber: string;
+        postnumber: string;
 }

@@ -13,28 +13,28 @@ export enum FriendsStatus {
 export class UsersFriends {
 
     @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
-    id: number;
+        id: number;
 
     @ManyToOne(() => Users, user => user.id)
     @Column("varchar", { name: " user_id" })
-    userId: Users;
+        userId: Users;
 
     @ManyToOne(() => Users, user => user.id)
     @Column("varchar", { name: "friend_user_id" })
-    friendUserId: Users;
+        friendUserId: Users;
 
     @Column({
         type: "enum",
         enum: FriendsStatus,
         default: FriendsStatus.PENDING
     })
-    status: FriendsStatus;
+        status: FriendsStatus;
 
     @CreateDateColumn()
     @Column("timestamp", { nullable: false })
-    requested: string
+        requested: string;
 
     @UpdateDateColumn()
     @Column("timestamp", { nullable: true })
-    updated: string
+        updated: string;
 }

@@ -2,11 +2,11 @@ import { DataSource } from "typeorm";
 
 
 let ClippicDataSource: DataSource;
-let synchronizeDatabase: boolean = false;
+let synchronizeDatabase = false;
 
 if (process.env.DATABASE_SYNCHRONIZE == "true" || process.env.DATABASE_SYNCHRONIZE) {
     synchronizeDatabase = true;
-    console.log("Data Source has been synchronized")
+    console.log("Data Source has been synchronized");
 }
 
 
@@ -40,7 +40,7 @@ const LocalDataSource = new DataSource ({
 if (process.env.NODE_ENV === "jest" || process.env.NODE_ENV === "dev") {
     ClippicDataSource = LocalDataSource;
 } else {
-    ClippicDataSource = MariadbDataSource
+    ClippicDataSource = MariadbDataSource;
 }
 
 export {

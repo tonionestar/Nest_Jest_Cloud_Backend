@@ -1,27 +1,50 @@
-import { BodyFieldCombinationInvalidError, ShippingNotFoundError } from "@clippic/clippic-errors";
-import { SpanContext } from "opentracing";
-import { Body, Controller, Example, Get, Header, Post, Put, Request, Response, Route, Security, Tags } from "tsoa";
+import {
+    Body,
+    Controller,
+    Example,
+    Get,
+    Header,
+    Post,
+    Put,
+    Request,
+    Response,
+    Route,
+    Security,
+    Tags
+} from "tsoa";
+import {
+    BodyFieldCombinationInvalidError,
+    ShippingNotFoundError
+} from "@clippic/clippic-errors";
 import {
     checkJWTAuthenticationSession,
     checkJWTAuthenticationUserId,
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
-import Country from "../../../classes/Country";
-import { ShippingType, UsersShipping } from "../../../database/entity/UsersShipping";
-import { UserQueries } from "../../../database/query/UserQueries";
-import { CountryRecord } from "../../../models/Country";
-import { RequestTracing } from "../../../models/RequestTracing";
-import { ShippingResponse, ShippingResponseData } from "../../../models/shipping/ShippingResponse";
-import { PostShippingRequest } from "../../../models/shipping/PostShippingRequest";
-import { PutShippingRequest } from "../../../models/shipping/PutShippingRequest";
-import { User } from "../../../models/User";
+import {
+    ShippingResponse,
+    ShippingResponseData
+} from "../../../models/shipping/ShippingResponse";
+import {
+    ShippingType,
+    UsersShipping
+} from "../../../database/entity/UsersShipping";
 import {
     validateCompanyForenameSurename,
     validatePackstation,
     validateStreetStateStreetnumber,
     validateZipCityCountry
 } from "../../../logic/optionalValuesValidation";
+
+import Country from "../../../classes/Country";
+import { CountryRecord } from "../../../models/Country";
+import { PostShippingRequest } from "../../../models/shipping/PostShippingRequest";
+import { PutShippingRequest } from "../../../models/shipping/PutShippingRequest";
+import { RequestTracing } from "../../../models/RequestTracing";
+import { SpanContext } from "opentracing";
+import { User } from "../../../models/User";
+import { UserQueries } from "../../../database/query/UserQueries";
 
 @Route("/v2/users/shipping")
 export class ShippingController extends Controller {
@@ -30,7 +53,7 @@ export class ShippingController extends Controller {
     private traceId: string;
     private parentSpanContext: SpanContext;
     private user: User = {};
-    private userShippings: ShippingResponseData[]
+    private userShippings: ShippingResponseData[];
 
     /**
      * This request will return the user's shipping addresses.
@@ -152,9 +175,9 @@ export class ShippingController extends Controller {
     @Post("/")
     public async postShippingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PostShippingRequest): Promise<ShippingResponse> {
         await this.initialize(req, id);
-        this.checkSemiOptionalValues(body)
+        this.checkSemiOptionalValues(body);
         await this.createShipping(body);
-        await this.updateAuditTimestamp()
+        await this.updateAuditTimestamp();
 
         return {
             "status": "success",
@@ -207,7 +230,7 @@ export class ShippingController extends Controller {
     public async putShippingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutShippingRequest): Promise<ShippingResponse> {
         await this.initialize(req, id);
         await this.updateShipping(body);
-        await this.updateAuditTimestamp()
+        await this.updateAuditTimestamp();
 
         return {
             "status": "success",
@@ -248,27 +271,27 @@ export class ShippingController extends Controller {
         if (shippings.length == 0) {
             throw new ShippingNotFoundError(shippingId, this.traceId);
         }
-        this.userShippings = [this.prepareShippingResponse(shippings[0])]
+        this.userShippings = [this.prepareShippingResponse(shippings[0])];
     }
 
     private async getAllUserShippings(): Promise<void> {
         const shippings: UsersShipping[] = await this.db.doQuery(this.parentSpanContext, this.db.GetShippings, this.user.id);
-        this.userShippings = shippings.map((shipping) => this.prepareShippingResponse(shipping))
+        this.userShippings = shippings.map((shipping) => this.prepareShippingResponse(shipping));
     }
 
     private checkSemiOptionalValues(shippingRequestData: PostShippingRequest) {
         if (shippingRequestData.shippingType == ShippingType.ADDRESS) {
-            validateZipCityCountry(shippingRequestData, this.traceId)
-            validateCompanyForenameSurename(shippingRequestData, this.traceId)
-            validateStreetStateStreetnumber(shippingRequestData, this.traceId)
+            validateZipCityCountry(shippingRequestData, this.traceId);
+            validateCompanyForenameSurename(shippingRequestData, this.traceId);
+            validateStreetStateStreetnumber(shippingRequestData, this.traceId);
         } else {
-            validatePackstation(shippingRequestData, this.traceId)
+            validatePackstation(shippingRequestData, this.traceId);
         }
     }
 
     private async createShipping(shippingRequestData: PostShippingRequest) {
         const newShipping = await this.db.doQuery(this.parentSpanContext, this.db.CreateShipping.bind(this.db), this.user.id, shippingRequestData);
-        this.userShippings = [this.prepareShippingResponse(newShipping)]
+        this.userShippings = [this.prepareShippingResponse(newShipping)];
     }
 
     private async updateShipping(shippingRequestData: PutShippingRequest): Promise<void> {
@@ -276,23 +299,23 @@ export class ShippingController extends Controller {
         if (!shipping) {
             throw new ShippingNotFoundError(shippingRequestData.id, this.traceId);
         }
-        this.userShippings = [this.prepareShippingResponse(shipping)]
+        this.userShippings = [this.prepareShippingResponse(shipping)];
     }
 
     private prepareShippingResponse(shipping: UsersShipping): ShippingResponseData {
-        const country = shipping.country ? this.getCountry(shipping.country) : null
-        delete shipping.country
+        const country = shipping.country ? this.getCountry(shipping.country) : null;
+        delete shipping.country;
         return {
             ...shipping,
             "countryISO2": country?.iso2 || null,
             "countryISO3": country?.iso3 || null,
             "countryName": country?.name || null,
-        }
+        };
     }
 
     private getCountry(countryId: number): CountryRecord {
         const allCountries = new Country();
-        return allCountries.getCountryById(countryId)
+        return allCountries.getCountryById(countryId);
     }
 
     private async updateAuditTimestamp() {

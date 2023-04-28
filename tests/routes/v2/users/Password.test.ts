@@ -1,18 +1,19 @@
 import {
     createNewUser,
-    generateAccessToken, testEmail,
+    generateAccessToken,
+    testEmail,
     testHash,
     testSalt,
     testSession
 } from "../../../classes/CommonTests";
+
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { UserQueries } from "../../../../src/database/query/UserQueries";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import request from "supertest"
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
+const app = require("../../../../src/app");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const request = require("supertest");
 
 const db = new UserQueries();
 
@@ -21,13 +22,13 @@ jest.mock("email-templates");
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -125,7 +126,7 @@ describe(url, () => {
                 .put(url)
                 .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
-                .send()
+                .send();
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");

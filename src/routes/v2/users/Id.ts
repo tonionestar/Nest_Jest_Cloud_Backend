@@ -1,4 +1,11 @@
 import * as express from "express";
+
+import {
+    checkJWTAuthenticationSession,
+    checkJWTAuthenticationUserId,
+    getTraceContext,
+    getTraceId
+} from "../../../classes/Common";
 import {
     Controller,
     Example,
@@ -11,12 +18,7 @@ import {
     Security,
     Tags
 } from "tsoa";
-import {
-    checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
-    getTraceContext,
-    getTraceId
-} from "../../../classes/Common";
+
 import { GetIdResponse } from "../../../models/id/GetIdResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";

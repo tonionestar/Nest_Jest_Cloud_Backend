@@ -7,9 +7,9 @@ export class UsersStripe {
 
     @PrimaryColumn("varbinary", { name: " user_id", length: 40 })
     @OneToOne(() => Users)
-    userId: string;
+        userId: string;
 
     @Column("varchar", { name: "stripe_id", length: 50, nullable: true })
-    stripeId: string;
+        stripeId: string;
 
 }

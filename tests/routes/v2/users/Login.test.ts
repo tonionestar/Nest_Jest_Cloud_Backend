@@ -14,21 +14,21 @@ import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import request from "supertest"
+import request from "supertest";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
+const app = require("../../../../src/app");
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -38,7 +38,7 @@ afterEach(async () => {
     await ClippicDataSource.dropDatabase();
 });
 
-const url = "/v2/users/login"
+const url = "/v2/users/login";
 
 describe(url, () => {
 
@@ -56,7 +56,7 @@ describe(url, () => {
 
             expect(result.status).toBe(200);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
+            expect(result.body.data).toHaveLength(1);
 
             // check code
             expect(result.body).toHaveProperty("code");
@@ -76,7 +76,7 @@ describe(url, () => {
             // token
             expect(result.body.data[0]).toHaveProperty("token");
             expect(result.body.data[0].token).not.toBeNull();
-        })
+        });
 
         it("should be possible to login with username", async () => {
             const testUserId = await createNewUser({});
@@ -90,7 +90,7 @@ describe(url, () => {
 
             expect(result.status).toBe(200);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
+            expect(result.body.data).toHaveLength(1);
 
             // check code
             expect(result.body).toHaveProperty("code");
@@ -110,7 +110,7 @@ describe(url, () => {
             // token
             expect(result.body.data[0]).toHaveProperty("token");
             expect(result.body.data[0].token).not.toBeNull();
-        })
+        });
 
         it("should not be possible to login with wrong password", async () => {
             await createNewUser({});
@@ -124,14 +124,14 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0)
+            expect(result.body.data).toHaveLength(0);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1025);
 
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
-        })
+        });
 
         it("should not be possible to login with non-existing user", async () => {
 
@@ -144,7 +144,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0)
+            expect(result.body.data).toHaveLength(0);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1025);
@@ -152,7 +152,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login when password missing", async () => {
 
@@ -164,8 +164,8 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
-            expect(result.body.data[0]).toStrictEqual({ "body.pass": { "message": "'pass' is required" } })
+            expect(result.body.data).toHaveLength(1);
+            expect(result.body.data[0]).toStrictEqual({ "body.pass": { "message": "'pass' is required" } });
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1101);
@@ -173,7 +173,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login when username/email missing", async () => {
 
@@ -185,13 +185,13 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
+            expect(result.body.data).toHaveLength(1);
             expect(result.body.data[0]).toStrictEqual({ "body.pass": { "message": "'pass' is required" },
                 "body.password": {
                     "message": "\"password\" is an excess property and therefore is not allowed",
                     "value": "password"
                 }
-            })
+            });
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1101);
@@ -199,7 +199,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login when username and email are provided", async () => {
 
@@ -213,7 +213,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0)
+            expect(result.body.data).toHaveLength(0);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1049);
@@ -221,7 +221,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login with wrong formatted email", async () => {
 
@@ -234,16 +234,16 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0)
+            expect(result.body.data).toHaveLength(0);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1022);
 
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
-            expect(result.body.message).toContain("tester")
+            expect(result.body.message).toContain("tester");
 
-        })
+        });
 
         it("should not be possible to login when no audit is in database", async () => {
             await insertUser(
@@ -265,7 +265,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0)
+            expect(result.body.data).toHaveLength(0);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1028);
@@ -273,7 +273,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login with to long username", async () => {
 
@@ -286,7 +286,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
+            expect(result.body.data).toHaveLength(1);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1101);
@@ -294,7 +294,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login with to long email", async () => {
 
@@ -307,7 +307,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
+            expect(result.body.data).toHaveLength(1);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1101);
@@ -315,7 +315,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login with null password", async () => {
 
@@ -328,7 +328,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1)
+            expect(result.body.data).toHaveLength(1);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1101);
@@ -336,7 +336,7 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
 
         it("should not be possible to login with to short password", async () => {
 
@@ -349,7 +349,7 @@ describe(url, () => {
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0)
+            expect(result.body.data).toHaveLength(0);
 
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1025);
@@ -357,6 +357,6 @@ describe(url, () => {
             expect(result.body).toHaveProperty("message");
             expect(result.body.message).not.toBeNull();
 
-        })
+        });
     });
 });

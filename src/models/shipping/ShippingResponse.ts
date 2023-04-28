@@ -1,4 +1,3 @@
-import { ShippingType } from "../../database/entity/UsersShipping";
 import { ClippicResponse } from "../ClippicResponse";
 
 export interface ShippingResponse extends ClippicResponse{

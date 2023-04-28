@@ -12,16 +12,16 @@ import {
     SuccessResponse, Tags
 } from "tsoa";
 import {
+    generatePasswordHash,
+    getJWTSecret, getTraceContext,
+    getTraceId
+} from "../../../classes/Common";
+import {
     GetAuditError,
     MailFormatError,
     PasswordWrongError,
     UsernameOrMailRequiredError
 } from "@clippic/clippic-errors";
-import {
-    generatePasswordHash,
-    getJWTSecret, getTraceContext,
-    getTraceId
-} from "../../../classes/Common";
 
 import { AccessToken } from "../../../models/AccessToken";
 import { PostLoginRequest } from "../../../models/login/PostLoginRequest";
@@ -89,7 +89,7 @@ export class LoginController extends Controller {
     private async getUsersAudit() {
         this.userAudit = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersAudit, this.user.id);
         if (this.userAudit == null) {
-            throw new GetAuditError(this.traceId)
+            throw new GetAuditError(this.traceId);
         }
     }
 
@@ -97,7 +97,7 @@ export class LoginController extends Controller {
         const accessToken: AccessToken = {
             userId: this.user.id.toString(),
             session: this.user.session.toString()
-        }
+        };
         this.token = jwt.sign(accessToken, getJWTSecret(), {});
     }
 

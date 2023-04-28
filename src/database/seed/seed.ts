@@ -1,30 +1,30 @@
+import { ClippicDataSource } from "../DatabaseConnection";
+import seedBillings from "./entities/billing.json";
+import seedShippings from "./entities/shipping.json";
+import seedUsers from "./entities/users.json";
 import { Users } from "../entity/Users";
 import { UsersBilling } from "../entity/UsersBilling";
 import { UsersShipping } from "../entity/UsersShipping";
-import seedUsers from "./entities/users.json"
-import seedBillings from "./entities/billing.json"
-import seedShippings from "./entities/shipping.json"
-import { ClippicDataSource } from "../../database/DatabaseConnection";
 
 if (process.env.NODE_ENV === "dev") {
     seedData();
 } else {
-    console.log("Seed-data should not run on production DB")
+    console.log("Seed-data should not run on production DB");
 }
 
 async function seedData() {
-    await ClippicDataSource.initialize()
-    console.log("Connected to DB")
+    await ClippicDataSource.initialize();
+    console.log("Connected to DB");
 
-    const usersRepo = ClippicDataSource.getRepository(Users)
-    await usersRepo.save(seedUsers)
+    const usersRepo = ClippicDataSource.getRepository(Users);
+    await usersRepo.save(seedUsers);
 
-    const billingRepo = ClippicDataSource.getRepository(UsersBilling)
-    await billingRepo.save(seedBillings)
+    const billingRepo = ClippicDataSource.getRepository(UsersBilling);
+    await billingRepo.save(seedBillings);
 
-    const shippingRepo = ClippicDataSource.getRepository(UsersShipping)
-    await shippingRepo.save(seedShippings)
+    const shippingRepo = ClippicDataSource.getRepository(UsersShipping);
+    await shippingRepo.save(seedShippings);
 
-    await ClippicDataSource.destroy()
-    console.log("Seed db finished successfully")
+    await ClippicDataSource.destroy();
+    console.log("Seed db finished successfully");
 }

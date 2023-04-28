@@ -1,6 +1,5 @@
 import * as crypto from "crypto";
 import * as express from "express";
-import * as jwt from "jsonwebtoken";
 
 import {
     Body,
@@ -105,11 +104,11 @@ export class PasswordController extends Controller {
     }
 
     private async sendPasswordForgottenMail(secret: number) {
-        await this.mailer.sendPasswordResetCode(this.user, secret)
+        await this.mailer.sendPasswordResetCode(this.user, secret);
     }
 
     private async sendPasswordChangedMail() {
-        await this.mailer.sendPasswordChanged(this.user)
+        await this.mailer.sendPasswordChanged(this.user);
     }
 
     private async initialize(req: RequestTracing, id: string) {
@@ -192,8 +191,8 @@ export class PasswordController extends Controller {
         // Only continue when user exists.
         // Return success response as well to avoid email lookups by spammers
         if (this.user.id !== undefined) {
-            const secret = await this.setPasswordForgottenSecret()
-            await this.sendPasswordForgottenMail(secret)
+            const secret = await this.setPasswordForgottenSecret();
+            await this.sendPasswordForgottenMail(secret);
         }
 
         return Promise.resolve({

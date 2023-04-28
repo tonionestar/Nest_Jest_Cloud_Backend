@@ -1,14 +1,14 @@
 import * as jwt from "jsonwebtoken";
-import { getJWTSecret } from "../../src/classes/Common";
-import Country from "../../src/classes/Country";
+
+import { AccessToken } from "../../src/models/AccessToken";
 import { ClippicDataSource } from "../../src/database/DatabaseConnection";
+import Country from "../../src/classes/Country";
+import { getJWTSecret } from "../../src/classes/Common";
+import { User } from "../../src/models/User";
 import { Users } from "../../src/database/entity/Users";
 import { UsersAudit } from "../../src/database/entity/UsersAudit";
 import { UsersBilling } from "../../src/database/entity/UsersBilling";
-import { ShippingType, UsersShipping } from "../../src/database/entity/UsersShipping";
-import { AccessToken } from "../../src/models/AccessToken";
-import { PostShippingRequest } from "../../src/models/shipping/PostShippingRequest";
-import { User } from "../../src/models/User";
+import { UsersShipping } from "../../src/database/entity/UsersShipping";
 
 export const testUsername = "tester";
 export const testEmail = "tester@clippic.app";
@@ -17,28 +17,28 @@ export const testSession = "3f044014c4b85d9dea5c595a87497da8";
 export const testHash = "3d5e381ad0eab4871413523de5a591c0c939c6c9358edfb53a2155f872f779cc2f04730dfa3971b5101f177f90caf7e66fa6b04c62a7c3b507f2cae4e4030a1d";
 export const testForename = "Mr";
 export const testSurname = "Tester";
-export const testPassword = "Test1234#"
-export const testCompany = "Example Corp Inc"
-export const testZip = "1234"
-export const testCity = "LA"
-export const testState = "California"
-export const testBox = "PO Box 5"
-export const testStreet = "Arbitrary Steet"
-export const testStreetNumber = "230a"
-export const testCountry = "USA"
+export const testPassword = "Test1234#";
+export const testCompany = "Example Corp Inc";
+export const testZip = "1234";
+export const testCity = "LA";
+export const testState = "California";
+export const testBox = "PO Box 5";
+export const testStreet = "Arbitrary Steet";
+export const testStreetNumber = "230a";
+export const testCountry = "USA";
 
 export const testPackstation = "5553";
 export const testPostnumber = "534598745874";
 
 export async function createNewUser({
-                                        username = testUsername,
-                                        email = testEmail,
-                                        salt = testSalt,
-                                        session = testSession,
-                                        hash = testHash,
-                                        forename = testForename,
-                                        surname = testSurname
-                                    }: User): Promise<string> {
+    username = testUsername,
+    email = testEmail,
+    salt = testSalt,
+    session = testSession,
+    hash = testHash,
+    forename = testForename,
+    surname = testSurname
+}: User): Promise<string> {
     const insert = await insertUser(username, email, salt, session, hash, forename, surname);
 
     const userId = insert.identifiers[0].id;
@@ -48,20 +48,20 @@ export async function createNewUser({
 }
 
 export async function createNewBilling({
-                                           company,
-                                           forename,
-                                           surname,
-                                           zip,
-                                           city,
-                                           state,
-                                           box,
-                                           street,
-                                           streetNumber,
-                                           country
-                                       }: Partial<UsersBilling>): Promise<string> {
-    const userId = await createNewUser({})
+    company,
+    forename,
+    surname,
+    zip,
+    city,
+    state,
+    box,
+    street,
+    streetNumber,
+    country
+}: Partial<UsersBilling>): Promise<string> {
+    const userId = await createNewUser({});
     const allCountries = new Country();
-    const usaId = allCountries.getIDFromISO3("USA")
+    const usaId = allCountries.getIDFromISO3("USA");
     const newBilling: UsersBilling = {
         userId,
         company,
@@ -74,31 +74,31 @@ export async function createNewBilling({
         street,
         streetNumber,
         country: country || usaId
-    }
+    };
 
     const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
-    await BillingRepository.save(newBilling)
-    return newBilling.userId
+    await BillingRepository.save(newBilling);
+    return newBilling.userId;
 }
 
 export async function createNewShipping({
-                                            userId,
-                                            name,
-                                            shippingType,
-                                            company,
-                                            forename,
-                                            surname,
-                                            zip,
-                                            city,
-                                            state,
-                                            box,
-                                            street,
-                                            streetNumber,
-                                            country
-                                        }: Partial<UsersShipping>): Promise<UsersShipping> {
-    userId = userId || await createNewUser({})
+    userId,
+    name,
+    shippingType,
+    company,
+    forename,
+    surname,
+    zip,
+    city,
+    state,
+    box,
+    street,
+    streetNumber,
+    country
+}: Partial<UsersShipping>): Promise<UsersShipping> {
+    userId = userId || await createNewUser({});
     const allCountries = new Country();
-    const usaId = allCountries.getIDFromISO3("USA")
+    const usaId = allCountries.getIDFromISO3("USA");
 
     const newShipping: Partial<UsersShipping> = {
         userId,
@@ -114,10 +114,10 @@ export async function createNewShipping({
         street,
         streetNumber,
         country: country || usaId
-    }
+    };
 
     const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
-    return ShippingRepository.save(newShipping)
+    return ShippingRepository.save(newShipping);
 }
 
 export async function insertUser(
@@ -144,7 +144,7 @@ export function generateAccessToken(userId: string, session: string = testSessio
     const accessToken: AccessToken = {
         userId: userId,
         session: session
-    }
+    };
     return jwt.sign(accessToken, getJWTSecret(), {});
 }
 

@@ -1,24 +1,21 @@
-// 3rd party modules
-
-import { ClippicError, ValidationError } from "@clippic/clippic-errors";
-import { ValidateError } from "@tsoa/runtime";
-import { getTraceId } from "./classes/Common";
 import {
-    ClippicDataSource
-} from "./database/DatabaseConnection";
-import { RequestTracing } from "./models/RequestTracing";
-import { RegisterRoutes } from "./routes";
-import JaegerMiddleware from "./middleware/JaegerMiddleware";
-import { LoginController } from "./routes/v2/users/Login";
-
-import cors from "cors";
+    ClippicError,
+    ValidationError
+} from "@clippic/clippic-errors";
 import express, {
     NextFunction,
     Response,
 } from "express";
+
+import { ClippicDataSource } from "./database/DatabaseConnection";
+import cors from "cors";
+import { getTraceId } from "./classes/Common";
+import JaegerMiddleware from "./middleware/JaegerMiddleware";
 import promBundle from "express-prom-bundle";
+import { RegisterRoutes } from "./routes";
+import { RequestTracing } from "./models/RequestTracing";
 import swaggerUi from "swagger-ui-express";
-import {UsernameController} from "./routes/v2/users/Username";
+import { ValidateError } from "@tsoa/runtime";
 
 // Express
 const app = express();
@@ -26,7 +23,7 @@ let port = 3000;
 
 function initializeTestEnvironment() {
     if (process.env.NODE_ENV == "test") {
-        app.use(cors())
+        app.use(cors());
     }
 }
 
@@ -53,11 +50,11 @@ function initializeExpress() {
 async function initializeDatabaseConnection() {
     ClippicDataSource.initialize()
         .then(() => {
-            console.log("Data Source has been initialized")
+            console.log("Data Source has been initialized");
         })
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 }
 
 function errorHandler(

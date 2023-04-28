@@ -1,6 +1,6 @@
 import { BodyFieldCombinationInvalidError } from "@clippic/clippic-errors";
-import { PutBillingRequest } from "../models/billing/PutBillingRequest";
 import { PostShippingRequest } from "../models/shipping/PostShippingRequest";
+import { PutBillingRequest } from "../models/billing/PutBillingRequest";
 import { PutShippingRequest } from "../models/shipping/PutShippingRequest";
 
 export function validateZipCityCountry(requestData: PutBillingRequest | PostShippingRequest | PutShippingRequest, traceId: string) {
@@ -16,11 +16,11 @@ export function validateCompanyForenameSurename(requestData: PutBillingRequest |
 
 export function validateStreetStateStreetnumber(requestData: PutBillingRequest | PostShippingRequest | PutShippingRequest, traceId: string) {
     if (!(requestData.street && requestData.state && requestData.streetNumber) && !requestData.box) {
-        throw new BodyFieldCombinationInvalidError("either box, or state, street and street number are required", traceId)
+        throw new BodyFieldCombinationInvalidError("either box, or state, street and street number are required", traceId);
     }
 }
 export function validatePackstation(requestData: PostShippingRequest | PutShippingRequest, traceId: string) {
     if (!requestData.packstation || !requestData.postnumber) {
-        throw new BodyFieldCombinationInvalidError("packstation and postnumber are required when using packstation shipping method", traceId)
+        throw new BodyFieldCombinationInvalidError("packstation and postnumber are required when using packstation shipping method", traceId);
     }
 }
