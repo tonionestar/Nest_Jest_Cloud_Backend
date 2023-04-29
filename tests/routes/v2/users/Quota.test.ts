@@ -1,32 +1,29 @@
-import { UsersQuota } from "../../../../src/database/entity/UsersQuota";
 import {
     createNewQuota,
-    createNewUser,
     generateAccessToken,
-    testUsedSpace,
-    testTotalSpace
+    testTotalSpace,
+    testUsedSpace
 } from "../../../classes/CommonTests";
+
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import request from "supertest"
+import request from "supertest";
+import { UsersQuota } from "../../../../src/database/entity/UsersQuota";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require("../../../../src/app")
-
-const db = new UserQueries();
+const app = require("../../../../src/app");
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
         .catch((err) => {
-            console.error("Error during Data Source initialization", err)
-        })
+            console.error("Error during Data Source initialization", err);
+        });
 });
 
 afterAll(async () => {
     await ClippicDataSource.destroy();
-})
+});
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
@@ -43,7 +40,7 @@ describe(QUOTA_ROUTE, () => {
     describe("GET", () => {
 
         it("should return the expected quota when querying with exiting id", async () => {
-            const newQuotaId = await createNewQuota({})
+            const newQuotaId = await createNewQuota({});
 
             const result = await request(app)
                 .get(QUOTA_ROUTE)
@@ -64,9 +61,9 @@ describe(QUOTA_ROUTE, () => {
             const newQuota: Partial<UsersQuota> = {
                 usedSpace: testUsedSpace,
                 totalSpace: testTotalSpace
-            }
+            };
 
-            const newQuotaId = await createNewQuota(newQuota)
+            const newQuotaId = await createNewQuota(newQuota);
 
             const result = await request(app)
                 .get(QUOTA_ROUTE)
@@ -81,13 +78,13 @@ describe(QUOTA_ROUTE, () => {
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(200);
 
-            const createdQuota = result.body.data[0]
+            const createdQuota = result.body.data[0];
             expect(createdQuota).toMatchObject({
                 usedSpace: newQuota.usedSpace?.toString(),
                 totalSpace: newQuota.totalSpace?.toString()
-            })
+            });
         });
-    })
+    });
 
     it("should not be possible to get quota data when access-token is missing", async () => {
         const result = await request(app)
@@ -102,4 +99,18 @@ describe(QUOTA_ROUTE, () => {
         expect(result.body).toHaveProperty("code");
         expect(result.body.code).toBe(1000);
     });
-})
+
+    it("should not be possible to get quota data when id is missing", async () => {
+        const result = await request(app)
+            .get(QUOTA_ROUTE)
+            .set("x-access-token", generateAccessToken("08e40963-f4e0-4e36-a4ea-16f0196b5133"));
+
+        expect(result.status).toBe(400);
+        expect(result.body).toHaveProperty("data");
+        expect(result.body.data).toHaveLength(1);
+
+        // check code
+        expect(result.body).toHaveProperty("code");
+        expect(result.body.code).toBe(1101);
+    });
+});

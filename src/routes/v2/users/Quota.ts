@@ -1,4 +1,11 @@
 import * as express from "express";
+
+import {
+    checkJWTAuthenticationSession,
+    checkJWTAuthenticationUserId,
+    getTraceContext,
+    getTraceId
+} from "../../../classes/Common";
 import {
     Controller,
     Example,
@@ -10,12 +17,6 @@ import {
     Tags
 } from "tsoa";
 
-import {
-    checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
-    getTraceContext,
-    getTraceId
-} from "../../../classes/Common";
 import { GetQuotaResponse } from "../../../models/quota/GetQuotaResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
@@ -99,5 +100,4 @@ export class QuotaController extends Controller {
             "trace": this.traceId
         };
     }
-
 }

@@ -89,16 +89,16 @@ export async function createNewQuota({
     usedSpace,
     totalSpace
 }: Partial<UsersQuota>): Promise<string> {
-    const userId = await createNewUser({})
+    const userId = await createNewUser({});
     const newQuota: UsersQuota = {
         userId,
         usedSpace,
         totalSpace
-    }
+    };
 
     const QuotaRepository = ClippicDataSource.getRepository(UsersQuota);
-    await QuotaRepository.save(newQuota)
-    return newQuota.userId
+    await QuotaRepository.save(newQuota);
+    return newQuota.userId;
 }
 
 export async function createNewShipping({

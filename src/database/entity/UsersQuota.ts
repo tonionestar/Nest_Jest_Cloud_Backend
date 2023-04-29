@@ -9,10 +9,10 @@ export class UsersQuota {
     @OneToOne(() => Users)
         userId: string;
 
-    @Column("bigint", { name: "used_space", unsigned: true, nullable: false })
+    @Column("bigint", { name: "used_space", unsigned: true, nullable: false, default: 0 })
         usedSpace: number;
 
-    @Column("bigint", { name: "total_space", unsigned: true, nullable: false })
+    @Column("bigint", { name: "total_space", unsigned: true, nullable: false, default: 5242880 })
         totalSpace: number;
 
 }

@@ -75,6 +75,9 @@
     "collectCoverageFrom": ["src/routes/**/*.ts", "!**/node_modules/**"],
     "setupFiles": [
       "<rootDir>/jest/setEnvVars.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.tsx"
     ]
   }
 }

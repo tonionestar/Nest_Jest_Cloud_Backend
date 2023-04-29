@@ -113,8 +113,8 @@ export class UserQueries {
     }
 
     GetUsersQuotaAll(userId: string): Promise<UsersQuota> {
-        const QuotaRepository = ClippicDataSource.getRepository(UsersQuota)
-        return QuotaRepository.findOneBy({ userId })
+        const QuotaRepository = ClippicDataSource.getRepository(UsersQuota);
+        return QuotaRepository.findOneBy({ userId });
     }
 
     GetUsername(userId: string) {
