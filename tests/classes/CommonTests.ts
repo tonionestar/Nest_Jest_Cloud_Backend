@@ -31,6 +31,9 @@ export const testCountry = "USA";
 export const testUsedSpace = 300;
 export const testTotalSpace = 700;
 
+export const testNotEnoughRequestSpace = 500;
+export const testEnoughRequestSpace = 200;
+
 export const testPackstation = "5553";
 export const testPostnumber = "534598745874";
 
