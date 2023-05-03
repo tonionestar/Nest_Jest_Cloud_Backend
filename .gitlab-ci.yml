@@ -53,36 +53,6 @@ build:
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
-.deploy:
-  stage: "deploy"
-  image:
-    name: "registry.clippic.app/infrastructure/docker-external-cache/alpine/helm"
-    entrypoint: [""]
-  before_script:
-    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/charts/user/files/serviceAccountKey.json"
-  environment:
-    name: "${CI_COMMIT_REF_NAME}"
-    url: "https://${DOMAIN}/v2/user/docs"
-  needs:
-    - "build"
-  script:
-    - >
-      helm upgrade
-      --install
-      --namespace "clippic-${CI_COMMIT_REF_NAME}"
-      --create-namespace
-      --kube-context clippic/gitlab-agent:clippic-agent-1
-      --set database.name=${DATABASE_NAME}
-      --set database.user=${DATABASE_USER}
-      --set database.pass=${DATABASE_PASSWORD}
-      --set smtp.pass=${SMTP_PASS}
-      --set ingress.host=${DOMAIN}
-      --set imagePullSecret.password=${DEPLOY_TOKEN_PASSWORD}
-      --set image.tag=${IMAGE_TAG}
-      --set additionalLabels.commit="${CI_COMMIT_SHA}"
-      user
-      charts/user
-
 test:
   artifacts:
     when: "always"
@@ -130,6 +100,39 @@ eslint:
     - "npx eslint --format gitlab ."
   stage: "lint"
 
+.deploy:
+  before_script:
+    - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/charts/user/files/serviceAccountKey.json"
+  dependencies:
+    - "prepare"
+  environment:
+    name: "${CI_COMMIT_REF_NAME}"
+    url: "https://${DOMAIN}/v2/user/docs"
+  image:
+    name: "registry.clippic.app/infrastructure/docker-external-cache/alpine/helm"
+    entrypoint: [""]
+  needs:
+    - "build"
+    - "prepare"
+  script:
+    - >
+      helm upgrade
+      --install
+      --namespace "clippic-${CI_COMMIT_REF_NAME}"
+      --create-namespace
+      --kube-context clippic/gitlab-agent:clippic-agent-1
+      --set database.name=${DATABASE_NAME}
+      --set database.user=${DATABASE_USER}
+      --set database.pass=${DATABASE_PASSWORD}
+      --set smtp.pass=${SMTP_PASS}
+      --set ingress.host=${DOMAIN}
+      --set imagePullSecret.password=${DEPLOY_TOKEN_PASSWORD}
+      --set image.tag=${IMAGE_TAG}
+      --set additionalLabels.commit="${CI_COMMIT_SHA}"
+      user
+      charts/user
+  stage: "deploy"
+
 deploy-dev:
   extends: ".deploy"
   only:
@@ -162,7 +165,7 @@ release:
     - "prepare"
     - "build"
   only:
-    - "main"
+    - "dev"
   script:
     - "npm version --allow-same-version --no-commit-hooks --no-git-tag-version ${RELEASE_VERSION}"
     - "semantic-release"
