@@ -18,42 +18,43 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import { AuditQueries } from "../../../database/query/AuditQueries";
 import { GetSurnameResponse } from "../../../models/surname/GetSurnameResponse";
 import { PutSurnameRequest } from "../../../models/surname/PutSurnameRequest";
 import { PutSurnameResponse } from "../../../models/surname/PutSurnameResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/surname")
 export class SurnameController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
 
     private req: RequestTracing;
     private traceId: string;
+    private usersQueries: UsersQueries;
+    private auditQueries: AuditQueries;
     private parentSpanContext: SpanContext;
-
     private user: User = {};
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersSurname() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetSurname, this.user.id);
+        const result = await this.usersQueries.GetSurname(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async updateSurname(surname: string) {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateSurname, this.user.id, surname);
+        await this.usersQueries.UpdateSurname(this.user.id, surname);
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditSurname, this.user.id);
+        await this.auditQueries.UpdateAuditSurname(this.user.id);
     }
 
     private async checkRouteAccess() {
@@ -72,6 +73,8 @@ export class SurnameController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }

@@ -12,6 +12,7 @@ import MulticastMessage = messaging.MulticastMessage;
 import { opentracing } from "jaeger-client";
 import { RequestTracing } from "../models/RequestTracing";
 import { SpanContext } from "opentracing";
+import tracer from "./Jaeger";
 import { User } from "../models/User";
 
 
@@ -122,3 +123,18 @@ export function checkJWTAuthenticationSession(req: RequestTracing, user: User) {
         throw new AccessTokenNotAllowedForUriError(getTraceId(req));
     }
 }
+
+/**
+ * decorator function, to wrap span tracing on db queries
+ */
+export function trace(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = async function (...args: any) {
+        const span = tracer.startSpan(originalMethod.name, { childOf: this.parentSpanContext });
+        span.setTag("component", "db");
+        const result = await originalMethod.call(this, ...args);
+        span.finish();
+        return result;
+    };
+};

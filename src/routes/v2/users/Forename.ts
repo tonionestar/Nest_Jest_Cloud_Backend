@@ -18,19 +18,22 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import { AuditQueries } from "../../../database/query/AuditQueries";
 import { GetForenameResponse } from "../../../models/forename/GetForenameResponse";
 import { PutForenameRequest } from "../../../models/forename/PutForenameRequest";
 import { PutForenameResponse } from "../../../models/forename/PutForenameResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/forename")
 export class ForenameController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
+    private usersQueries: UsersQueries;
+    private auditQueries: AuditQueries;
+
 
     private req: RequestTracing;
     private traceId: string;
@@ -39,21 +42,21 @@ export class ForenameController extends Controller {
     private user: User = {};
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersForename() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetForename, this.user.id);
+        const result = await this.usersQueries.GetForename(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async updateForename(forename: string) {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateForename, this.user.id, forename);
+        await this.usersQueries.UpdateForename(this.user.id, forename);
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditForename, this.user.id);
+        await this.auditQueries.UpdateAuditForename(this.user.id);
     }
 
     private async checkRouteAccess() {
@@ -72,6 +75,10 @@ export class ForenameController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+
+
 
         await this.checkRouteAccess();
     }

@@ -25,22 +25,26 @@ import {
     validateCompanyForenameSurename,
     validateStreetStateStreetnumber
 } from "../../../logic/optionalValuesValidation";
-
+import { AuditQueries } from "../../../database/query/AuditQueries";
+import { BillingQueries } from "../../../database/query/BillingQueries";
 import Country from "../../../classes/Country";
 import { CountryRecord } from "../../../models/Country";
 import { GetBillingResponse } from "../../../models/billing/GetBillingResponse";
 import { PutBillingRequest } from "../../../models/billing/PutBillingRequest";
 import { PutBillingResponse } from "../../../models/billing/PutBillingResponse";
+
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserBilling } from "../../../models/UserBilling";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/billing")
 export class BillingController extends Controller {
 
-    public db = new UserQueries();
+    private billingQueries: BillingQueries;
+    private auditQueries:  AuditQueries;
+    private usersQueries: UsersQueries;
 
     private req: RequestTracing;
     private traceId: string;
@@ -180,6 +184,9 @@ export class BillingController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.billingQueries = new BillingQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }
@@ -196,12 +203,12 @@ export class BillingController extends Controller {
     }
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersBilling() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetBilling, this.user.id);
+        const result = await this.billingQueries.GetBilling(this.user.id);
         this.userBilling = { ...result };
     }
 
@@ -217,12 +224,12 @@ export class BillingController extends Controller {
     }
 
     private async CreateOrUpdateBilling(billingRequestData: PutBillingRequest): Promise<void> {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.CreateOrUpdateBilling.bind(this.db), this.user.id, billingRequestData);
+        const result = await this.billingQueries.CreateOrUpdateBilling(this.user.id, billingRequestData);
         this.userBilling = { ...result };
     }
 
     private async updateAuditTimestamp() {
-        return this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditBilling, this.user.id);
+        return this.auditQueries.UpdateAuditBilling(this.user.id);
     }
 
     private isBillingNotFound() {

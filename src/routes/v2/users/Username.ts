@@ -19,6 +19,7 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import { AuditQueries } from "../../../database/query/AuditQueries";
 
 import { GetUsernameResponse } from "../../../models/username/GetUsernameResponse";
 import { PutUsernameRequest } from "../../../models/username/PutUsernameRequest";
@@ -27,13 +28,14 @@ import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UsernameAlreadyExistsError } from "@clippic/clippic-errors";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/username")
 export class UsernameController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
+    private usersQueries: UsersQueries;
+    private auditQueries: AuditQueries;
 
     private req: RequestTracing;
     private traceId: string;
@@ -42,25 +44,25 @@ export class UsernameController extends Controller {
     private user: User = {};
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersUsername() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsername, this.user.id);
+        const result = await this.usersQueries.GetUsername(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async CheckIfUsernameAlreadyExists(username: string): Promise<boolean> {
-        return await this.db.doQuery(this.parentSpanContext, this.db.CheckIfUsernameAlreadyExists, username);
+        return await this.usersQueries.CheckIfUsernameAlreadyExists(username)>0;
     }
 
     private async updateUsername(username: string) {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateUsername, this.user.id, username);
+        await this.usersQueries.UpdateUsername(this.user.id, username);
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditUsername, this.user.id);
+        await this.auditQueries.UpdateAuditUsername(this.user.id);
     }
 
     private async checkRouteAccess() {
@@ -79,6 +81,9 @@ export class UsernameController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+
 
         await this.checkRouteAccess();
     }

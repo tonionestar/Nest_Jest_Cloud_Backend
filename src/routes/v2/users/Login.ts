@@ -22,22 +22,24 @@ import {
     PasswordWrongError,
     UsernameOrMailRequiredError
 } from "@clippic/clippic-errors";
-
 import { AccessToken } from "../../../models/AccessToken";
+import { AuditQueries } from "../../../database/query/AuditQueries";
+
 import { PostLoginRequest } from "../../../models/login/PostLoginRequest";
 import { PostLoginResponse } from "../../../models/login/PostLoginResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserAudit } from "../../../models/UserAudit";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 import { validateEmail } from "../../../classes/Mailer";
 
 @Route("/v2/users/login")
 export class LoginController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
+    private auditQueries: AuditQueries;
+    private usersQueries: UsersQueries;
 
     private body: PostLoginRequest;
     private traceId: string;
@@ -48,7 +50,7 @@ export class LoginController extends Controller {
     private username: string;
 
     private user: User;
-    private userAudit: UserAudit;
+    private userAudit: Partial<UserAudit>;
 
     private prove: string;
     private token: string;
@@ -87,7 +89,7 @@ export class LoginController extends Controller {
     }
 
     private async getUsersAudit() {
-        this.userAudit = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersAudit, this.user.id);
+        this.userAudit = await this.auditQueries.GetUsersAudit(this.user.id);
         if (this.userAudit == null) {
             throw new GetAuditError(this.traceId);
         }
@@ -137,6 +139,8 @@ export class LoginController extends Controller {
     public async login (@Request() req: RequestTracing, @Body() body: PostLoginRequest): Promise<PostLoginResponse> {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
         this.body = body;
 
         this.readPassword();
@@ -146,9 +150,9 @@ export class LoginController extends Controller {
         this.checkRequiredFieldsExists();
 
         if (this.email !== undefined) {
-            this.user = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersInformationByEMail, this.email);
+            this.user = await this.usersQueries.GetUsersInformationByEMail(this.email);
         } else {
-            this.user = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersInformationByUsername, this.username);
+            this.user = await this.usersQueries.GetUsersInformationByUsername(this.username);
         }
 
         this.checkIfUserExists();

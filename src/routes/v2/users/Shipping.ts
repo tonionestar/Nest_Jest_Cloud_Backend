@@ -22,6 +22,7 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+
 import {
     ShippingResponse,
     ShippingResponseData
@@ -36,19 +37,24 @@ import {
     validateStreetStateStreetnumber,
     validateZipCityCountry
 } from "../../../logic/optionalValuesValidation";
-
+import { AuditQueries } from "../../../database/query/AuditQueries";
 import Country from "../../../classes/Country";
 import { CountryRecord } from "../../../models/Country";
 import { PostShippingRequest } from "../../../models/shipping/PostShippingRequest";
 import { PutShippingRequest } from "../../../models/shipping/PutShippingRequest";
 import { RequestTracing } from "../../../models/RequestTracing";
+import { ShippingQueries } from "../../../database/query/ShippingQueries";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/shipping")
 export class ShippingController extends Controller {
-    public db = new UserQueries();
+    private shippingQueries: ShippingQueries;
+    private auditQueries: AuditQueries;
+    private usersQueries: UsersQueries;
+
+
     private req: RequestTracing;
     private traceId: string;
     private parentSpanContext: SpanContext;
@@ -246,6 +252,9 @@ export class ShippingController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.shippingQueries = new ShippingQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }
@@ -262,12 +271,12 @@ export class ShippingController extends Controller {
     }
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getShippingById(shippingId: string): Promise<void> {
-        const shippings: UsersShipping[] = await this.db.doQuery(this.parentSpanContext, this.db.GetShippingById, shippingId);
+        const shippings: UsersShipping[] = await this.shippingQueries.GetShippingById(shippingId);
         if (shippings.length == 0) {
             throw new ShippingNotFoundError(shippingId, this.traceId);
         }
@@ -275,7 +284,7 @@ export class ShippingController extends Controller {
     }
 
     private async getAllUserShippings(): Promise<void> {
-        const shippings: UsersShipping[] = await this.db.doQuery(this.parentSpanContext, this.db.GetShippings, this.user.id);
+        const shippings: UsersShipping[] = await this.shippingQueries.GetShippings(this.user.id);
         this.userShippings = shippings.map((shipping) => this.prepareShippingResponse(shipping));
     }
 
@@ -290,12 +299,12 @@ export class ShippingController extends Controller {
     }
 
     private async createShipping(shippingRequestData: PostShippingRequest) {
-        const newShipping = await this.db.doQuery(this.parentSpanContext, this.db.CreateShipping.bind(this.db), this.user.id, shippingRequestData);
+        const newShipping = await this.shippingQueries.CreateShipping(this.user.id, shippingRequestData);
         this.userShippings = [this.prepareShippingResponse(newShipping)];
     }
 
     private async updateShipping(shippingRequestData: PutShippingRequest): Promise<void> {
-        const shipping = await this.db.doQuery(this.parentSpanContext, this.db.UpdateShipping.bind(this.db), this.user.id, shippingRequestData);
+        const shipping = await this.shippingQueries.UpdateShipping(this.user.id, shippingRequestData);
         if (!shipping) {
             throw new ShippingNotFoundError(shippingRequestData.id, this.traceId);
         }
@@ -319,6 +328,6 @@ export class ShippingController extends Controller {
     }
 
     private async updateAuditTimestamp() {
-        return this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditShipping, this.user.id);
+        return this.auditQueries.UpdateAuditShipping(this.user.id);
     }
 }

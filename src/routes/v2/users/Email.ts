@@ -22,20 +22,22 @@ import {
     getTraceContext,
     getTraceId
 } from "../../../classes/Common";
+import { AuditQueries } from "../../../database/query/AuditQueries";
 import { GetEmailResponse } from "../../../models/email/GetEmailResponse";
 import { PutEmailRequest } from "../../../models/email/PutEmailRequest";
 import { PutEmailResponse } from "../../../models/email/PutEmailResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 import { validateEmail } from "../../../classes/Mailer";
 
 @Route("/v2/users/email")
 export class EmailController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
+    private usersQueries: UsersQueries;
+    private auditQueries: AuditQueries;
 
     private req: RequestTracing;
     private traceId: string;
@@ -44,25 +46,25 @@ export class EmailController extends Controller {
     private user: User = {};
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersEmail() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetEmail, this.user.id);
+        const result = await this.usersQueries.GetEmail(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async CheckIfEmailAlreadyExists(email: string): Promise<boolean> {
-        return await this.db.doQuery(this.parentSpanContext, this.db.CheckIfEmailAlreadyExists, email);
+        return await this.usersQueries.CheckIfEmailAlreadyExists(email) > 0; // check!!!!!
     }
 
     private async updateEmail(email: string) {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateEmail, this.user.id, email);
+        await this.usersQueries.UpdateEmail(this.user.id, email);
     }
 
     private async updateModified() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditEmail, this.user.id);
+        await this.auditQueries.UpdateAuditEmail(this.user.id);
     }
 
     private async checkRouteAccess() {
@@ -81,6 +83,8 @@ export class EmailController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }

@@ -18,33 +18,34 @@ import {
 } from "tsoa";
 
 import { GetQuotaResponse } from "../../../models/quota/GetQuotaResponse";
+import { QuotaQueries } from "../../../database/query/QuotaQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
 import { UserQuota } from "../../../models/UserQuota";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/quota")
 export class QuotaController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
 
     private req: RequestTracing;
     private traceId: string;
     private parentSpanContext: SpanContext;
+    private quotaQueries: QuotaQueries;
+    private usersQueries: UsersQueries;
 
     private user: User = {};
     private userQuota: UserQuota;
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
-        this.user = { ...result };
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
+        this.user = Object.assign(this.user, result);
     }
 
     private async getUsersQuota() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersQuotaAll, this.user.id);
-        // this.userQuota = Object.assign(result);
+        const result = await this.quotaQueries.GetUsersQuotaAll(this.user.id);
         this.userQuota = { ...result };
     }
 
@@ -64,6 +65,8 @@ export class QuotaController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.quotaQueries = new QuotaQueries(this.parentSpanContext);
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }

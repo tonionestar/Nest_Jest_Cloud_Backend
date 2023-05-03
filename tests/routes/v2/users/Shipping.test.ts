@@ -15,6 +15,7 @@ import {
     testSurname,
     testZip,
 } from "../../../classes/CommonTests";
+import { AuditQueries } from "../../../../src/database/query/AuditQueries";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import Country from "../../../../src/classes/Country";
@@ -22,14 +23,13 @@ import { PostShippingRequest } from "../../../../src/models/shipping/PostShippin
 import { PutShippingRequest } from "../../../../src/models/shipping/PutShippingRequest";
 import { ShippingResponse } from "../../../../src/models/shipping/ShippingResponse";
 import { ShippingType } from "../../../../src/database/entity/UsersShipping";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require("supertest");
 
-const db = new UserQueries();
+const auditQueries = new AuditQueries();
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
@@ -210,7 +210,7 @@ describe(SHIPPING_ROUTE, () => {
                 forename: testForename,
                 surname: testSurname,
             });
-            const initialAudit = await db.GetUsersAuditAll(newShipping.userId);
+            const initialAudit = await auditQueries.GetUsersAuditAll(newShipping.userId);
 
             const updateShippingRequest: PutShippingRequest = {
                 id: newShipping.id,
@@ -228,7 +228,7 @@ describe(SHIPPING_ROUTE, () => {
                 .set("x-access-token", generateAccessToken(newShipping.userId))
                 .send(updateShippingRequest);
 
-            const audit = await db.GetUsersAuditAll(newShipping.userId);
+            const audit = await auditQueries.GetUsersAuditAll(newShipping.userId);
             expect(getTime(audit.modified)).toBeGreaterThan(getTime(initialAudit.modified));
             expect(getTime(audit.shipping)).toBeGreaterThan(getTime(initialAudit.shipping));
 
@@ -312,7 +312,7 @@ describe(SHIPPING_ROUTE, () => {
 
         it("should update the audit timestamp in audit table when creating new shipping", async () => {
             const userId = await createNewUser({});
-            const initialAudit = await db.GetUsersAuditAll(userId);
+            const initialAudit = await auditQueries.GetUsersAuditAll(userId);
 
             const shippingRequest: PostShippingRequest = {
                 name: "shipping name",
@@ -336,7 +336,7 @@ describe(SHIPPING_ROUTE, () => {
                 .set("x-access-token", generateAccessToken(userId))
                 .send(shippingRequest);
 
-            const audit = await db.GetUsersAuditAll(userId);
+            const audit = await auditQueries.GetUsersAuditAll(userId);
             expect(getTime(audit.modified)).toBeGreaterThan(getTime(initialAudit.modified));
             expect(getTime(audit.shipping)).toBeGreaterThan(getTime(initialAudit.shipping));
 

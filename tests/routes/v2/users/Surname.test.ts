@@ -5,14 +5,14 @@ import {
 } from "../../../classes/CommonTests";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
+import { UsersQueries } from "../../../../src/database/query/UsersQueries";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require("supertest");
 
-const db = new UserQueries();
+const usersQueries = new UsersQueries();
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
@@ -135,7 +135,7 @@ describe(url, () => {
             expect(result.body.data[0].surname).toBe(newSurname);
 
             // check database
-            const databaseResult = await db.GetSurname(testUserId);
+            const databaseResult = await usersQueries.GetSurname(testUserId);
 
             expect(databaseResult).toHaveProperty("surname");
             expect(databaseResult.surname).toBe(newSurname);
@@ -166,7 +166,7 @@ describe(url, () => {
             expect(result.body.data[0].surname).toBe(newSurname);
 
             // check database
-            const databaseResult = await db.GetSurname(testUserId);
+            const databaseResult = await usersQueries.GetSurname(testUserId);
 
             expect(databaseResult).toHaveProperty("surname");
             expect(databaseResult.surname).toBe(newSurname);

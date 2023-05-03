@@ -21,16 +21,18 @@ import { ClippicResponse } from "../../../../src/models/ClippicResponse";
 import { PatchInternalSpaceRequest } from "../../../models/internalQuota/PatchInternalSpaceRequest";
 import { PostConsumptionRequest } from "../../../models/internalQuota/PostConsumptionRequest";
 import { PostConsumptionResponse } from "../../../models/internalQuota/PostConsumptionResponse";
+import { QuotaQueries } from "../../../database/query/QuotaQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserIdNotFoundError } from "@clippic/clippic-errors";
-import { UserQueries } from "../../../database/query/UserQueries";
 import { UserQuota } from "../../../models/UserQuota";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/internal/users/quota")
 export class InternalQuotaController extends Controller {
-    public db = new UserQueries();
+    private quotaQueries: QuotaQueries;
+    private usersQueries: UsersQueries;
 
     private req: RequestTracing;
     private traceId: string;
@@ -100,6 +102,8 @@ export class InternalQuotaController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.quotaQueries = new QuotaQueries(this.parentSpanContext);
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }
@@ -116,53 +120,34 @@ export class InternalQuotaController extends Controller {
     }
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(
-            this.parentSpanContext,
-            this.db.GetUsersSession,
-            this.user.id
-        );
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getInternalSize(): Promise<number> {
-        this.userQuota = await this.db.doQuery(
-            this.parentSpanContext,
-            this.db.GetUsersQuotaAll,
-            this.user.id
-        );
+        this.userQuota = await this.quotaQueries.GetUsersQuotaAll(this.user.id);
         return this.userQuota.totalSpace - this.userQuota.usedSpace;
     }
 
-    private async setIsSufficientQuota(
-        consumptionRequest: PostConsumptionRequest
-    ) {
+    private async setIsSufficientQuota(consumptionRequest: PostConsumptionRequest) {
         const requestSize = consumptionRequest.requestSize;
         const internalSize = await this.getInternalSize();
         this.isSufficientQuota = requestSize <= internalSize;
     }
 
-    private async getConsumedQuota(): Promise<number>{
-        this.userQuota = await this.db.doQuery(
-            this.parentSpanContext,
-            this.db.GetUsersQuotaAll,
-            this.user.id
-        );
+    private async getConsumedQuota(): Promise<number> {
+        this.userQuota = await this.quotaQueries.GetUsersQuotaAll(this.user.id);
         const consumedQuota = Number(this.userQuota.usedSpace);
         return consumedQuota;
     }
 
-    private async setUsedSpace(requestedSize: number){
+    private async setUsedSpace(requestedSize: number) {
         const consumedQuota = await this.getConsumedQuota();
-        const newSize = await this.isValidSpace(consumedQuota + requestedSize, Number(this.userQuota.totalSpace))? consumedQuota + requestedSize: consumedQuota;
-        await this.db.doQuery(
-            this.parentSpanContext,
-            this.db.UpdateQuota,
-            this.user.id,
-            newSize
-        );
+        const newSize = await this.isValidSpace(consumedQuota + requestedSize, Number(this.userQuota.totalSpace)) ? consumedQuota + requestedSize : consumedQuota;
+        await this.quotaQueries.UpdateQuota(this.user.id, newSize);
     }
 
-    private async isValidSpace(newSize: number, totalSpace: number){
+    private async isValidSpace(newSize: number, totalSpace: number) {
         return newSize > 0 && newSize < totalSpace;
     }
 }

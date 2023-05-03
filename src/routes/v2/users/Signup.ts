@@ -29,21 +29,25 @@ import {
 import { Mailer,
     validateEmail
 } from "../../../classes/Mailer";
-
 import { AccessToken } from "../../../models/AccessToken";
+import { AuditQueries } from "../../../database/query/AuditQueries";
+
 import { PostSignupRequest } from "../../../models/signup/PostSignupRequest";
 import { PostSignupResponse } from "../../../models/signup/PostSignupResponse";
+import { QuotaQueries } from "../../../database/query/QuotaQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/signup")
 export class SignupController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
     public mailer = new Mailer();
+    private usersQueries: UsersQueries;
+    private auditQueries: AuditQueries;
+    private quotaQueries: QuotaQueries;
 
     private body: PostSignupRequest;
     private traceId: string;
@@ -69,20 +73,18 @@ export class SignupController extends Controller {
     }
 
     private async checkIfEmailExists() {
-        if(await this.db.doQuery(this.parentSpanContext, this.db.CheckIfEmailAlreadyExists, this.user.email) > 0) {
+        if(await this.usersQueries.CheckIfEmailAlreadyExists(this.user.email) > 0) {
             throw new AccountAlreadyExistsError(this.user.email, this.traceId);
         }
     }
 
     private async checkIfUsernameExists() {
-        if(await this.db.doQuery(this.parentSpanContext, this.db.CheckIfUsernameAlreadyExists, this.user.username) > 0) {
+        if(await this.usersQueries.CheckIfUsernameAlreadyExists(this.user.username) > 0) {
             throw new UsernameAlreadyExistsError(this.user.username, this.traceId);
         }
     }
     private async insertNewUser() {
-        const result = await this.db.doQuery(
-            this.parentSpanContext,
-            this.db.InsertNewUser,
+        const result = await this.usersQueries.InsertNewUser(
             this.user.username,
             this.user.email,
             this.user.salt,
@@ -96,9 +98,9 @@ export class SignupController extends Controller {
     private async insertUserAdditional() {
         await Promise.all([
             // Audit
-            this.db.doQuery(this.parentSpanContext, this.db.InsertInitialAudit, this.user.id),
+            this.auditQueries.InsertInitialAudit(this.user.id),
             // Quota
-            this.db.doQuery(this.parentSpanContext, this.db.InsertInitialQuota, this.user.id, 5242880),
+            this.quotaQueries.InsertInitialQuota(this.user.id, 5242880),
         ]);
 
     }
@@ -150,6 +152,10 @@ export class SignupController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.body = body;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+        this.quotaQueries = new QuotaQueries(this.parentSpanContext);
+
 
         this.readPassword();
         this.readEmail();

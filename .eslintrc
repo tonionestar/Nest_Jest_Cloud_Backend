@@ -17,6 +17,7 @@
     "jest": true
   },
   "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
     "curly": "error",
     "eol-last": ["error", "always"],
     "indent": "error",

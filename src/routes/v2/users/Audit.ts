@@ -16,19 +16,21 @@ import {
     Security,
     Tags
 } from "tsoa";
+import { AuditQueries } from "../../../database/query/AuditQueries";
 
 import { GetAuditResponse } from "../../../models/audit/GetAuditResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserAudit } from "../../../models/UserAudit";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/audit")
 export class AuditController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
+    private usersQueries: UsersQueries;
+    private auditQueries: AuditQueries;
 
     private req: RequestTracing;
     private traceId: string;
@@ -38,12 +40,12 @@ export class AuditController extends Controller {
     private userAudit: UserAudit;
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersAudit() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersAuditAll, this.user.id);
+        const result = await this.auditQueries.GetUsersAuditAll(this.user.id);
         this.userAudit = Object.assign(result);
     }
 
@@ -63,7 +65,8 @@ export class AuditController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
-
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
         await this.checkRouteAccess();
     }
 

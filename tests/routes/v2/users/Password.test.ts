@@ -1,3 +1,4 @@
+
 import {
     createNewUser,
     generateAccessToken,
@@ -8,14 +9,15 @@ import {
 } from "../../../classes/CommonTests";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
-
+import { PasswordResetQueries } from "../../../../src/database/query/PasswordResetQueries";
+import { UsersQueries } from "../../../../src/database/query/UsersQueries";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require("supertest");
 
-const db = new UserQueries();
+const usersQueries = new UsersQueries();
+const passwordResetQueries = new PasswordResetQueries();
 
 jest.mock("email-templates");
 
@@ -63,7 +65,7 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await db.GetLoginData(testUserId);
+            const databaseResult = await usersQueries.GetLoginData(testUserId);
 
             expect(databaseResult).toHaveProperty("hash");
             expect(databaseResult.hash).toBe("6b170c369b15eff255c91499d381b56c12bb8f1339cc11f767b4b0c4df5d6004ad4800b0240bbde4bff39190cc59c69420e02d2574a7a0f4e9531f5167d83602");
@@ -89,7 +91,7 @@ describe(url, () => {
             expect(resultSecondIteration.body.code).toBe(200);
 
             // check database
-            const databaseResultSecondIteration = await db.GetLoginData(testUserId);
+            const databaseResultSecondIteration = await usersQueries.GetLoginData(testUserId);
 
             expect(databaseResultSecondIteration).toHaveProperty("hash");
             expect(databaseResultSecondIteration.hash).toBe(testHash);
@@ -195,7 +197,7 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await db.GetPasswordReset(testUserId);
+            const databaseResult = await passwordResetQueries.GetPasswordReset(testUserId);
 
             expect(databaseResult).toHaveProperty("created");
             const created = new Date (databaseResult.created).valueOf();

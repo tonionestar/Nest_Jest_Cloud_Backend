@@ -14,12 +14,12 @@ import {
     testZip,
 } from "../../../classes/CommonTests";
 
+import { AuditQueries } from "../../../../src/database/query/AuditQueries";
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import Country from "../../../../src/classes/Country";
 import { GetBillingResponseData } from "../../../../src/models/billing/GetBillingResponse";
 import { PutBillingRequest } from "../../../../src/models/billing/PutBillingRequest";
 import { PutBillingResponse } from "../../../../src/models/billing/PutBillingResponse";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
 import { UsersBilling } from "../../../../src/database/entity/UsersBilling";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -27,7 +27,7 @@ const app = require("../../../../src/app");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require("supertest");
 
-const db = new UserQueries();
+const auditQueries = new AuditQueries();
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
@@ -229,13 +229,13 @@ describe(BILLING_ROUTE, () => {
             });
         });
 
-        //This test waits 1s to assert that the audit timestamp has been updated.
+        //  This test waits 1s to assert that the audit timestamp has been updated.
         it("should update the audit timestamp in audit table", async () => {
             const newBillingId = await createNewBilling({
                 forename: testForename,
                 surname: testSurname,
             });
-            const initialAudit = await db.GetUsersAuditAll(newBillingId);
+            const initialAudit = await auditQueries.GetUsersAuditAll(newBillingId);
 
             const updateBillingRequest: PutBillingRequest = {
                 company: testCompany,
@@ -252,7 +252,7 @@ describe(BILLING_ROUTE, () => {
                 .set("x-access-token", generateAccessToken(newBillingId))
                 .send(updateBillingRequest);
 
-            const audit = await db.GetUsersAuditAll(newBillingId);
+            const audit = await auditQueries.GetUsersAuditAll(newBillingId);
             expect(getTime(audit.modified)).toBeGreaterThan(getTime(initialAudit.modified));
             expect(getTime(audit.billing)).toBeGreaterThan(getTime(initialAudit.billing));
 

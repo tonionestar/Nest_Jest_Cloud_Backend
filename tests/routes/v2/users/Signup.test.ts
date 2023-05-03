@@ -6,14 +6,15 @@ import {
 } from "../../../classes/CommonTests";
 
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
+import { UsersQueries } from "../../../../src/database/query/UsersQueries";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const request = require("supertest");
 
-const db = new UserQueries();
+const usersQueries = new UsersQueries();
+
 
 jest.mock("email-templates");
 
@@ -68,7 +69,7 @@ describe(url, () => {
             expect(result.body.data[0].token).not.toEqual("");
 
             // check database
-            const databaseResult = await db.GetSignupData(result.body.data[0].id);
+            const databaseResult = await usersQueries.GetSignupData(result.body.data[0].id);
 
             expect(databaseResult).toHaveProperty("hash");
             expect(databaseResult.hash).not.toBeNull();
@@ -109,7 +110,7 @@ describe(url, () => {
             expect(result.body.data[0].token).not.toEqual("");
 
             // check database
-            const databaseResult = await db.GetSignupData(result.body.data[0].id);
+            const databaseResult = await usersQueries.GetSignupData(result.body.data[0].id);
 
             expect(databaseResult).toHaveProperty("hash");
             expect(databaseResult.hash).not.toBeNull();
@@ -150,7 +151,7 @@ describe(url, () => {
             expect(result.body.data[0].token).not.toEqual("");
 
             // check database
-            const databaseResult = await db.GetSignupData(result.body.data[0].id);
+            const databaseResult = await usersQueries.GetSignupData(result.body.data[0].id);
 
             expect(databaseResult).toHaveProperty("hash");
             expect(databaseResult.hash).not.toBeNull();

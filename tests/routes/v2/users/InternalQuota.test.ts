@@ -12,11 +12,11 @@ import {
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { PatchInternalSpaceRequest } from "../../../../src/models/internalQuota/PatchInternalSpaceRequest";
 import { PostConsumptionRequest } from "../../../../src/models/internalQuota/PostConsumptionRequest";
+import { QuotaQueries } from "../../../../src/database/query/QuotaQueries";
 import request from "supertest";
-import { UserQueries } from "../../../../src/database/query/UserQueries";
 import { UsersQuota } from "../../../../src/database/entity/UsersQuota";
 
-const db = new UserQueries();
+const quotaQueries = new QuotaQueries();
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require("../../../../src/app");
@@ -191,7 +191,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await db.GetUsersQuotaAll(testuserId);
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(testuserId);
 
             expect(databaseResult).toHaveProperty("usedSpace");
             expect(Number(databaseResult.usedSpace)).toBe(testUsedSpace);
@@ -221,7 +221,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await db.GetUsersQuotaAll(testuserId);
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(testuserId);
 
             expect(databaseResult).toHaveProperty("usedSpace");
             expect(Number(databaseResult.usedSpace)).toBe(testUsedSpace);
@@ -251,7 +251,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await db.GetUsersQuotaAll(testUserId);
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(testUserId);
 
             expect(databaseResult).toHaveProperty("usedSpace");
             expect(Number(databaseResult.usedSpace)).toBe(testUsedSpace + testSize);

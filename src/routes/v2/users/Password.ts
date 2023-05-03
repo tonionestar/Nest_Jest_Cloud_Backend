@@ -19,23 +19,25 @@ import {
     getTraceContext,
     getTraceId, validatePassword
 } from "../../../classes/Common";
-
+import { AuditQueries } from "../../../database/query/AuditQueries";
 import { ClippicResponse } from "../../../models/ClippicResponse";
 import { Mailer } from "../../../classes/Mailer";
 import { PasswordInvalidError } from "@clippic/clippic-errors";
+import { PasswordResetQueries } from "../../../database/query/PasswordResetQueries";
 import { PutPasswordRequest } from "../../../models/password/PutPasswordRequest";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/password")
 export class PasswordController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
     public mailer = new Mailer();
-
+    private usersQueries: UsersQueries;
+    private passwordQueries: PasswordResetQueries;
+    private auditQueries: AuditQueries;
     private req: RequestTracing;
     private traceId: string;
     private parentSpanContext: SpanContext;
@@ -45,22 +47,22 @@ export class PasswordController extends Controller {
     // getter
 
     private async getUsersSalt() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSalt, this.user.id);
+        const result = await this.usersQueries.GetUsersSalt(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersID() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersInformationByEMail, this.user.email);
+        const result = await this.usersQueries.GetUsersInformationByEMail(this.user.email);
         this.user = Object.assign(this.user, result);
     }
 
     private async getUsersEmail() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetEmail, this.user.id);
+        const result = await this.usersQueries.GetEmail(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
@@ -68,22 +70,22 @@ export class PasswordController extends Controller {
 
     private async setPasswordForgottenSecret() {
         const secret: number = crypto.randomInt(100000, 999999);
-        await this.db.doQuery(this.parentSpanContext, this.db.SetPasswordForgottenSecret, this.user.id, secret);
+        await this.passwordQueries.SetPasswordForgottenSecret(this.user.id, secret);
         return secret;
     }
 
     private async updateUsersSession() {
         this.generateSession();
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateSession, this.user.id, this.user.session);
+        await this.usersQueries.UpdateSession(this.user.id, this.user.session);
     }
 
     private async updateUsersPassword(pass: string) {
         const hash = crypto.pbkdf2Sync(pass, this.user.salt, 1000, 64, "sha512").toString("hex");
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateHash, this.user.id, hash);
+        await this.usersQueries.UpdateHash(this.user.id, hash);
     }
 
     private async updateUsersAudit() {
-        await this.db.doQuery(this.parentSpanContext, this.db.UpdateAuditHash, this.user.id);
+        await this.auditQueries.UpdateAuditHash(this.user.id);
     }
 
     // functions
@@ -116,6 +118,11 @@ export class PasswordController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.passwordQueries = new PasswordResetQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
+
+
 
         await this.checkRouteAccess();
     }
@@ -185,6 +192,9 @@ export class PasswordController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.email = email;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
+        this.passwordQueries = new PasswordResetQueries(this.parentSpanContext);
+        this.auditQueries = new AuditQueries(this.parentSpanContext);
 
         await this.getUsersID();
 

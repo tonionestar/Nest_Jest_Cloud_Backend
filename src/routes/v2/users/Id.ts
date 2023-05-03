@@ -24,13 +24,13 @@ import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
 import { User } from "../../../models/User";
 import { UserMailNotFoundError } from "@clippic/clippic-errors";
-import { UserQueries } from "../../../database/query/UserQueries";
+import { UsersQueries } from "../../../database/query/UsersQueries";
 
 @Route("/v2/users/id")
 export class IdController extends Controller {
 
     public router = express.Router();
-    public db = new UserQueries();
+    private usersQueries: UsersQueries;
 
     private req: RequestTracing;
     private traceId: string;
@@ -39,12 +39,12 @@ export class IdController extends Controller {
     private user: User = {};
 
     private async getUsersSession() {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetUsersSession, this.user.id);
+        const result = await this.usersQueries.GetUsersSession(this.user.id);
         this.user = Object.assign(this.user, result);
     }
 
     private async getIdByEmail(email: string): Promise<User> {
-        const result = await this.db.doQuery(this.parentSpanContext, this.db.GetIdByEmail, email);
+        const result = await this.usersQueries.GetIdByEmail(email);
         if (result === null) {
             throw new UserMailNotFoundError(email, this.traceId);
         }
@@ -68,6 +68,7 @@ export class IdController extends Controller {
         this.parentSpanContext = getTraceContext(req);
         this.traceId = getTraceId(req);
         this.user.id = id;
+        this.usersQueries = new UsersQueries(this.parentSpanContext);
 
         await this.checkRouteAccess();
     }
