@@ -117,6 +117,16 @@ export class UserQueries {
         return QuotaRepository.findOneBy({ userId });
     }
 
+    UpdateQuota(userId: string, size: number) {
+        return ClippicDataSource.manager
+            .createQueryBuilder(UsersQuota, "users_quota")
+            .update(UsersQuota, {
+                usedSpace: size
+            })
+            .where("users_quota.user_id = :userId", { userId: userId })
+            .execute();
+    }
+
     GetUsername(userId: string) {
         return ClippicDataSource.manager
             .createQueryBuilder(Users, "users")

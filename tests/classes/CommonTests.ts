@@ -34,6 +34,10 @@ export const testTotalSpace = 700;
 export const testNotEnoughRequestSpace = 500;
 export const testEnoughRequestSpace = 200;
 
+export const testSize = 200;
+export const testValidSize1 = 500;
+export const testValidSize2 = -400;
+
 export const testPackstation = "5553";
 export const testPostnumber = "534598745874";
 

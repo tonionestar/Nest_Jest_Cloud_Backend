@@ -3,6 +3,7 @@ import {
     Controller,
     Example,
     Header,
+    Patch,
     Post,
     Request,
     Response,
@@ -16,6 +17,8 @@ import {
     getTraceContext,
     getTraceId,
 } from "../../../classes/Common";
+import { ClippicResponse } from "../../../../src/models/ClippicResponse";
+import { PatchInternalSpaceRequest } from "../../../models/internalQuota/PatchInternalSpaceRequest";
 import { PostConsumptionRequest } from "../../../models/internalQuota/PostConsumptionRequest";
 import { PostConsumptionResponse } from "../../../models/internalQuota/PostConsumptionResponse";
 import { RequestTracing } from "../../../models/RequestTracing";
@@ -68,6 +71,30 @@ export class InternalQuotaController extends Controller {
         };
     }
 
+    @Tags("InternalQuota")
+    @Example<ClippicResponse>({
+        status: "success",
+        code: 200,
+        trace: "4ba373202a8e4807",
+    })
+    @Security("jwt")
+    @Response<UserIdNotFoundError>(400)
+    @Patch("/")
+    public async patchInternalSpaceRequest(
+        @Request() req: RequestTracing,
+        @Header() id: string,
+        @Body() body: PatchInternalSpaceRequest
+    ): Promise<ClippicResponse> {
+        await this.initialize(req, id);
+        await this.setUsedSpace(body.size);
+
+        return {
+            status: "success",
+            code: 200,
+            trace: this.traceId,
+        };
+    }
+
     private async initialize(req: RequestTracing, id: string) {
         this.req = req;
         this.parentSpanContext = getTraceContext(req);
@@ -112,5 +139,30 @@ export class InternalQuotaController extends Controller {
         const requestSize = consumptionRequest.requestSize;
         const internalSize = await this.getInternalSize();
         this.isSufficientQuota = requestSize <= internalSize;
+    }
+
+    private async getConsumedQuota(): Promise<number>{
+        this.userQuota = await this.db.doQuery(
+            this.parentSpanContext,
+            this.db.GetUsersQuotaAll,
+            this.user.id
+        );
+        const consumedQuota = Number(this.userQuota.usedSpace);
+        return consumedQuota;
+    }
+
+    private async setUsedSpace(requestedSize: number){
+        const consumedQuota = await this.getConsumedQuota();
+        const newSize = await this.isValidSpace(consumedQuota + requestedSize, Number(this.userQuota.totalSpace))? consumedQuota + requestedSize: consumedQuota;
+        await this.db.doQuery(
+            this.parentSpanContext,
+            this.db.UpdateQuota,
+            this.user.id,
+            newSize
+        );
+    }
+
+    private async isValidSpace(newSize: number, totalSpace: number){
+        return newSize > 0 && newSize < totalSpace;
     }
 }
