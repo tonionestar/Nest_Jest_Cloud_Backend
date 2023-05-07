@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM gitlab.clippic.app/clippic/dependency_proxy/containers/node:18-alpine AS base
+FROM registry.clippic.app/open/images/node:18-lts-alpine AS base
 # install node
 RUN apk add --no-cache tini
 # set working directory
