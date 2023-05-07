@@ -53,7 +53,7 @@ build:
       /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_NAME}
+      --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_SLUG}
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
 
@@ -64,7 +64,7 @@ container_scanning:
   dependencies:
     - "prepare"
   variables:
-    CS_IMAGE: "$CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_NAME}"
+    CS_IMAGE: "$CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_SLUG}"
 
 
 test:
@@ -123,7 +123,7 @@ eslint:
     name: "${CI_COMMIT_REF_NAME}"
     url: "https://${DOMAIN}/v2/user/docs"
   image:
-    name: "registry.clippic.app/infrastructure/docker-external-cache/alpine/helm"
+    name: "registry.clippic.app/open/images/helm:3.11.3"
     entrypoint: [""]
   needs:
     - "build"
