@@ -1,6 +1,5 @@
 ### Clippic
 serviceAccountKey.json
-package-lock.json
 src/routes.ts
 public/swagger.json
 junit.xml
