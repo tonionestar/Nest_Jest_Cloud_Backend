@@ -1,3 +1,10 @@
+# [1.1.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.0.0...v1.1.0) (2023-05-07)
+
+
+### Features
+
+* **Queries:** split userQueries to several files ([053f37c](https://gitlab.clippic.app/clippic/backend/user-v2/commit/053f37c867423a34aa39b1a445e5f5a7d0e24f0f))
+
 # 1.0.0 (2023-05-07)
 
 
