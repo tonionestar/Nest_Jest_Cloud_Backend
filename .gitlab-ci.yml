@@ -1,12 +1,12 @@
 include:
-  - template: Jobs/SAST.gitlab-ci.yml
-  - template: Jobs/Container-Scanning.gitlab-ci.yml
+  - template: "Jobs/SAST.gitlab-ci.yml"
+  - template: "Jobs/Container-Scanning.gitlab-ci.yml"
 
 stages:
   - "prepare"
+  - "build"
   - "test"
   - "lint"
-  - "build"
   - "deploy"
   - "release"
 
@@ -34,6 +34,8 @@ prepare:
     GIT_STRATEGY: clone
     GIT_DEPTH: "500"
 
+
+
 build:
   dependencies:
     - "prepare"
@@ -46,8 +48,6 @@ build:
   before_script:
     - "mkdir -p /kaniko/.docker"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n $CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD | base64)\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(echo -n $CI_DEPENDENCY_PROXY_USER:$CI_DEPENDENCY_PROXY_PASSWORD | base64)\"}}}" > /kaniko/.docker/config.json
-  only:
-    - "dev"
   script:
     - >-
       /kaniko/executor
@@ -56,6 +56,16 @@ build:
       --destination $CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_NAME}
       --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN}
       --build-arg APP_VERSION=${RELEASE_VERSION}
+
+container_scanning:
+  needs:
+    - "prepare"
+    - "build"
+  dependencies:
+    - "prepare"
+  variables:
+    CS_IMAGE: "$CI_REGISTRY_IMAGE:${RELEASE_VERSION}-${CI_COMMIT_REF_NAME}"
+
 
 test:
   artifacts:
