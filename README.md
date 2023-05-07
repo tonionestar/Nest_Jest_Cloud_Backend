@@ -1,5 +1,8 @@
 # User Backend guide
 
+![pipeline](https://gitlab.clippic.app/clippic/backend/user-v2/badges/dev/pipeline.svg?ignore_skipped=true)
+![coverage](https://gitlab.clippic.app/clippic/backend/user-v2/badges/dev/coverage.svg)
+
 Hello and welcome to the clippic user backend :tada:
 
 [[_TOC_]]
