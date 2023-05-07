@@ -1,3 +1,7 @@
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Container-Scanning.gitlab-ci.yml
+
 stages:
   - "prepare"
   - "test"
@@ -37,7 +41,7 @@ build:
     - "prepare"
   stage: "build"
   image:
-    name: "gcr.io/kaniko-project/executor:debug"
+    name: "registry.clippic.app/open/images/kaniko:debug"
     entrypoint: [ "" ]
   before_script:
     - "mkdir -p /kaniko/.docker"
@@ -64,12 +68,12 @@ test:
     - "npm run build"
     - "cp ${FCM_SERVICE_ACCOUNT} ${CI_PROJECT_DIR}/serviceAccountKey.json"
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  image: "registry.clippic.app/infrastructure/docker-external-cache/node:18-slim"
+  image: "registry.clippic.app/open/images/node:18-lts-alpine"
   needs: []
   script:
     - "npm run test:ci"
   services:
-    - name: "registry.clippic.app/infrastructure/docker-external-cache/mariadb:10.10"
+    - name: "registry.clippic.app/open/images/mariadb:10.11.2"
       variables:
         MARIADB_USER: "jest"
         MARIADB_PASSWORD: "jest"
@@ -94,7 +98,7 @@ eslint:
         - "gl-codequality.json"
   before_script:
     - "npm i"
-  image: "registry.clippic.app/infrastructure/docker-external-cache/node:18-slim"
+  image: "registry.clippic.app/open/images/node:18-lts-alpine"
   needs: []
   script:
     - "npx eslint --format gitlab ."
