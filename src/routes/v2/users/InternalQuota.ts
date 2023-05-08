@@ -19,6 +19,7 @@ import {
 } from "../../../classes/Common";
 import { ClippicResponse } from "../../../../src/models/ClippicResponse";
 import { PatchInternalSpaceRequest } from "../../../models/internalQuota/PatchInternalSpaceRequest";
+import { PatchManageQuotaResponse } from "../../../models/internalQuota/PatchManageQuotaResponse";
 import { PostConsumptionRequest } from "../../../models/internalQuota/PostConsumptionRequest";
 import { PostConsumptionResponse } from "../../../models/internalQuota/PostConsumptionResponse";
 import { QuotaQueries } from "../../../database/query/QuotaQueries";
@@ -28,6 +29,8 @@ import { User } from "../../../models/User";
 import { UserIdNotFoundError } from "@clippic/clippic-errors";
 import { UserQuota } from "../../../models/UserQuota";
 import { UsersQueries } from "../../../database/query/UsersQueries";
+
+const MIN_TOTAL_SPACE = 5242880;
 
 @Route("/v2/internal/users/quota")
 export class InternalQuotaController extends Controller {
@@ -97,6 +100,32 @@ export class InternalQuotaController extends Controller {
         };
     }
 
+    @Tags("InternalQuota")
+    @Example<PatchManageQuotaResponse>({
+        status: "success",
+        data: { totalSpace: 700 },
+        code: 200,
+        trace: "4ba373202a8e4807",
+    })
+    @Security("jwt")
+    @Response<UserIdNotFoundError>(400)
+    @Patch("/manage")
+    public async PatchManageQuotaResponse(
+        @Request() req: RequestTracing,
+        @Header() id: string,
+        @Body() body: PatchInternalSpaceRequest
+    ): Promise<ClippicResponse> {
+        await this.initialize(req, id);
+        await this.setTotalSpace(body.size);
+
+        return {
+            status: "success",
+            data: { totalSpace: await this.getManagedQuota() },
+            code: 200,
+            trace: this.traceId,
+        };
+    }
+
     private async initialize(req: RequestTracing, id: string) {
         this.req = req;
         this.parentSpanContext = getTraceContext(req);
@@ -129,7 +158,9 @@ export class InternalQuotaController extends Controller {
         return this.userQuota.totalSpace - this.userQuota.usedSpace;
     }
 
-    private async setIsSufficientQuota(consumptionRequest: PostConsumptionRequest) {
+    private async setIsSufficientQuota(
+        consumptionRequest: PostConsumptionRequest
+    ) {
         const requestSize = consumptionRequest.requestSize;
         const internalSize = await this.getInternalSize();
         this.isSufficientQuota = requestSize <= internalSize;
@@ -141,13 +172,45 @@ export class InternalQuotaController extends Controller {
         return consumedQuota;
     }
 
-    private async setUsedSpace(requestedSize: number) {
-        const consumedQuota = await this.getConsumedQuota();
-        const newSize = await this.isValidSpace(consumedQuota + requestedSize, Number(this.userQuota.totalSpace)) ? consumedQuota + requestedSize : consumedQuota;
-        await this.quotaQueries.UpdateQuota(this.user.id, newSize);
+    private async getManagedQuota(): Promise<number> {
+        this.userQuota = await this.quotaQueries.GetUsersQuotaAll(this.user.id);
+        const managedQuota = Number(this.userQuota.totalSpace);
+        return managedQuota;
     }
 
-    private async isValidSpace(newSize: number, totalSpace: number) {
+    private async setUsedSpace(requestedSize: number) {
+        const quota = await this.getQuota();
+        const totalRequestedSize = quota.usedSpace + requestedSize;
+        const isValidUsedSpace = this.isValidUsedSpace(totalRequestedSize, quota.totalSpace);
+        const newSize = isValidUsedSpace ? totalRequestedSize : quota.usedSpace;
+
+        await this.quotaQueries.UpdateQuota(
+            this.user.id,
+            newSize,
+            quota.totalSpace
+        );
+    }
+
+    private async setTotalSpace(requestedSize: number) {
+        const quota = await this.getQuota();
+        const newSize = Math.max(quota.totalSpace + requestedSize, MIN_TOTAL_SPACE);
+        await this.quotaQueries.UpdateQuota(
+            this.user.id,
+            quota.usedSpace,
+            newSize
+        );
+    }
+
+    private async getQuota(): Promise<UserQuota> {
+        const quota = await this.quotaQueries.GetUsersQuotaAll(this.user.id);
+        return {
+            ...quota,
+            usedSpace: Number(quota.usedSpace),
+            totalSpace: Number(quota.totalSpace)
+        };
+    }
+
+    private isValidUsedSpace(newSize: number, totalSpace: number) {
         return newSize > 0 && newSize < totalSpace;
     }
 }

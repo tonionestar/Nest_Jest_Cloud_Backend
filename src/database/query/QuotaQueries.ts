@@ -34,11 +34,12 @@ export class QuotaQueries {
     }
 
     @trace
-    UpdateQuota(userId: string, size: number) {
+    UpdateQuota(userId: string, usedSpace: number, totalSpace: number) {
         return ClippicDataSource.manager
             .createQueryBuilder(UsersQuota, "users_quota")
             .update(UsersQuota, {
-                usedSpace: size
+                usedSpace: usedSpace,
+                totalSpace: totalSpace,
             })
             .where("users_quota.user_id = :userId", { userId: userId })
             .execute();

@@ -2,7 +2,9 @@ import {
     createNewQuota,
     generateAccessToken,
     testEnoughRequestSpace,
+    testManageTotalValidSize,
     testNotEnoughRequestSpace,
+    testReducingSize,
     testSize,
     testTotalSpace,
     testUsedSpace,
@@ -39,9 +41,10 @@ afterEach(async () => {
     await ClippicDataSource.dropDatabase();
 });
 
-const INTERNAL_QUOTA_ROUTE = "/v2/internal/users/quota";
+const INTERNAL_CONSUME_QUOTA_ROUTE = "/v2/internal/users/quota";
+const INTERNAL_MANAGE_QUOTA_ROUTE = "/v2/internal/users/quota/manage";
 
-describe(INTERNAL_QUOTA_ROUTE, () => {
+describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
     describe("GET", () => {
         it("should return the expected quota when querying with exiting id", async () => {
             const newQuotaId = await createNewQuota({});
@@ -51,7 +54,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             };
 
             const result = await request(app)
-                .post(INTERNAL_QUOTA_ROUTE)
+                .post(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId))
                 .send(InternalQuotaRequest);
@@ -77,7 +80,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             const newQuotaId = await createNewQuota(newQuota);
 
             const result = await request(app)
-                .post(INTERNAL_QUOTA_ROUTE)
+                .post(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId))
                 .send(InternalQuotaRequest);
@@ -108,7 +111,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             const newQuotaId = await createNewQuota(newQuota);
 
             const result = await request(app)
-                .post(INTERNAL_QUOTA_ROUTE)
+                .post(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId))
                 .send(InternalQuotaRequest);
@@ -132,7 +135,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             };
 
             const result = await request(app)
-                .post(INTERNAL_QUOTA_ROUTE)
+                .post(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", "0")
                 .send(InternalQuotaRequest);
 
@@ -150,7 +153,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             };
 
             const result = await request(app)
-                .post(INTERNAL_QUOTA_ROUTE)
+                .post(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set(
                     "x-access-token",
                     generateAccessToken("08e40963-f4e0-4e36-a4ea-16f0196b5133")
@@ -179,7 +182,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             };
 
             const result = await request(app)
-                .patch(INTERNAL_QUOTA_ROUTE)
+                .patch(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", testuserId)
                 .set("x-access-token", generateAccessToken(testuserId))
                 .send(updateQuotaRequest);
@@ -191,7 +194,9 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await quotaQueries.GetUsersQuotaAll(testuserId);
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testuserId
+            );
 
             expect(databaseResult).toHaveProperty("usedSpace");
             expect(Number(databaseResult.usedSpace)).toBe(testUsedSpace);
@@ -209,7 +214,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             };
 
             const result = await request(app)
-                .patch(INTERNAL_QUOTA_ROUTE)
+                .patch(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", testuserId)
                 .set("x-access-token", generateAccessToken(testuserId))
                 .send(updateQuotaRequest);
@@ -221,7 +226,9 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await quotaQueries.GetUsersQuotaAll(testuserId);
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testuserId
+            );
 
             expect(databaseResult).toHaveProperty("usedSpace");
             expect(Number(databaseResult.usedSpace)).toBe(testUsedSpace);
@@ -239,7 +246,7 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             };
 
             const result = await request(app)
-                .patch(INTERNAL_QUOTA_ROUTE)
+                .patch(INTERNAL_CONSUME_QUOTA_ROUTE)
                 .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send(updateQuotaRequest);
@@ -251,10 +258,152 @@ describe(INTERNAL_QUOTA_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             // check database
-            const databaseResult = await quotaQueries.GetUsersQuotaAll(testUserId);
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testUserId
+            );
 
             expect(databaseResult).toHaveProperty("usedSpace");
-            expect(Number(databaseResult.usedSpace)).toBe(testUsedSpace + testSize);
+            expect(Number(databaseResult.usedSpace)).toBe(
+                testUsedSpace + testSize
+            );
+        });
+    });
+});
+
+describe(INTERNAL_MANAGE_QUOTA_ROUTE, () => {
+    describe("PATCH", () => {
+        it("should return the MIN_TOTAL_SPACE when trying to update to a total space that is less than MIN_TOTAL_SPACE", async () => {
+            const newQuota: Partial<UsersQuota> = {
+                usedSpace: testUsedSpace,
+                totalSpace: testTotalSpace,
+            };
+
+            const testuserId = await createNewQuota(newQuota);
+            const updateQuotaRequest: PatchInternalSpaceRequest = {
+                size: testManageTotalValidSize,
+            };
+
+            const result = await request(app)
+                .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
+                .set("id", testuserId)
+                .set("x-access-token", generateAccessToken(testuserId))
+                .send(updateQuotaRequest);
+
+            expect(result.status).toBe(200);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+
+            // check database
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testuserId
+            );
+
+            expect(databaseResult).toHaveProperty("totalSpace");
+            expect(Number(databaseResult.totalSpace)).toBe(5242880);
+        });
+
+        it("should return the expected total space when increasing space", async () => {
+            const newQuota: Partial<UsersQuota> = {
+                usedSpace: testUsedSpace,
+                totalSpace: testTotalSpace,
+            };
+
+            const testUserId = await createNewQuota(newQuota);
+            const updateQuotaRequest: PatchInternalSpaceRequest = {
+                size: testSize,
+            };
+
+            const result = await request(app)
+                .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
+                .send(updateQuotaRequest);
+
+            expect(result.status).toBe(200);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+
+            // check database
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testUserId
+            );
+
+            expect(databaseResult).toHaveProperty("totalSpace");
+            expect(Number(databaseResult.totalSpace)).toBe(
+                testTotalSpace + testSize
+            );
+        });
+
+        it("should return the expected total space when reducing space", async () => {
+            const newQuota: Partial<UsersQuota> = {
+                usedSpace: testUsedSpace,
+                totalSpace: testTotalSpace,
+            };
+
+            const testUserId = await createNewQuota(newQuota);
+            const updateQuotaRequest: PatchInternalSpaceRequest = {
+                size: testReducingSize,
+            };
+
+            const result = await request(app)
+                .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
+                .send(updateQuotaRequest);
+
+            expect(result.status).toBe(200);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+
+            // check database
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testUserId
+            );
+
+            expect(databaseResult).toHaveProperty("totalSpace");
+            expect(Number(databaseResult.totalSpace)).toBe(
+                testTotalSpace + testReducingSize
+            );
+        });
+
+        it("should not change the existing usedSpace when updating totalSpace", async () => {
+            const newQuota: Partial<UsersQuota> = {
+                usedSpace: testUsedSpace,
+                totalSpace: testTotalSpace,
+            };
+
+            const testUserId = await createNewQuota(newQuota);
+            const updateQuotaRequest: PatchInternalSpaceRequest = {
+                size: testSize,
+            };
+
+            const result = await request(app)
+                .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
+                .set("id", testUserId)
+                .set("x-access-token", generateAccessToken(testUserId))
+                .send(updateQuotaRequest);
+
+            expect(result.status).toBe(200);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+
+            // check database
+            const databaseResult = await quotaQueries.GetUsersQuotaAll(
+                testUserId
+            );
+
+            expect(databaseResult).toHaveProperty("usedSpace");
+            expect(Number(databaseResult.usedSpace)).toBe(
+                testUsedSpace
+            );
         });
     });
 });
