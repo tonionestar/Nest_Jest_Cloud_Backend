@@ -15,6 +15,9 @@ import {
 } from "../../../classes/CommonTests";
 
 import { AuditQueries } from "../../../../src/database/query/AuditQueries";
+import axios from "axios";
+import { AxiosError } from "axios";
+import { BillingQueries } from "../../../../src/database/query/BillingQueries";
 import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import Country from "../../../../src/classes/Country";
 import { GetBillingResponseData } from "../../../../src/models/billing/GetBillingResponse";
@@ -28,6 +31,8 @@ const app = require("../../../../src/app");
 const request = require("supertest");
 
 const auditQueries = new AuditQueries();
+const billingQueries = new BillingQueries();
+jest.mock("axios");
 
 beforeAll(async () => {
     await ClippicDataSource.initialize()
@@ -42,6 +47,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
     await ClippicDataSource.synchronize();
+    const mockResponse = { data: { id: "123" } };
+    (axios.request as jest.Mock).mockResolvedValue(mockResponse);
 });
 
 afterEach(async () => {
@@ -189,8 +196,120 @@ describe(BILLING_ROUTE, () => {
                 countryISO2: usa.iso2,
                 countryISO3: usa.iso3,
                 countryName: usa.name
-            }
-            );
+            });
+        });
+
+        describe("contactId validations", () => {
+            it("should create contactId in the billing table when updated user doesn't have existing contactId", async () => {
+                const mockResponse = { data: { id: "123" } };
+                (axios.request as jest.Mock).mockResolvedValue(mockResponse);
+
+                const userId = await createNewBilling({
+                    forename: testForename,
+                    surname: testSurname,
+                });
+
+                const updateBillingRequest: PutBillingRequest = {
+                    forename: testForename,
+                    surname: testSurname,
+                    company: testCompany,
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    box: testBox,
+                };
+
+                const result = await request(app)
+                    .put(BILLING_ROUTE)
+                    .set("x-access-token", generateAccessToken(userId))
+                    .send(updateBillingRequest);
+
+                expect(result.status).toBe(200);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                // check code
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(200);
+
+                // check database
+                const databaseResult = await billingQueries.GetBilling(userId);
+
+                expect(databaseResult).toHaveProperty("contactId");
+                expect(databaseResult.contactId).toBe("123");
+            });
+
+            it("should return error status when CRM API threw an error", async () => {
+                (axios.request as jest.Mock).mockRejectedValueOnce(new AxiosError("Unauthorized", "401"));
+
+                const userId = await createNewBilling({
+                    forename: testForename,
+                    surname: testSurname,
+                });
+
+                const updateBillingRequest: PutBillingRequest = {
+                    forename: testForename,
+                    surname: testSurname,
+                    company: testCompany,
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    box: testBox,
+                };
+
+                const result = await request(app)
+                    .put(BILLING_ROUTE)
+                    .set("x-access-token", generateAccessToken(userId))
+                    .send(updateBillingRequest);
+
+                expect(result.status).not.toBe(200);
+            });
+
+            it("should call the update CRM API when updated user already has an existing contactId", async () => {
+
+                const userId = await createNewBilling({
+                    forename: testForename,
+                    surname: testSurname,
+                });
+
+                const updateBillingRequest: PutBillingRequest = {
+                    forename: testForename,
+                    surname: testSurname,
+                    company: testCompany,
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    box: testBox,
+                };
+
+                await request(app)
+                    .put(BILLING_ROUTE)
+                    .set("x-access-token", generateAccessToken(userId))
+                    .send(updateBillingRequest);
+
+                const updateBillingRequest2: PutBillingRequest = {
+                    forename: testForename,
+                    surname: testSurname,
+                    company: testCompany,
+                    country: testCountry,
+                    zip: testZip,
+                    city: testCity,
+                    box: testBox,
+                };
+                const result = await request(app)
+                    .put(BILLING_ROUTE)
+                    .set("x-access-token", generateAccessToken(userId))
+                    .send(updateBillingRequest2);
+
+                expect(result.status).toBe(200);
+                expect(result.body).toHaveProperty("data");
+                expect(result.body.data).toHaveLength(1);
+
+                expect(result.body).toHaveProperty("code");
+                expect(result.body.code).toBe(200);
+
+                expect(axios.request).toBeCalled();
+            });
         });
 
         it("should only update the modified fields", async () => {

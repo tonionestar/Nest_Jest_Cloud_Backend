@@ -69,7 +69,7 @@ function errorHandler(
     else if (err instanceof ValidateError) {
         return res.status(400).json(new ValidationError([err.fields], getTraceId(req)));
     }
-    console.error(err);
+    // console.error(err);
     next();
 }
 

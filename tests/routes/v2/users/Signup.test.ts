@@ -304,6 +304,5 @@ describe(url, () => {
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1023);
         });
-
     });
 });

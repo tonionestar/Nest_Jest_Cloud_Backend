@@ -41,6 +41,9 @@ export class UsersBilling {
     @Column("int", { nullable: true })
         country: number;
 
+    @Column("varchar", { nullable: true })
+        contactId: string;
+
     @OneToOne(() => Users, user => user.billing, { onDelete: "CASCADE" })
     @JoinColumn({ name: "user_id" })
         user: Users;

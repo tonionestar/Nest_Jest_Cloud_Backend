@@ -24,7 +24,7 @@ export class UsersQueries {
                 email: email,
                 salt: salt,
                 hash: hash,
-                session: session,
+                session: session
             })
             .returning(
                 "id"

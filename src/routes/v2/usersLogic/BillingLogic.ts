@@ -10,6 +10,8 @@ import { AuditQueries } from "../../../database/query/AuditQueries";
 import { BillingQueries } from "../../../database/query/BillingQueries";
 import Country from "../../../classes/Country";
 import { CountryRecord } from "../../../models/Country";
+import { CreateInvoiceInCRMError } from "@clippic/clippic-errors";
+import CRMClient from "../../../classes/CRM";
 import { GetBillingResponseData } from "../../../models/billing/GetBillingResponse";
 import { PutBillingRequest } from "../../../models/billing/PutBillingRequest";
 import { PutBillingResponseData } from "../../../models/billing/PutBillingResponse";
@@ -27,7 +29,8 @@ export class BillingLogic {
 
     private req: RequestTracing;
     private traceId: string;
-
+    private crmClient = new CRMClient();
+    private contactId: string;
 
     private user: User = {};
     private userBilling: UserBilling;
@@ -36,6 +39,7 @@ export class BillingLogic {
         this.req = req;
         this.traceId = traceId;
         this.user.id = getUserIdFromJWTToken(req);
+        this.contactId = "";
         this.billingQueries = new BillingQueries(parentSpanContext);
         this.auditQueries = new AuditQueries(parentSpanContext);
         this.usersQueries = new UsersQueries(parentSpanContext);
@@ -69,7 +73,8 @@ export class BillingLogic {
 
     public async putUsersBillingLogic(body: PutBillingRequest): Promise<PutBillingResponseData> {
         await this.checkRouteAccess();
-
+        await this.checkContactId(body);
+        this.checkIfContactIdExists();
         this.checkSemiOptionalValues(body);
         await this.CreateOrUpdateBilling(body);
         await this.updateAuditTimestamp();
@@ -115,6 +120,31 @@ export class BillingLogic {
         return allCountries.getCountryById(countryId);
     }
 
+    private async checkContactId(billingRequestData: PutBillingRequest) {
+        await this.getUsersBilling();
+        if(this.userBilling.contactId) {
+            this.contactId = this.userBilling.contactId;
+            this.updateContactId(this.userBilling.contactId, billingRequestData.forename, billingRequestData.surname);
+        }else {
+            await this.createContactId(billingRequestData.forename, billingRequestData.surname);
+        }
+    }
+
+    private updateContactId(id: string, forename: string, surname: string) {
+        this.crmClient.updateContact(id, forename, surname);
+    }
+
+
+    private async createContactId(forename: string, surname: string) {
+        this.contactId = await this.crmClient.createContact(forename, surname);
+    }
+
+    private checkIfContactIdExists(){
+        if(!this.contactId) {
+            throw new CreateInvoiceInCRMError(this.traceId);
+        }
+    }
+
     private isBillingNotFound() {
         return Object.keys(this.userBilling).length == 0;
     }
@@ -125,7 +155,8 @@ export class BillingLogic {
     }
 
     private async CreateOrUpdateBilling(billingRequestData: PutBillingRequest): Promise<void> {
-        const result = await this.billingQueries.CreateOrUpdateBilling(this.user.id, billingRequestData);
+        const createOrUpdateData = { ...billingRequestData, contactId: this.contactId };
+        const result = await this.billingQueries.CreateOrUpdateBilling(this.user.id, createOrUpdateData);
         this.userBilling = { ...result };
     }
 

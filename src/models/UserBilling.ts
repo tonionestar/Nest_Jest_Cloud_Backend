@@ -10,4 +10,5 @@ export interface UserBilling {
     city?: string;
     state?: string;
     country?: number;
+    contactId?: string;
 }

@@ -26,7 +26,7 @@ export class AuditQueries {
                 username: () => "CURRENT_TIMESTAMP",
                 email: () => "CURRENT_TIMESTAMP",
                 hash: () => "CURRENT_TIMESTAMP",
-                quota: () => "CURRENT_TIMESTAMP",
+                quota: () => "CURRENT_TIMESTAMP"
             })
             .execute();
     }
