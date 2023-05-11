@@ -1,3 +1,10 @@
+# [1.2.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.1.0...v1.2.0) (2023-05-11)
+
+
+### Features
+
+* **Quota:** added internal manage quota routes ([a79b8f9](https://gitlab.clippic.app/clippic/backend/user-v2/commit/a79b8f9499fc0b86ba99eb101a0e62c52f4e0bc3))
+
 # [1.1.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.0.0...v1.1.0) (2023-05-07)
 
 
