@@ -1,3 +1,10 @@
+# [1.3.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.2.0...v1.3.0) (2023-05-15)
+
+
+### Features
+
+* **controllers:** seperating logic from controllers ([767d383](https://gitlab.clippic.app/clippic/backend/user-v2/commit/767d38383565ac0d45f83c9905a9a89dbe4b8eb6))
+
 # [1.2.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.1.0...v1.2.0) (2023-05-11)
 
 
