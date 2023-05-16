@@ -15,6 +15,8 @@ import { ClippicDataSource } from "../../../../src/database/DatabaseConnection";
 import { PatchInternalSpaceRequest } from "../../../../src/models/internalQuota/PatchInternalSpaceRequest";
 import { PostConsumptionRequest } from "../../../../src/models/internalQuota/PostConsumptionRequest";
 import { QuotaQueries } from "../../../../src/database/query/QuotaQueries";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import request from "supertest";
 import { UsersQuota } from "../../../../src/database/entity/UsersQuota";
 
@@ -55,7 +57,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .post(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId))
                 .send(InternalQuotaRequest);
 
@@ -81,7 +82,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .post(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId))
                 .send(InternalQuotaRequest);
 
@@ -112,7 +112,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .post(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId))
                 .send(InternalQuotaRequest);
 
@@ -136,7 +135,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .post(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", "0")
                 .send(InternalQuotaRequest);
 
             expect(result.status).toBe(400);
@@ -145,27 +143,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
             // check code
             expect(result.body).toHaveProperty("code");
             expect(result.body.code).toBe(1000);
-        });
-
-        it("should not be possible to get quota data when id is missing", async () => {
-            const InternalQuotaRequest: PostConsumptionRequest = {
-                requestSize: testNotEnoughRequestSpace,
-            };
-
-            const result = await request(app)
-                .post(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set(
-                    "x-access-token",
-                    generateAccessToken("08e40963-f4e0-4e36-a4ea-16f0196b5133")
-                )
-                .send(InternalQuotaRequest);
-
-            expect(result.status).toBe(400);
-            expect(result.body).toHaveProperty("data");
-
-            // check code
-            expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1101);
         });
     });
 
@@ -183,7 +160,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", testuserId)
                 .set("x-access-token", generateAccessToken(testuserId))
                 .send(updateQuotaRequest);
 
@@ -215,7 +191,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", testuserId)
                 .set("x-access-token", generateAccessToken(testuserId))
                 .send(updateQuotaRequest);
 
@@ -247,7 +222,6 @@ describe(INTERNAL_CONSUME_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_CONSUME_QUOTA_ROUTE)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send(updateQuotaRequest);
 
@@ -285,7 +259,6 @@ describe(INTERNAL_MANAGE_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
-                .set("id", testuserId)
                 .set("x-access-token", generateAccessToken(testuserId))
                 .send(updateQuotaRequest);
 
@@ -317,7 +290,6 @@ describe(INTERNAL_MANAGE_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send(updateQuotaRequest);
 
@@ -351,7 +323,6 @@ describe(INTERNAL_MANAGE_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send(updateQuotaRequest);
 
@@ -385,7 +356,6 @@ describe(INTERNAL_MANAGE_QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .patch(INTERNAL_MANAGE_QUOTA_ROUTE)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send(updateQuotaRequest);
 

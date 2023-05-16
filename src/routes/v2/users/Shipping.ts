@@ -90,10 +90,10 @@ export class ShippingController extends Controller {
     @Security("jwt")
     @Response<ShippingNotFoundError>(400)
     @Get("/")
-    public async getShippingRequest(@Request() req: RequestTracing, @Header() id: string, @Header() shippingId?: string): Promise<ShippingResponse> {
+    public async getShippingRequest(@Request() req: RequestTracing, @Header() shippingId?: string): Promise<ShippingResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const shippingLogic = new ShippingLogic(req, id, parentSpanContext, traceId);
+        const shippingLogic = new ShippingLogic(req, parentSpanContext, traceId);
         const shippingDataResponse : ShippingResponseData[]= await shippingLogic.getShippingLogic(shippingId);
 
         return {
@@ -144,10 +144,10 @@ export class ShippingController extends Controller {
     @Security("jwt")
     @Response<BodyFieldCombinationInvalidError>(400)
     @Post("/")
-    public async postShippingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PostShippingRequest): Promise<ShippingResponse> {
+    public async postShippingRequest(@Request() req: RequestTracing, @Body() body: PostShippingRequest): Promise<ShippingResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const shippingLogic = new ShippingLogic(req, id, parentSpanContext, traceId);
+        const shippingLogic = new ShippingLogic(req, parentSpanContext, traceId);
         const shippingDataResponse : ShippingResponseData[]= await shippingLogic.postShippingLogic(body);
 
         return {
@@ -198,10 +198,10 @@ export class ShippingController extends Controller {
     @Security("jwt")
     @Response<ShippingNotFoundError>(400)
     @Put("/")
-    public async putShippingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutShippingRequest): Promise<ShippingResponse> {
+    public async putShippingRequest(@Request() req: RequestTracing, @Body() body: PutShippingRequest): Promise<ShippingResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const shippingLogic = new ShippingLogic(req, id, parentSpanContext, traceId);
+        const shippingLogic = new ShippingLogic(req, parentSpanContext, traceId);
         const shippingDataResponse : ShippingResponseData[]= await shippingLogic.putShippingLogic(body);
 
         return {

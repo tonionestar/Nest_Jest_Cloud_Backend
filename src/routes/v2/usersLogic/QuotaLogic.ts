@@ -1,4 +1,7 @@
-import { checkJWTAuthenticationSession, checkJWTAuthenticationUserId } from "../../../classes/Common";
+import {
+    checkJWTAuthenticationSession,
+    getUserIdFromJWTToken
+} from "../../../classes/Common";
 import { AuditQueries } from "../../../database/query/AuditQueries";
 import { QuotaQueries } from "../../../database/query/QuotaQueries";
 import { RequestTracing } from "../../../models/RequestTracing";
@@ -19,10 +22,10 @@ export class QuotaLogic {
 
     private user: User = {};
 
-    constructor(req: RequestTracing, id: string, parentSpanContext: SpanContext, traceId: string) {
+    constructor(req: RequestTracing, parentSpanContext: SpanContext, traceId: string) {
         this.req = req;
         this.traceId = traceId;
-        this.user.id = id;
+        this.user.id = getUserIdFromJWTToken(req);
         this.auditQueries = new AuditQueries(parentSpanContext);
         this.usersQueries = new UsersQueries(parentSpanContext);
         this.quotaQueries = new QuotaQueries(parentSpanContext);
@@ -43,9 +46,6 @@ export class QuotaLogic {
     }
 
     private async checkRouteAccess() {
-        // check if user is allowed for this url
-        checkJWTAuthenticationUserId(this.req, this.user);
-
         // get session from database
         await this.getUsersSession();
 

@@ -1,10 +1,8 @@
-import * as express from "express";
 import {
     Body,
     Controller,
     Example,
     Get,
-    Header,
     Put,
     Request,
     Route,
@@ -25,8 +23,6 @@ import { SurnameLogic } from "../usersLogic/SurnameLogic";
 @Route("/v2/users/surname")
 export class SurnameController extends Controller {
 
-    public router = express.Router();
-
     /**
      * This request will return the user's surname.
      */
@@ -44,10 +40,10 @@ export class SurnameController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getSurnameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetSurnameResponse> {
+    public async getSurnameRequest(@Request() req: RequestTracing): Promise<GetSurnameResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const surnameLogic = new SurnameLogic(req, id, parentSpanContext, traceId);
+        const surnameLogic = new SurnameLogic(req, parentSpanContext, traceId);
         const usersSurname = await surnameLogic.getUsersSurnameLogic();
 
         return Promise.resolve({
@@ -78,10 +74,10 @@ export class SurnameController extends Controller {
     })
     @Security("jwt")
     @Put("/")
-    public async putSurnameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutSurnameRequest): Promise<PutSurnameResponse> {
+    public async putSurnameRequest(@Request() req: RequestTracing, @Body() body: PutSurnameRequest): Promise<PutSurnameResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const surnameLogic = new SurnameLogic(req, id, parentSpanContext, traceId);
+        const surnameLogic = new SurnameLogic(req, parentSpanContext, traceId);
         const updateSurnameResponse = await surnameLogic.updateSurnameLogic(body);
 
         return Promise.resolve({

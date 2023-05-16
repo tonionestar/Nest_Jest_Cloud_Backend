@@ -2,7 +2,7 @@ import {
     Body,
     Controller,
     Example,
-    Header, Patch,
+    Patch,
     Post,
     Request,
     Response,
@@ -42,10 +42,10 @@ export class InternalQuotaController extends Controller {
     @Security("jwt")
     @Response<UserIdNotFoundError>(400)
     @Post("/")
-    public async postConsumptionRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PostConsumptionRequest): Promise<PostConsumptionResponse> {
+    public async postConsumptionRequest(@Request() req: RequestTracing, @Body() body: PostConsumptionRequest): Promise<PostConsumptionResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const internalQuotaLogic = new InternalQuotaLogic(req, id, parentSpanContext, traceId);
+        const internalQuotaLogic = new InternalQuotaLogic(req, parentSpanContext, traceId);
         const consumptionResponse: PostConsumptionResponseData = await internalQuotaLogic.consumptionRequestLogic(body);
 
         return {
@@ -68,12 +68,11 @@ export class InternalQuotaController extends Controller {
     @Patch("/")
     public async patchInternalSpaceRequest(
         @Request() req: RequestTracing,
-        @Header() id: string,
         @Body() body: PatchInternalSpaceRequest
     ): Promise<ClippicResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const internalQuotaLogic = new InternalQuotaLogic(req, id, parentSpanContext, traceId);
+        const internalQuotaLogic = new InternalQuotaLogic(req, parentSpanContext, traceId);
         await internalQuotaLogic.setUsedSpace(body.size);
 
         return {
@@ -95,12 +94,11 @@ export class InternalQuotaController extends Controller {
     @Patch("/manage")
     public async PatchManageQuotaResponse(
         @Request() req: RequestTracing,
-        @Header() id: string,
         @Body() body: PatchInternalSpaceRequest
     ): Promise<PatchManageQuotaResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const internalQuotaLogic = new InternalQuotaLogic(req, id, parentSpanContext, traceId);
+        const internalQuotaLogic = new InternalQuotaLogic(req, parentSpanContext, traceId);
         await internalQuotaLogic.setTotalSpace(body.size);
 
         const totalSpace = await internalQuotaLogic.getManagedQuota();

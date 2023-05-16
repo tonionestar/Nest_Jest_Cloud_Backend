@@ -102,17 +102,6 @@ export function getJWTTokenFromHeaders(req: RequestTracing): string {
     return token;
 }
 
-export function checkJWTAuthenticationUserId(req: RequestTracing, user: User) {
-    const token: string = getJWTTokenFromHeaders(req);
-
-    const decodedToken: AccessToken = decode(token) as AccessToken;
-
-    // Check if id from token is the same as from uri
-    if (user.id != decodedToken.userId) {
-        throw new AccessTokenNotAllowedForUriError(getTraceId(req));
-    }
-}
-
 export function checkJWTAuthenticationSession(req: RequestTracing, user: User) {
     const token: string = getJWTTokenFromHeaders(req);
 
@@ -122,6 +111,14 @@ export function checkJWTAuthenticationSession(req: RequestTracing, user: User) {
     if (user.session != decodedToken.session) {
         throw new AccessTokenNotAllowedForUriError(getTraceId(req));
     }
+}
+
+export function getUserIdFromJWTToken(req: RequestTracing): string {
+    if (typeof req.headers["x-access-token"] == "string") {
+        const decodedToken: AccessToken = decode(getJWTTokenFromHeaders(req)) as AccessToken;
+        return decodedToken.userId;
+    }
+    return undefined;
 }
 
 /**

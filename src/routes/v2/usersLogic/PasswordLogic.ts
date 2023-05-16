@@ -1,7 +1,7 @@
 import {
     checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
     generateSession,
+    getUserIdFromJWTToken,
     validatePassword
 } from "../../../classes/Common";
 import { AuditQueries } from "../../../database/query/AuditQueries";
@@ -24,10 +24,10 @@ export class PasswordLogic {
 
     private user: User = {};
 
-    constructor(req: RequestTracing,  parentSpanContext: SpanContext, traceId: string, id?: string) {
+    constructor(req: RequestTracing, parentSpanContext: SpanContext, traceId: string) {
         this.req = req;
         this.traceId = traceId;
-        this.user.id = id;
+        this.user.id = getUserIdFromJWTToken(req);
         this.auditQueries = new AuditQueries(parentSpanContext);
         this.usersQueries = new UsersQueries(parentSpanContext);
         this.passwordQueries = new PasswordResetQueries(parentSpanContext);
@@ -106,9 +106,6 @@ export class PasswordLogic {
     // functions
 
     private async checkRouteAccess() {
-        // check if user is allowed for this url
-        checkJWTAuthenticationUserId(this.req, this.user);
-
         // get session from database
         await this.getUsersSession();
 

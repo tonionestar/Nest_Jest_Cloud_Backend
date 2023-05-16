@@ -1,10 +1,7 @@
-import * as express from "express";
-
 import {
     Controller,
     Example,
     Get,
-    Header,
     Request,
     Route,
     Security,
@@ -21,9 +18,6 @@ import { RequestTracing } from "../../../models/RequestTracing";
 
 @Route("/v2/users/quota")
 export class QuotaController extends Controller {
-
-    public router = express.Router();
-
 
     /**
      * This request will return the user's last modified dates.
@@ -42,10 +36,10 @@ export class QuotaController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getQuotaRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetQuotaResponse> {
+    public async getQuotaRequest(@Request() req: RequestTracing): Promise<GetQuotaResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const quotaLogic = new QuotaLogic(req, id, parentSpanContext, traceId);
+        const quotaLogic = new QuotaLogic(req, parentSpanContext, traceId);
         const quotaResponse = await quotaLogic.getUserQuotaLogic();
 
         return {

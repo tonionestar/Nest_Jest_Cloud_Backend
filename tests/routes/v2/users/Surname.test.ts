@@ -44,7 +44,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId));
 
             expect(result.status).toBe(200);
@@ -60,43 +59,9 @@ describe(url, () => {
             expect(result.body.data[0].surname).toBe(testSurname);
         });
 
-        it("should not be possible to get surname when id is missing", async () => {
-            const testUserId = await createNewUser({});
-
-            const result = await request(app)
-                .get(url)
-                .set("x-access-token", generateAccessToken(testUserId));
-
-            expect(result.status).toBe(400);
-            expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1);
-
-            // check code
-            expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1101);
-        });
-
-        it("should not be possible to get surname when id is wrong", async () => {
-            const testUserId = await createNewUser({});
-
-            const result = await request(app)
-                .get(url)
-                .set("id", "0")
-                .set("x-access-token", generateAccessToken(testUserId));
-
-            expect(result.status).toBe(400);
-            expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(0);
-
-            // check code
-            expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1001);
-        });
-
         it("should not be possible to get surname when access-token is missing", async () => {
             const result = await request(app)
-                .get(url)
-                .set("id", "0");
+                .get(url);
 
             expect(result.status).toBe(400);
             expect(result.body).toHaveProperty("data");
@@ -116,7 +81,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     surname: newSurname
@@ -147,7 +111,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     surname: newSurname
@@ -178,7 +141,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     surname: newSurname
@@ -199,7 +161,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     surname: newSurname
@@ -219,7 +180,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send();
 
@@ -232,31 +192,11 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to change surname when id is missing", async () => {
-            const testUserId = await createNewUser({});
-
-            const result = await request(app)
-                .put(url)
-                .set("x-access-token", generateAccessToken(testUserId))
-                .send({
-                    surname: "newSurname"
-                });
-
-            expect(result.status).toBe(400);
-            expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1);
-
-            // check code
-            expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1101);
-        });
-
         it("should not be possible to change surname when access-token is missing", async () => {
-            const testUserId = await createNewUser({});
+            await createNewUser({});
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .send({
                     surname: "newSurname"
                 });

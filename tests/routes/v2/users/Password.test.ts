@@ -50,7 +50,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     pass: "Test12345#"
@@ -77,7 +76,6 @@ describe(url, () => {
             // try again with new sessions
             const resultSecondIteration = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId, databaseResult.session))
                 .send({
                     pass: "Test1234#"
@@ -106,7 +104,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send({
                     pass: "t1#"
@@ -126,7 +123,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .send();
 
@@ -139,31 +135,11 @@ describe(url, () => {
             expect(result.body.code).toBe(1101);
         });
 
-        it("should not be possible to change password when id is missing", async () => {
-            const testUserId = await createNewUser({});
-
-            const result = await request(app)
-                .put(url)
-                .set("x-access-token", generateAccessToken(testUserId))
-                .send({
-                    pass: "Test1234#"
-                });
-
-            expect(result.status).toBe(400);
-            expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1);
-
-            // check code
-            expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1101);
-        });
-
         it("should not be possible to change password when access-token is missing", async () => {
-            const testUserId = await createNewUser({});
+            await createNewUser({});
 
             const result = await request(app)
                 .put(url)
-                .set("id", testUserId)
                 .send({
                     pass: "Test1234#"
                 });

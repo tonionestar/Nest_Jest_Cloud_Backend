@@ -1,10 +1,7 @@
-import * as express from "express";
-
 import {
     Controller,
     Example,
     Get,
-    Header,
     Query,
     Request,
     Response,
@@ -25,7 +22,6 @@ import { UserMailNotFoundError } from "@clippic/clippic-errors";
 @Route("/v2/users/id")
 export class IdController extends Controller {
 
-    public router = express.Router();
     /**
      * This request will return the id of any kind of user by its email address. This can not be used to fetch your own
      * user id cause this route requires authorization.
@@ -51,10 +47,10 @@ export class IdController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getIdByEmailRequest(@Request() req: RequestTracing, @Header() id: string, @Query() email: string): Promise<GetIdResponse> {
+    public async getIdByEmailRequest(@Request() req: RequestTracing, @Query() email: string): Promise<GetIdResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const idLogic = new IdLogic(req, id, parentSpanContext, traceId);
+        const idLogic = new IdLogic(req, parentSpanContext, traceId);
         const userId = await idLogic.getIdByEmailLogic(email);
 
         return Promise.resolve({

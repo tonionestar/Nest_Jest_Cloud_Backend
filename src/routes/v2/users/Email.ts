@@ -7,7 +7,6 @@ import {
     Controller,
     Example,
     Get,
-    Header,
     Put,
     Request,
     Response,
@@ -46,10 +45,10 @@ export class EmailController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getEmailRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetEmailResponse> {
+    public async getEmailRequest(@Request() req: RequestTracing): Promise<GetEmailResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const emailLogic = new EmailLogic(req, id, parentSpanContext, traceId);
+        const emailLogic = new EmailLogic(req, parentSpanContext, traceId);
         const emailResponseData: string = await emailLogic.getEmailLogic();
         return {
             "status": "success",
@@ -88,10 +87,10 @@ export class EmailController extends Controller {
     @Response<MailFormatError>(400)
     @Security("jwt")
     @Put("/")
-    public async putEmailRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutEmailRequest): Promise<PutEmailResponse> {
+    public async putEmailRequest(@Request() req: RequestTracing, @Body() body: PutEmailRequest): Promise<PutEmailResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const emailLogic = new EmailLogic(req, id, parentSpanContext, traceId);
+        const emailLogic = new EmailLogic(req, parentSpanContext, traceId);
         const PutEmailResponseData = await emailLogic.putEmailLogic(body);
         return {
             "status": "success",

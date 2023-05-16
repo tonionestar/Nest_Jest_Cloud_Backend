@@ -1,6 +1,6 @@
 import {
     checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
+    getUserIdFromJWTToken,
 } from "../../../classes/Common";
 import {
     validateCompanyForenameSurename,
@@ -32,10 +32,10 @@ export class BillingLogic {
     private user: User = {};
     private userBilling: UserBilling;
 
-    constructor(req: RequestTracing, id: string, parentSpanContext: SpanContext, traceId: string) {
+    constructor(req: RequestTracing, parentSpanContext: SpanContext, traceId: string) {
         this.req = req;
         this.traceId = traceId;
-        this.user.id = id;
+        this.user.id = getUserIdFromJWTToken(req);
         this.billingQueries = new BillingQueries(parentSpanContext);
         this.auditQueries = new AuditQueries(parentSpanContext);
         this.usersQueries = new UsersQueries(parentSpanContext);
@@ -92,9 +92,6 @@ export class BillingLogic {
 
 
     private async checkRouteAccess() {
-        // check if user is allowed for this url
-        checkJWTAuthenticationUserId(this.req, this.user);
-
         // get session from database
         await this.getUsersSession();
 

@@ -1,6 +1,6 @@
 import {
     checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
+    getUserIdFromJWTToken,
 } from "../../../classes/Common";
 import { ShippingType, UsersShipping } from "../../../database/entity/UsersShipping";
 import {
@@ -32,10 +32,10 @@ export class ShippingLogic {
     private user: User = {};
     private userShippings: ShippingResponseData[];
 
-    constructor(req: RequestTracing, id: string, parentSpanContext: SpanContext, traceId: string) {
+    constructor(req: RequestTracing, parentSpanContext: SpanContext, traceId: string) {
         this.req = req;
         this.traceId = traceId;
-        this.user.id = id;
+        this.user.id = getUserIdFromJWTToken(req);
         this.auditQueries = new AuditQueries(parentSpanContext);
         this.usersQueries = new UsersQueries(parentSpanContext);
         this.shippingQueries = new ShippingQueries(parentSpanContext);
@@ -67,9 +67,6 @@ export class ShippingLogic {
     }
 
     private async checkRouteAccess() {
-        // check if user is allowed for this url
-        checkJWTAuthenticationUserId(this.req, this.user);
-
         // get session from database
         await this.getUsersSession();
 

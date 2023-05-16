@@ -1,10 +1,8 @@
-import * as express from "express";
 import {
     Body,
     Controller,
     Example,
     Get,
-    Header,
     Put,
     Request,
     Route,
@@ -26,8 +24,6 @@ import { RequestTracing } from "../../../models/RequestTracing";
 @Route("/v2/users/forename")
 export class ForenameController extends Controller {
 
-    public router = express.Router();
-
     /**
      * This request will return the user's forename.
      */
@@ -45,10 +41,10 @@ export class ForenameController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getForenameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetForenameResponse> {
+    public async getForenameRequest(@Request() req: RequestTracing): Promise<GetForenameResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const forenameLogic = new ForenameLogic(req, id, parentSpanContext, traceId);
+        const forenameLogic = new ForenameLogic(req, parentSpanContext, traceId);
         const forenameResponseData = await forenameLogic.getForenameLogic();
 
         return Promise.resolve({
@@ -79,10 +75,10 @@ export class ForenameController extends Controller {
     })
     @Security("jwt")
     @Put("/")
-    public async putForenameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutForenameRequest): Promise<PutForenameResponse> {
+    public async putForenameRequest(@Request() req: RequestTracing, @Body() body: PutForenameRequest): Promise<PutForenameResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const forenameLogic = new ForenameLogic(req, id, parentSpanContext, traceId);
+        const forenameLogic = new ForenameLogic(req, parentSpanContext, traceId);
         const putForenameResponseData = await forenameLogic.putForenameLogic(body);
         return {
             "status": "success",

@@ -1,11 +1,8 @@
-import * as express from "express";
-
 import {
     Body,
     Controller,
     Example,
     Get,
-    Header,
     Put,
     Request,
     Response,
@@ -27,9 +24,6 @@ import { UsernameLogic } from "../usersLogic/UsernameLogic";
 @Route("/v2/users/username")
 export class UsernameController extends Controller {
 
-    public router = express.Router();
-
-
     /**
      * This request will return the user's username.
      */
@@ -47,10 +41,10 @@ export class UsernameController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getUsernameRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetUsernameResponse> {
+    public async getUsernameRequest(@Request() req: RequestTracing): Promise<GetUsernameResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const usernameLogic = new UsernameLogic(req, id, parentSpanContext, traceId);
+        const usernameLogic = new UsernameLogic(req, parentSpanContext, traceId);
         const usersUsername = await usernameLogic.getUsersUsernameLogic();
 
         return Promise.resolve({
@@ -88,11 +82,11 @@ export class UsernameController extends Controller {
     @Response<UsernameAlreadyExistsError>(400)
     @Security("jwt")
     @Put("/")
-    public async putUsernameRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutUsernameRequest): Promise<PutUsernameResponse> {
+    public async putUsernameRequest(@Request() req: RequestTracing, @Body() body: PutUsernameRequest): Promise<PutUsernameResponse> {
 
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const usernameLogic = new UsernameLogic(req, id, parentSpanContext, traceId);
+        const usernameLogic = new UsernameLogic(req, parentSpanContext, traceId);
         const usersUsername = await usernameLogic.updateUsersUsername(body);
 
         return Promise.resolve({

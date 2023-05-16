@@ -1,6 +1,6 @@
 import {
     checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId
+    getUserIdFromJWTToken
 } from "../../../classes/Common";
 import { PostConsumptionRequest } from "../../../models/internalQuota/PostConsumptionRequest";
 import { PostConsumptionResponseData } from "../../../models/internalQuota/PostConsumptionResponse";
@@ -22,10 +22,10 @@ export class InternalQuotaLogic {
     private user: User = {};
     private userQuota: UserQuota;
 
-    constructor(req: RequestTracing, id: string, parentSpanContext: SpanContext, traceId: string) {
+    constructor(req: RequestTracing, parentSpanContext: SpanContext, traceId: string) {
         this.req = req;
         this.traceId = traceId;
-        this.user.id = id;
+        this.user.id = getUserIdFromJWTToken(req);
         this.usersQueries = new UsersQueries(parentSpanContext);
         this.quotaQueries = new QuotaQueries(parentSpanContext);
     }
@@ -70,9 +70,6 @@ export class InternalQuotaLogic {
     }
 
     private async checkRouteAccess() {
-        // check if user is allowed for this url
-        checkJWTAuthenticationUserId(this.req, this.user);
-
         // get session from database
         await this.getUsersSession();
 

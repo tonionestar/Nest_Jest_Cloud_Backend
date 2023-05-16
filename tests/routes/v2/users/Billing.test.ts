@@ -59,7 +59,6 @@ describe(BILLING_ROUTE, () => {
 
             const result = await request(app)
                 .get(BILLING_ROUTE)
-                .set("id", newBillingId)
                 .set("x-access-token", generateAccessToken(newBillingId));
 
             expect(result.status).toBe(200);
@@ -77,7 +76,6 @@ describe(BILLING_ROUTE, () => {
 
             const result = await request(app)
                 .get(BILLING_ROUTE)
-                .set("id", userId)
                 .set("x-access-token", generateAccessToken(userId));
 
             expect(result.status).toBe(400);
@@ -98,7 +96,6 @@ describe(BILLING_ROUTE, () => {
 
             const result = await request(app)
                 .get(BILLING_ROUTE)
-                .set("id", newBillingId)
                 .set("x-access-token", generateAccessToken(newBillingId));
 
 
@@ -136,7 +133,6 @@ describe(BILLING_ROUTE, () => {
 
             const result = await request(app)
                 .get(BILLING_ROUTE)
-                .set("id", newBillingId)
                 .set("x-access-token", generateAccessToken(newBillingId));
 
             expect(result.status).toBe(200);
@@ -169,7 +165,6 @@ describe(BILLING_ROUTE, () => {
             };
             const result = await request(app)
                 .put(BILLING_ROUTE)
-                .set("id", userId)
                 .set("x-access-token", generateAccessToken(userId))
                 .send(billingRequest);
 
@@ -210,7 +205,6 @@ describe(BILLING_ROUTE, () => {
             };
             const result = await request(app)
                 .put(BILLING_ROUTE)
-                .set("id", existingBillingId)
                 .set("x-access-token", generateAccessToken(existingBillingId))
                 .send(updateBillingRequest);
 
@@ -248,7 +242,6 @@ describe(BILLING_ROUTE, () => {
 
             await request(app)
                 .put(BILLING_ROUTE)
-                .set("id", newBillingId)
                 .set("x-access-token", generateAccessToken(newBillingId))
                 .send(updateBillingRequest);
 
@@ -278,7 +271,6 @@ describe(BILLING_ROUTE, () => {
 
                     const result = await request(app)
                         .put(BILLING_ROUTE)
-                        .set("id", userId)
                         .set("x-access-token", generateAccessToken(userId))
                         .send(billingRequest);
 
@@ -304,7 +296,6 @@ describe(BILLING_ROUTE, () => {
 
                     const result = await request(app)
                         .put(BILLING_ROUTE)
-                        .set("id", userId)
                         .set("x-access-token", generateAccessToken(userId))
                         .send(billingRequest);
 
@@ -330,7 +321,6 @@ describe(BILLING_ROUTE, () => {
 
                     const result = await request(app)
                         .put(BILLING_ROUTE)
-                        .set("id", userId)
                         .set("x-access-token", generateAccessToken(userId))
                         .send(billingRequest);
 
@@ -355,7 +345,6 @@ describe(BILLING_ROUTE, () => {
 
                     const result = await request(app)
                         .put(BILLING_ROUTE)
-                        .set("id", userId)
                         .set("x-access-token", generateAccessToken(userId))
                         .send(billingRequest);
 
@@ -381,7 +370,6 @@ describe(BILLING_ROUTE, () => {
 
                     const result = await request(app)
                         .put(BILLING_ROUTE)
-                        .set("id", userId)
                         .set("x-access-token", generateAccessToken(userId))
                         .send(billingRequest);
 
@@ -408,7 +396,6 @@ describe(BILLING_ROUTE, () => {
 
                     const result = await request(app)
                         .put(BILLING_ROUTE)
-                        .set("id", userId)
                         .set("x-access-token", generateAccessToken(userId))
                         .send(billingRequest);
 
@@ -436,7 +423,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -462,7 +448,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -488,7 +473,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -514,7 +498,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -540,7 +523,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -566,7 +548,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -592,7 +573,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -619,7 +599,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -645,7 +624,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -672,7 +650,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -699,7 +676,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -725,7 +701,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 
@@ -751,7 +726,6 @@ describe(BILLING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .put(BILLING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(billingRequest);
 

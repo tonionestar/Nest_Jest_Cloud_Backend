@@ -3,7 +3,6 @@ import {
     Controller,
     Example,
     Get,
-    Header,
     Put,
     Request,
     Response,
@@ -58,10 +57,10 @@ export class BillingController extends Controller {
     @Security("jwt")
     @Response<UserIdNotFoundError>(400)
     @Get("/")
-    public async getBillingRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetBillingResponse> {
+    public async getBillingRequest(@Request() req: RequestTracing): Promise<GetBillingResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const billingLogic = new BillingLogic(req, id, parentSpanContext, traceId);
+        const billingLogic = new BillingLogic(req, parentSpanContext, traceId);
         const billingDataResponse = await billingLogic.getUsersBillingLogic();
 
         return {
@@ -104,10 +103,10 @@ export class BillingController extends Controller {
     @Security("jwt")
     @Response<BodyFieldCombinationInvalidError>(400)
     @Put("/")
-    public async putBillingRequest(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutBillingRequest): Promise<PutBillingResponse> {
+    public async putBillingRequest(@Request() req: RequestTracing, @Body() body: PutBillingRequest): Promise<PutBillingResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const billingLogic = new BillingLogic(req, id, parentSpanContext, traceId);
+        const billingLogic = new BillingLogic(req, parentSpanContext, traceId);
         const billingDataResponse = await billingLogic.putUsersBillingLogic(body);
 
         return {

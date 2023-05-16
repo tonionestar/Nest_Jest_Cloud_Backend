@@ -44,7 +44,6 @@ describe(QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .get(QUOTA_ROUTE)
-                .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId));
 
             expect(result.status).toBe(200);
@@ -67,7 +66,6 @@ describe(QUOTA_ROUTE, () => {
 
             const result = await request(app)
                 .get(QUOTA_ROUTE)
-                .set("id", newQuotaId)
                 .set("x-access-token", generateAccessToken(newQuotaId));
 
             expect(result.status).toBe(200);
@@ -88,8 +86,7 @@ describe(QUOTA_ROUTE, () => {
 
     it("should not be possible to get quota data when access-token is missing", async () => {
         const result = await request(app)
-            .get(QUOTA_ROUTE)
-            .set("id", "0");
+            .get(QUOTA_ROUTE);
 
         expect(result.status).toBe(400);
         expect(result.body).toHaveProperty("data");
@@ -100,17 +97,4 @@ describe(QUOTA_ROUTE, () => {
         expect(result.body.code).toBe(1000);
     });
 
-    it("should not be possible to get quota data when id is missing", async () => {
-        const result = await request(app)
-            .get(QUOTA_ROUTE)
-            .set("x-access-token", generateAccessToken("08e40963-f4e0-4e36-a4ea-16f0196b5133"));
-
-        expect(result.status).toBe(400);
-        expect(result.body).toHaveProperty("data");
-        expect(result.body.data).toHaveLength(1);
-
-        // check code
-        expect(result.body).toHaveProperty("code");
-        expect(result.body.code).toBe(1101);
-    });
 });

@@ -1,5 +1,3 @@
-import * as express from "express";
-
 import {
     AccountAlreadyExistsError,
     IdAlreadyExistsError,
@@ -28,8 +26,6 @@ import { SignupLogic } from "../usersLogic/SignupLogic";
 
 @Route("/v2/users/signup")
 export class SignupController extends Controller {
-
-    public router = express.Router();
 
     /**
      * This request will create a new user account.

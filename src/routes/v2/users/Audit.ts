@@ -1,9 +1,7 @@
-import * as express from "express";
 import {
     Controller,
     Example,
     Get,
-    Header,
     Request,
     Route,
     Security,
@@ -20,9 +18,6 @@ import { RequestTracing } from "../../../models/RequestTracing";
 
 @Route("/v2/users/audit")
 export class AuditController extends Controller {
-
-    public router = express.Router();
-
 
     /**
      * This request will return the user's last modified dates.
@@ -51,10 +46,10 @@ export class AuditController extends Controller {
     })
     @Security("jwt")
     @Get("/")
-    public async getAuditRequest(@Request() req: RequestTracing, @Header() id: string): Promise<GetAuditResponse> {
+    public async getAuditRequest(@Request() req: RequestTracing): Promise<GetAuditResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const auditLogic = new AuditLogic(req, id, parentSpanContext, traceId);
+        const auditLogic = new AuditLogic(req, parentSpanContext, traceId);
 
         const userAuditDataResponse = await auditLogic.getUsersAuditLogic();
         return {

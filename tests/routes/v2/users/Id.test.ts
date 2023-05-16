@@ -46,7 +46,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .query({
                     "email": newUserEmail
@@ -70,7 +69,6 @@ describe(url, () => {
 
             const result = await request(app)
                 .get(url)
-                .set("id", testUserId)
                 .set("x-access-token", generateAccessToken(testUserId))
                 .query({
                     "email": "dumb"
@@ -85,31 +83,11 @@ describe(url, () => {
             expect(result.body.code).toBe(1030);
         });
 
-        it("should not be possible to get id of other user when id is missing", async () => {
-            const testUserId = await createNewUser({});
-
-            const result = await request(app)
-                .get(url)
-                .set("x-access-token", generateAccessToken(testUserId))
-                .query({
-                    "email": "dumb"
-                });
-
-            expect(result.status).toBe(400);
-            expect(result.body).toHaveProperty("data");
-            expect(result.body.data).toHaveLength(1);
-
-            // check code
-            expect(result.body).toHaveProperty("code");
-            expect(result.body.code).toBe(1101);
-        });
-
         it("should not be possible to get id of other user when access-token is missing", async () => {
-            const testUserId = await createNewUser({});
+            await createNewUser({});
 
             const result = await request(app)
                 .get(url)
-                .set("id", testUserId)
                 .query({
                     "email": "dumb"
                 });

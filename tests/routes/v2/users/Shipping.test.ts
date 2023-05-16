@@ -62,7 +62,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", shipping.userId)
                     .set("x-access-token", generateAccessToken(shipping.userId));
 
                 expect(result.status).toBe(200);
@@ -78,7 +77,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", shipping.userId)
                     .set("x-access-token", generateAccessToken(shipping.userId));
 
                 const shippingResponse = result.body.data[0];
@@ -93,7 +91,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId));
 
                 expect(result.body.data).toHaveLength(2);
@@ -104,7 +101,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId));
 
                 expect(result.status).toBe(200);
@@ -123,7 +119,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", shipping.userId)
                     .set("shippingId", shipping.id)
                     .set("x-access-token", generateAccessToken(shipping.userId));
 
@@ -140,7 +135,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", shipping.userId)
                     .set("shippingId", shipping.id)
                     .set("x-access-token", generateAccessToken(shipping.userId));
 
@@ -155,7 +149,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .get(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("shippingId", shippingId)
                     .set("x-access-token", generateAccessToken(userId));
 
@@ -187,7 +180,6 @@ describe(SHIPPING_ROUTE, () => {
             };
             const result = await request(app)
                 .put(SHIPPING_ROUTE)
-                .set("id", shipping.userId)
                 .set("x-access-token", generateAccessToken(shipping.userId))
                 .send(updateShippingRequest);
 
@@ -224,7 +216,6 @@ describe(SHIPPING_ROUTE, () => {
 
             await request(app)
                 .put(SHIPPING_ROUTE)
-                .set("id", newShipping.userId)
                 .set("x-access-token", generateAccessToken(newShipping.userId))
                 .send(updateShippingRequest);
 
@@ -251,7 +242,6 @@ describe(SHIPPING_ROUTE, () => {
             };
             const result = await request(app)
                 .put(SHIPPING_ROUTE)
-                .set("id", userId)
                 .set("x-access-token", generateAccessToken(userId))
                 .send(updateShippingRequest);
 
@@ -286,7 +276,6 @@ describe(SHIPPING_ROUTE, () => {
             };
             const result = await request(app)
                 .post(SHIPPING_ROUTE)
-                .set("id", userId)
                 .set("x-access-token", generateAccessToken(userId))
                 .send(shippingRequest);
 
@@ -332,7 +321,6 @@ describe(SHIPPING_ROUTE, () => {
 
             await request(app)
                 .post(SHIPPING_ROUTE)
-                .set("id", userId)
                 .set("x-access-token", generateAccessToken(userId))
                 .send(shippingRequest);
 
@@ -361,7 +349,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -383,7 +370,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -408,7 +394,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -438,7 +423,6 @@ describe(SHIPPING_ROUTE, () => {
 
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -466,7 +450,6 @@ describe(SHIPPING_ROUTE, () => {
 
                         const result = await request(app)
                             .post(SHIPPING_ROUTE)
-                            .set("id", userId)
                             .set("x-access-token", generateAccessToken(userId))
                             .send(shippingRequest);
 
@@ -494,7 +477,6 @@ describe(SHIPPING_ROUTE, () => {
 
                         const result = await request(app)
                             .post(SHIPPING_ROUTE)
-                            .set("id", userId)
                             .set("x-access-token", generateAccessToken(userId))
                             .send(shippingRequest);
 
@@ -522,7 +504,6 @@ describe(SHIPPING_ROUTE, () => {
 
                         const result = await request(app)
                             .post(SHIPPING_ROUTE)
-                            .set("id", userId)
                             .set("x-access-token", generateAccessToken(userId))
                             .send(shippingRequest);
 
@@ -549,7 +530,6 @@ describe(SHIPPING_ROUTE, () => {
 
                         const result = await request(app)
                             .post(SHIPPING_ROUTE)
-                            .set("id", userId)
                             .set("x-access-token", generateAccessToken(userId))
                             .send(shippingRequest);
 
@@ -577,7 +557,6 @@ describe(SHIPPING_ROUTE, () => {
 
                         const result = await request(app)
                             .post(SHIPPING_ROUTE)
-                            .set("id", userId)
                             .set("x-access-token", generateAccessToken(userId))
                             .send(shippingRequest);
 
@@ -606,7 +585,6 @@ describe(SHIPPING_ROUTE, () => {
 
                         const result = await request(app)
                             .post(SHIPPING_ROUTE)
-                            .set("id", userId)
                             .set("x-access-token", generateAccessToken(userId))
                             .send(shippingRequest);
 
@@ -638,7 +616,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -665,7 +642,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -692,7 +668,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -720,7 +695,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -748,7 +722,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -776,7 +749,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -804,7 +776,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -832,7 +803,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -860,7 +830,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -889,7 +858,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -917,7 +885,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -946,7 +913,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -975,7 +941,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -1003,7 +968,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -1031,7 +995,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -1055,7 +1018,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -1079,7 +1041,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -1103,7 +1064,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 
@@ -1127,7 +1087,6 @@ describe(SHIPPING_ROUTE, () => {
                 };
                 const result = await request(app)
                     .post(SHIPPING_ROUTE)
-                    .set("id", userId)
                     .set("x-access-token", generateAccessToken(userId))
                     .send(shippingRequest);
 

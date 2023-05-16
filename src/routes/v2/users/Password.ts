@@ -1,5 +1,3 @@
-import * as express from "express";
-
 import {
     Body,
     Controller,
@@ -25,8 +23,6 @@ import { RequestTracing } from "../../../models/RequestTracing";
 @Route("/v2/users/password")
 export class PasswordController extends Controller {
 
-    public router = express.Router();
-
     /**
      * This request will update users password.
      *
@@ -48,10 +44,10 @@ export class PasswordController extends Controller {
     @SuccessResponse(200, "Password changed successfully")
     @Security("jwt")
     @Put("/")
-    public async changePassword(@Request() req: RequestTracing, @Header() id: string, @Body() body: PutPasswordRequest): Promise<ClippicResponse> {
+    public async changePassword(@Request() req: RequestTracing, @Body() body: PutPasswordRequest): Promise<ClippicResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
-        const passwordLogic = new PasswordLogic(req, parentSpanContext, traceId, id);
+        const passwordLogic = new PasswordLogic(req, parentSpanContext, traceId);
         await passwordLogic.changePasswordLogic(body);
 
         return Promise.resolve({

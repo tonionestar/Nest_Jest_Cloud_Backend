@@ -1,6 +1,6 @@
 import {
     checkJWTAuthenticationSession,
-    checkJWTAuthenticationUserId,
+    getUserIdFromJWTToken,
 } from "../../../classes/Common";
 import { AuditQueries } from "../../../database/query/AuditQueries";
 import { PutUsernameRequest } from "../../../models/username/PutUsernameRequest";
@@ -20,10 +20,10 @@ export class UsernameLogic {
 
     private user: User = {};
 
-    constructor(req: RequestTracing, id: string, parentSpanContext: SpanContext, traceId: string) {
+    constructor(req: RequestTracing, parentSpanContext: SpanContext, traceId: string) {
         this.req = req;
         this.traceId = traceId;
-        this.user.id = id;
+        this.user.id = getUserIdFromJWTToken(req);
         this.auditQueries = new AuditQueries(parentSpanContext);
         this.usersQueries = new UsersQueries(parentSpanContext);
     }
@@ -73,9 +73,6 @@ export class UsernameLogic {
     }
 
     private async checkRouteAccess() {
-        // check if user is allowed for this url
-        checkJWTAuthenticationUserId(this.req, this.user);
-
         // get session from database
         await this.getUsersSession();
 

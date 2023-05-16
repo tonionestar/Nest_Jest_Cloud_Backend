@@ -1,5 +1,3 @@
-import * as express from "express";
-
 import {
     Body,
     Controller,
@@ -26,10 +24,6 @@ import { RequestTracing } from "../../../models/RequestTracing";
 
 @Route("/v2/users/login")
 export class LoginController extends Controller {
-
-    public router = express.Router();
-
-
 
     /**
      * This request will login a user and return a JWT Token.
