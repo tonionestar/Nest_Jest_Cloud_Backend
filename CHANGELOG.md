@@ -1,3 +1,10 @@
+# [1.4.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.3.0...v1.4.0) (2023-05-19)
+
+
+### Features
+
+* Remove id header field from all ressources ([7f8a0be](https://gitlab.clippic.app/clippic/backend/user-v2/commit/7f8a0be89542079fda69b4f93650a8b3341fe6a8))
+
 # [1.3.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.2.0...v1.3.0) (2023-05-15)
 
 
