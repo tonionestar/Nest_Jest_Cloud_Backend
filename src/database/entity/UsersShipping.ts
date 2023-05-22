@@ -1,8 +1,7 @@
 import {
     Column,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn
+    Entity, JoinColumn,
+    ManyToOne, PrimaryGeneratedColumn
 } from "typeorm";
 
 import { Users } from "./Users";
@@ -19,7 +18,6 @@ export class UsersShipping {
         id: string;
 
     @Column("uuid", { name: "user_id" })
-    @ManyToOne(() => Users)
         userId: string;
 
     @Column("varchar", { length: 50, nullable: true })
@@ -68,4 +66,8 @@ export class UsersShipping {
 
     @Column("varchar", { length: 20, nullable: true })
         postnumber: string;
+
+    @ManyToOne(() => Users, user => user.shipping, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "user_id" })
+        user: Users;
 }

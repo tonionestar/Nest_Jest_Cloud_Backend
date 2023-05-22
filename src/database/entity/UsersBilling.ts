@@ -1,8 +1,9 @@
 import {
     Column,
-    Entity,
-    PrimaryColumn
+    Entity, JoinColumn, OneToOne,
+    PrimaryColumn,
 } from "typeorm";
+import { Users } from "./Users";
 
 @Entity()
 export class UsersBilling {
@@ -39,4 +40,8 @@ export class UsersBilling {
 
     @Column("int", { nullable: true })
         country: number;
+
+    @OneToOne(() => Users, user => user.billing, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "user_id" })
+        user: Users;
 }

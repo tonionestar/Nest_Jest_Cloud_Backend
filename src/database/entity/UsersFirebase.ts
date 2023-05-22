@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, ManyToOne,PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity, JoinColumn,
+    ManyToOne,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from "typeorm";
 
 import { Users } from "./Users";
 
@@ -22,4 +30,8 @@ export class UsersFirebase {
     @UpdateDateColumn()
     @Column("timestamp", { nullable: false })
         modified: string;
+
+    @OneToOne(() => Users, user => user.firebase, { onDelete: "CASCADE" })
+    @JoinColumn({ name: " user_id" })
+        user: Users;
 }

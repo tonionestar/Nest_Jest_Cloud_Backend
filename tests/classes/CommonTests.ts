@@ -70,91 +70,29 @@ export async function createNewUser({
     return userId;
 }
 
-export async function createNewBilling({
-    company,
-    forename,
-    surname,
-    zip,
-    city,
-    state,
-    box,
-    street,
-    streetNumber,
-    country,
-}: Partial<UsersBilling>): Promise<string> {
-    const userId = await createNewUser({});
+export async function createNewBilling(newBilling: Partial<UsersBilling>): Promise<string> {
     const allCountries = new Country();
     const usaId = allCountries.getIDFromISO3("USA");
-    const newBilling: UsersBilling = {
-        userId,
-        company,
-        forename,
-        surname,
-        zip,
-        city,
-        state,
-        box,
-        street,
-        streetNumber,
-        country: country || usaId,
-    };
+    newBilling.userId = newBilling.userId || await createNewUser({});
+    newBilling.country = newBilling.country || usaId;
 
     const BillingRepository = ClippicDataSource.getRepository(UsersBilling);
     await BillingRepository.save(newBilling);
     return newBilling.userId;
 }
 
-export async function createNewQuota({
-    usedSpace,
-    totalSpace,
-}: Partial<UsersQuota>): Promise<string> {
-    const userId = await createNewUser({});
-    const newQuota: UsersQuota = {
-        userId,
-        usedSpace,
-        totalSpace
-    };
-
+export async function createNewQuota(newQuota: Partial<UsersQuota>): Promise<string> {
+    newQuota.userId = newQuota.userId || await createNewUser({});
     const QuotaRepository = ClippicDataSource.getRepository(UsersQuota);
     await QuotaRepository.save(newQuota);
     return newQuota.userId;
 }
 
-export async function createNewShipping({
-    userId,
-    name,
-    shippingType,
-    company,
-    forename,
-    surname,
-    zip,
-    city,
-    state,
-    box,
-    street,
-    streetNumber,
-    country,
-}: Partial<UsersShipping>): Promise<UsersShipping> {
-    userId = userId || (await createNewUser({}));
+export async function createNewShipping(newShipping: Partial<UsersShipping>): Promise<UsersShipping> {
     const allCountries = new Country();
     const usaId = allCountries.getIDFromISO3("USA");
-
-    const newShipping: Partial<UsersShipping> = {
-        userId,
-        name,
-        shippingType,
-        company,
-        forename,
-        surname,
-        zip,
-        city,
-        state,
-        box,
-        street,
-        streetNumber,
-        country: country || usaId,
-    };
-
+    newShipping.userId = newShipping.userId || await createNewUser({});
+    newShipping.country = newShipping.country || usaId;
     const ShippingRepository = ClippicDataSource.getRepository(UsersShipping);
     return ShippingRepository.save(newShipping);
 }

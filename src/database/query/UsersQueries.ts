@@ -1,4 +1,4 @@
-import { InsertResult, Repository } from "typeorm";
+import { DeleteResult, InsertResult, Repository } from "typeorm";
 import { ClippicDataSource } from "../DatabaseConnection";
 import { SpanContext } from "opentracing";
 import { trace } from "../../classes/Common";
@@ -30,6 +30,16 @@ export class UsersQueries {
                 "id"
             )
             .execute();
+    }
+
+    @trace
+    DeleteUser(userId: string): Promise<DeleteResult> {
+        return this.usersRepository.delete(userId);
+    }
+
+    @trace
+    GetUserById(userId: string): Promise<Users>{
+        return this.usersRepository.findOneBy({ id:userId });
     }
 
     @trace

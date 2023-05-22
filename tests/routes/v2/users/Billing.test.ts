@@ -144,7 +144,11 @@ describe(BILLING_ROUTE, () => {
             expect(result.body.code).toBe(200);
 
             const createdBilling = result.body.data[0];
-            expect(createdBilling).toMatchObject(newBilling);
+            delete createdBilling.countryName;
+            delete createdBilling.countryISO2;
+            delete createdBilling.countryISO3;
+
+            expect(newBilling).toMatchObject(createdBilling);
         });
     });
 

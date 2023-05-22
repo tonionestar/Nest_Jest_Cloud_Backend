@@ -1,10 +1,11 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, JoinColumn, OneToOne,
     PrimaryColumn,
     UpdateDateColumn
 } from "typeorm";
+import { Users } from "./Users";
 
 @Entity()
 export class UsersAudit {
@@ -42,4 +43,7 @@ export class UsersAudit {
 
     @Column("timestamp", { nullable: true })
         quota: string;
+    @OneToOne(() => Users, user => user.audit, { onDelete: "CASCADE" })
+    @JoinColumn({ name: " user_id" })
+        user: Users;
 }

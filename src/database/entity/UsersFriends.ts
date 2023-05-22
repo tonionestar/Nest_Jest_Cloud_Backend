@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne,PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 import { Users } from "./Users";
 
@@ -15,11 +15,9 @@ export class UsersFriends {
     @PrimaryGeneratedColumn("increment", { type: "int", unsigned: true })
         id: number;
 
-    @ManyToOne(() => Users, user => user.id)
     @Column("varchar", { name: " user_id" })
         userId: Users;
 
-    @ManyToOne(() => Users, user => user.id)
     @Column("varchar", { name: "friend_user_id" })
         friendUserId: Users;
 
@@ -37,4 +35,5 @@ export class UsersFriends {
     @UpdateDateColumn()
     @Column("timestamp", { nullable: true })
         updated: string;
+
 }

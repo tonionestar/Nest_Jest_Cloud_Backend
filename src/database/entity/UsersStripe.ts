@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 
 import { Users } from "./Users";
 
@@ -12,4 +12,7 @@ export class UsersStripe {
     @Column("varchar", { name: "stripe_id", length: 50, nullable: true })
         stripeId: string;
 
+    @OneToOne(() => Users, user => user.stripe, { onDelete: "CASCADE" })
+    @JoinColumn({ name: " user_id" })
+        user: Users;
 }

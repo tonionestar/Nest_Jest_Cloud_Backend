@@ -1,9 +1,10 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, JoinColumn, OneToOne,
     PrimaryColumn,
 } from "typeorm";
+import { Users } from "./Users";
 
 @Entity()
 export class UsersPasswordReset {
@@ -22,4 +23,8 @@ export class UsersPasswordReset {
 
     @Column("tinyint")
         used: boolean;
+
+    @OneToOne(() => Users, user => user.passwordReset, { onDelete: "CASCADE" })
+    @JoinColumn({ name: " user_id" })
+        user: Users;
 }

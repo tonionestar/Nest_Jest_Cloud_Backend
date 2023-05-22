@@ -8,4 +8,6 @@ export class UsersCRM {
 
     @Column("varchar", { name: "customer_id", length: 50, nullable: true })
         customerId: string;
+
+
 }

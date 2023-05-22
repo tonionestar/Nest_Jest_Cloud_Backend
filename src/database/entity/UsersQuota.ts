@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 
 import { Users } from "./Users";
 
@@ -6,7 +6,6 @@ import { Users } from "./Users";
 export class UsersQuota {
 
     @PrimaryColumn("uuid", { name: "user_id" })
-    @OneToOne(() => Users)
         userId: string;
 
     @Column("bigint", { name: "used_space", unsigned: true, nullable: false, default: 0 })
@@ -15,4 +14,7 @@ export class UsersQuota {
     @Column("bigint", { name: "total_space", unsigned: true, nullable: false, default: 5242880 })
         totalSpace: number;
 
+    @OneToOne(() => Users, user => user.quota, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "user_id" })
+        user: Users;
 }
