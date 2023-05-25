@@ -8,6 +8,7 @@ import { AuditQueries } from "../../../database/query/AuditQueries";
 import crypto from "crypto";
 import { Mailer } from "../../../classes/Mailer";
 import { PasswordResetQueries } from "../../../database/query/PasswordResetQueries";
+import { PostEmailRequest } from "../../../models/password/PostEmailRequest";
 import { PutPasswordRequest } from "../../../models/password/PutPasswordRequest";
 import { RequestTracing } from "../../../models/RequestTracing";
 import { SpanContext } from "opentracing";
@@ -50,8 +51,8 @@ export class PasswordLogic {
         ]);
     }
 
-    public async forgotPasswordLogic(email:string) {
-        this.user.email = email;
+    public async forgotPasswordLogic(body: PostEmailRequest) {
+        this.user.email = body.email;
         await this.getUsersID();
 
         // Only continue when user exists.

@@ -2,8 +2,7 @@ import {
     Body,
     Controller,
     Example,
-    Get,
-    Header,
+    Post,
     Put,
     Request,
     Response,
@@ -17,6 +16,7 @@ import {
 import { ClippicResponse } from "../../../models/ClippicResponse";
 import { PasswordInvalidError } from "@clippic/clippic-errors";
 import { PasswordLogic } from "../usersLogic/PasswordLogic";
+import { PostEmailRequest } from "../../../models/password/PostEmailRequest";
 import { PutPasswordRequest } from "../../../models/password/PutPasswordRequest";
 import { RequestTracing } from "../../../models/RequestTracing";
 
@@ -71,12 +71,12 @@ export class PasswordController extends Controller {
         trace: "4ba373202a8e4807"
     })
     @SuccessResponse(200, "Password reset instructions has been sent if email address is registered.")
-    @Get("/")
-    public async forgotPassword(@Request() req: RequestTracing, @Header() email: string): Promise<ClippicResponse> {
+    @Post("/")
+    public async postEmailRequest(@Request() req: RequestTracing, @Body() body: PostEmailRequest): Promise<ClippicResponse> {
         const parentSpanContext = getTraceContext(req);
         const traceId = getTraceId(req);
         const passwordLogic = new PasswordLogic(req, parentSpanContext, traceId);
-        await passwordLogic.forgotPasswordLogic(email);
+        await passwordLogic.forgotPasswordLogic(body);
 
         return Promise.resolve({
             "status": "success",

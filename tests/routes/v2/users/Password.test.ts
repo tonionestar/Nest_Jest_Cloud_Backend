@@ -154,15 +154,16 @@ describe(url, () => {
         });
     });
 
-    describe("GET", () => {
+    describe("POST", () => {
 
         it("should be possible send password reset request", async () => {
             const testUserId = await createNewUser({});
 
             const result = await request(app)
-                .get(url)
-                .set("email", testEmail)
-                .send();
+                .post(url)
+                .send({
+                    email: testEmail
+                });
 
             expect(result.status).toBe(200);
             expect(result.body).toHaveProperty("data");
@@ -188,11 +189,13 @@ describe(url, () => {
 
         it("should be possible send password reset request with non-existing mail", async () => {
             await createNewUser({});
+            const newEmailAddress = "fake@clippic.app";
 
             const result = await request(app)
-                .get(url)
-                .set("email", "fake@clippic.app")
-                .send();
+                .post(url)
+                .send({
+                    email: newEmailAddress
+                });
 
             expect(result.status).toBe(200);
             expect(result.body).toHaveProperty("data");
@@ -203,6 +206,81 @@ describe(url, () => {
             expect(result.body.code).toBe(200);
         });
 
+        it("should be possible send password reset request with max chars", async () => {
+            await createNewUser({});
+            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-123@clippic.app";
+
+            const result = await request(app)
+                .post(url)
+                .send({
+                    email: newEmailAddress
+                });
+
+            expect(result.status).toBe(200);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(0);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(200);
+        });
+
+        it("should not be possible send password reset request with invaild email format", async () => {
+            await createNewUser({});
+            const newEmailAddress = "test";
+
+            const result = await request(app)
+                .post(url)
+                .send({
+                    email: newEmailAddress
+                });
+
+            expect(result.status).toBe(400);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(1101);
+        });
+
+        it("should not be possible send password reset request with too many chars", async () => {
+            await createNewUser({});
+            const newEmailAddress = "new-fancy-email-which-is-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-very-long-1234@clippic.app";
+
+            const result = await request(app)
+                .post(url)
+                .send({
+                    email: newEmailAddress
+                });
+
+            expect(result.status).toBe(400);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(1101);
+        });
+
+        it("should not be possible send password reset request when email is missing", async () => {
+            await createNewUser({});
+            const newEmailAddress = "";
+
+            const result = await request(app)
+                .post(url)
+                .send({
+                    email: newEmailAddress
+                });
+
+            expect(result.status).toBe(400);
+            expect(result.body).toHaveProperty("data");
+            expect(result.body.data).toHaveLength(1);
+
+            // check code
+            expect(result.body).toHaveProperty("code");
+            expect(result.body.code).toBe(1101);
+        });
 
     });
 });
