@@ -1,3 +1,10 @@
+# [1.5.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.4.0...v1.5.0) (2023-05-26)
+
+
+### Features
+
+* **User:** added delete user route and logic ([9baed24](https://gitlab.clippic.app/clippic/backend/user-v2/commit/9baed24a4790cd23668092ac34c66758ec61416b))
+
 # [1.4.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.3.0...v1.4.0) (2023-05-19)
 
 
