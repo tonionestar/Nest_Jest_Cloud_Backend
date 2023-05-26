@@ -1,6 +1,6 @@
 {
     "name": "@clippic/user-v2",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "private": true,
     "main": "dist/app.js",
     "scripts": {

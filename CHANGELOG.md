@@ -1,3 +1,10 @@
+# [1.6.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.5.0...v1.6.0) (2023-05-26)
+
+
+### Features
+
+* **Password:** Updated password reset email route ([e2f1099](https://gitlab.clippic.app/clippic/backend/user-v2/commit/e2f1099f37df033ec947939d16e6b2021b4e946c))
+
 # [1.5.0](https://gitlab.clippic.app/clippic/backend/user-v2/compare/v1.4.0...v1.5.0) (2023-05-26)
 
 
